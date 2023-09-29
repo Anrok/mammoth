@@ -263,7 +263,7 @@ export const any = <Config extends DbConfig, T>(
 export const exists = <Config extends DbConfig>(
   expression: AnyExpression | Query<any>,
 ): DefaultExpression<Config, boolean> =>
-  new InternalDefaultExpression([new StringToken(`EXISTS`), new GroupToken(expression.toTokens())]);
+  new InternalDefaultExpression([new StringToken(`EXISTS`), new GroupToken(expression.toTokens())]) as any;
 
 export const andNotExists = <Config extends DbConfig>(
   expression: Expression<Config, any, any, any> | Query<any>,
@@ -271,7 +271,7 @@ export const andNotExists = <Config extends DbConfig>(
   new InternalDefaultExpression([
     new StringToken(`AND NOT EXISTS`),
     new GroupToken(expression.toTokens()),
-  ]);
+  ]) as any;
 
 export const andExists = <Config extends DbConfig>(
   expression: Expression<Config, any, any, any> | Query<any>,
@@ -279,7 +279,7 @@ export const andExists = <Config extends DbConfig>(
   new InternalDefaultExpression([
     new StringToken(`AND EXISTS`),
     new GroupToken(expression.toTokens()),
-  ]);
+  ]) as any;
 
 export const notExists = <Config extends DbConfig>(
   expression: Expression<Config, any, any, any> | Query<any>,
@@ -287,7 +287,7 @@ export const notExists = <Config extends DbConfig>(
   new InternalDefaultExpression([
     new StringToken(`NOT EXISTS`),
     new GroupToken(expression.toTokens()),
-  ]);
+  ]) as any;
 
 export function nullIf<Config extends DbConfig, DataType>(
   value1: Expression<Config, DataType, any, any>,

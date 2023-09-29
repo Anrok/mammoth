@@ -2,8 +2,6 @@ import {
   AnyNumber,
   GetMostSignificantDataType,
   GetNotNull,
-  Int4,
-  Int8,
   Text,
   Uuid,
 } from './data-types';
@@ -17,9 +15,8 @@ import {
   Token,
 } from './tokens';
 import { DbConfig, GetResultType } from './config';
-import { Err, GetDataType } from './types';
+import { Err } from './types';
 
-import { Column } from './column';
 import { TableDefinition } from './table';
 import { wrapQuotes } from './naming';
 
@@ -36,7 +33,7 @@ export interface SharedExpression<
   hasName(): boolean;
 
   /** @internal */
-  getName(): string;
+  getName(): Name;
 
   as<AliasName extends string>(name: AliasName): Expression<Config, DataType, IsNotNull, AliasName>;
 
@@ -193,18 +190,7 @@ export interface BooleanExpression<
   DataType,
   IsNotNull extends boolean,
   Name extends string,
-> {
-  /** @internal */
-  toTokens(includeAlias?: boolean): Token[];
-
-  /** @internal */
-  hasName(): boolean;
-
-  /** @internal */
-  getName(): string;
-
-  as<AliasName extends string>(name: AliasName): Expression<Config, DataType, IsNotNull, AliasName>;
-
+> extends SharedExpression<Config, DataType, IsNotNull, Name>{
   or(query: BooleanQuery<Config, Query<any>>): DefaultExpression<Config, boolean, IsNotNull>;
   or<RightIsNotNull extends boolean>(
     expression: Expression<Config, boolean, RightIsNotNull, any>,
