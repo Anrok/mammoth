@@ -3,7 +3,7 @@ name: Lint, build & test
 on:
   push:
     branches:
-      - master
+      - main
 
 env:
   NODE_VERSION: 12.x
@@ -22,11 +22,3 @@ jobs:
       - run: npm test -- --coverage
         env:
           CI: true
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_AUTH_TOKEN }}
-          access: public
