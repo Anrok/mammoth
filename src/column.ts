@@ -30,7 +30,7 @@ export interface ColumnDefinition<
   // case of a NOT NULL constraint this would mean you'd have to set a value when inserting. Because
   // this is not neccesary in most of the cases we just assume a default expression will always set
   // a value. You can opt out of this by setting `IsAlwaysSettingAValue` to false.
-  default<IsAlwaysSettingAValue extends boolean = true>(
+  default<IsAlwaysSettingAValue extends boolean>(
     expression: string,
   ): ColumnDefinition<DataType, IsNotNull, IsAlwaysSettingAValue>;
   check(expression: string): ColumnDefinition<DataType, IsNotNull, HasDefault>;
