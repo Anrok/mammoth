@@ -1,4 +1,4 @@
-import { raw, star, toSql } from '../../src/sql-functions';
+import { raw, star, toSql } from '../sql-functions';
 import {
   any,
   arrayAgg,
@@ -20,11 +20,11 @@ import {
   text,
   timestampWithTimeZone,
   uuid,
-} from '../../src';
+} from '..';
 
-import { Query } from '../../src/query';
-import { ResultSet } from '../../src/result-set';
-import { enumType } from '../../src/data-types';
+import { Query } from '../query';
+import { ResultSet } from '../result-set';
+import { enumType } from '../data-types';
 
 describe(`select`, () => {
   const foo = defineTable({

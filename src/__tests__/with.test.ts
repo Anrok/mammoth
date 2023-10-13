@@ -5,10 +5,9 @@ import {
   star,
   sum,
   text,
-  timestampWithTimeZone,
   toSql,
   uuid,
-} from '../../src';
+} from '..';
 
 describe(`with`, () => {
   const orderLog = defineTable({

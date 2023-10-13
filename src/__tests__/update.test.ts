@@ -1,4 +1,4 @@
-import { defineDb, defineTable, integer, text, timestampWithTimeZone, toSql, uuid } from '../../src';
+import { defineDb, defineTable, integer, text, timestampWithTimeZone, toSql, uuid } from '..';
 
 describe(`update`, () => {
   const foo = defineTable({
