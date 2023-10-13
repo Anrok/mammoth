@@ -8,7 +8,7 @@ import {
   Token,
   createQueryState,
 } from './tokens';
-import { GetReturning, PickByValue, QueryExecutorFn, ResultType } from './types';
+import { DbNull, GetReturning, PickByValue, QueryExecutorFn, ResultType } from './types';
 import { SelectFn, makeSelect } from './select';
 
 import { Column } from './column';
@@ -327,7 +327,7 @@ export class InsertQuery<
               >
                 ? IsNotNull extends true
                   ? DataType | Expression<DataType, IsNotNull, any> | Query<any>
-                  : DataType | null | Expression<DataType, IsNotNull, any> | Query<any>
+                  : DataType | DbNull | Expression<DataType, IsNotNull, any> | Query<any>
                 : never;
             }
           : never,
@@ -430,7 +430,7 @@ export class InsertQuery<
               >
                 ? IsNotNull extends true
                   ? DataType | Expression<DataType, IsNotNull, any> | Query<any>
-                  : DataType | null | Expression<DataType, IsNotNull, any> | Query<any>
+                  : DataType | DbNull | Expression<DataType, IsNotNull, any> | Query<any>
                 : never;
             }
           : never,
@@ -545,7 +545,7 @@ export interface InsertIntoResult<
                 | DataType
                 | Query<{ [key: string]: DataType | Expression<DataType, boolean, string> }>
                 | Expression<DataType, boolean, string>
-                | null
+                | DbNull
             : never;
         }
     : never,
@@ -572,7 +572,7 @@ export interface InsertIntoResult<
             >
               ? IsNotNull extends true
                 ? DataType | Expression<DataType, boolean, any>
-                : DataType | null | Expression<DataType | null, boolean, any>
+                : DataType | DbNull | Expression<DataType | DbNull, boolean, any>
               : never;
           }
         : never,
@@ -645,7 +645,7 @@ export const makeInsertInto =
                   >
                     ? IsNotNull extends true
                       ? DataType | Expression<DataType, boolean, any>
-                      : DataType | null | Expression<DataType | undefined, boolean, any>
+                      : DataType | DbNull | Expression<DataType | DbNull, boolean, any>
                     : never;
                 }
               : never,

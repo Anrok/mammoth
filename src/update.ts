@@ -6,7 +6,7 @@ import {
   Token,
   createQueryState,
 } from './tokens';
-import { GetReturning, QueryExecutorFn, ResultType } from './types';
+import { DbNull, GetReturning, QueryExecutorFn, ResultType } from './types';
 
 import { Column } from './column';
 import { Expression } from './expression';
@@ -343,7 +343,7 @@ export const makeUpdate = (queryExecutor: QueryExecutorFn) => <T extends Table<a
             >
               ? IsNotNull extends true
                 ? DataType | Expression<DataType, boolean, any>
-                : DataType | null | Expression<DataType | null, boolean, any>
+                : DataType | DbNull | Expression<DataType | DbNull, boolean, any>
               : never;
           }
         : never,

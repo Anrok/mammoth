@@ -1,6 +1,6 @@
-import { defineDb, defineTable, integer, text, timestampWithTimeZone, uuid } from '../../src';
+import { defineDb, defineTable, integer, text, timestampWithTimeZone, uuid } from '..';
 
-import { enumType } from '../../src/data-types';
+import { enumType } from '../data-types';
 
 describe(`ddl`, () => {
   const foo = defineTable({

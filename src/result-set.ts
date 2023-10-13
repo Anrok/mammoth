@@ -1,13 +1,13 @@
 import type { Column } from './column';
 import { DeleteQuery } from './delete';
 import type { Expression } from './expression';
-import { Expand, GetDataType } from './types';
+import { DbNull, Expand, GetDataType } from './types';
 import { InsertQuery } from './insert';
 import { Query } from './query';
 import { SelectQuery } from './select';
 import { UpdateQuery } from './update';
 
-export type ResultSetDataType<Type, IsNotNull extends boolean> = IsNotNull extends true ? Type : Type | null;
+export type ResultSetDataType<Type, IsNotNull extends boolean> = IsNotNull extends true ? Type : Type | DbNull;
 
 // This is not ideal, but the `ShouldCapture` flag can be used to map returning types to a a helper class that can
 // capture the nullability of the result and the data type separately.  This is used in the `FromItemQuery` type

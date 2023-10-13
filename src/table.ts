@@ -1,6 +1,7 @@
 import { Column, ColumnDefinition } from './column';
 
 import { Table } from './TableType';
+import {DbNull} from './types';
 
 export type TableRow<T> = T extends TableDefinition<infer Columns>
   ? {
@@ -11,7 +12,7 @@ export type TableRow<T> = T extends TableDefinition<infer Columns>
       >
         ? IsNotNull extends true
           ? DataType
-          : DataType | null
+          : DataType | DbNull
         : never;
     }
   : never;
