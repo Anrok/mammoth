@@ -2,7 +2,8 @@ This is a fork of [@ff00ff/mammoth](https://github.com/Ff00ff/mammoth).  We made
 
 This fork is based on the 1.x version rather than newer 2.x version.  We made this decision because the 2.x version is still in alpha, and we ran into memory issues during TS compilation in the probject we were using it for.  We start from [c7c525c978aa6326042b35ca95f93699a69370c5](https://github.com/Anrok/mammoth/commit/c7c525c978aa6326042b35ca95f93699a69370c5) because that is the last commit before the big 2.x refactor.
 
-[List of changes](https://github.com/Anrok/mammoth/compare/main...c7c525c978aa6326042b35ca95f93699a69370c5)
+### List of changes ([commits](https://github.com/Anrok/mammoth/compare/main...c7c525c978aa6326042b35ca95f93699a69370c5))
+- Changes nullable expressions to use the `null` data type, rather than `undefined`.
 
 ---
 

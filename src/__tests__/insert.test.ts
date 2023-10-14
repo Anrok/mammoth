@@ -1,6 +1,4 @@
-import { defineDb, defineTable, integer, text, timestampWithTimeZone, toSql, uuid } from '..';
-
-import { raw } from '../sql-functions';
+import { defineDb, defineTable, integer, text, timestampWithTimeZone, raw, toSql, uuid } from '..';
 
 describe(`insert`, () => {
   const foo = defineTable({
@@ -204,5 +202,21 @@ describe(`insert`, () => {
         "text": "INSERT INTO foo (name) VALUES ((SELECT foo.name || $1 FROM foo LIMIT $2))",
       }
     `);
+  });
+
+  it(`should insert non-null with default value`, () => {
+    const query = db.insertInto(db.foo).values({
+      name: `Test`,
+      createDate: new Date('2023-01-01T06:00:00.000Z'),
+    });
+    expect(toSql(query)).toMatchInlineSnapshot(`
+    Object {
+      "parameters": Array [
+        "Test",
+        2023-01-01T06:00:00.000Z,
+      ],
+      "text": "INSERT INTO foo (name, create_date) VALUES ($1, $2)",
+    }
+  `);
   });
 });

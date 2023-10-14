@@ -8,7 +8,7 @@ import {
   Token,
   createQueryState,
 } from './tokens';
-import { GetReturning, PickByValue, QueryExecutorFn, ResultType } from './types';
+import { DbNull, GetReturning, PickByValue, QueryExecutorFn, ResultType } from './types';
 import { SelectFn, makeSelect } from './select';
 
 import { Column } from './column';
@@ -47,9 +47,7 @@ export class InsertQuery<
   then<Result1, Result2 = never>(
     onFulfilled?:
       | ((
-          value: Returning extends number
-            ? Returning
-            : ResultSet<InsertQuery<T, Returning>, false>[],
+          value: Returning extends number ? Returning : ResultSet<InsertQuery<T, Returning>>[],
         ) => Result1 | PromiseLike<Result1>)
       | undefined
       | null,
@@ -327,7 +325,7 @@ export class InsertQuery<
               >
                 ? IsNotNull extends true
                   ? DataType | Expression<DataType, IsNotNull, any> | Query<any>
-                  : DataType | undefined | Expression<DataType, IsNotNull, any> | Query<any>
+                  : DataType | DbNull | Expression<DataType, IsNotNull, any> | Query<any>
                 : never;
             }
           : never,
@@ -430,7 +428,7 @@ export class InsertQuery<
               >
                 ? IsNotNull extends true
                   ? DataType | Expression<DataType, IsNotNull, any> | Query<any>
-                  : DataType | undefined | Expression<DataType, IsNotNull, any> | Query<any>
+                  : DataType | DbNull | Expression<DataType, IsNotNull, any> | Query<any>
                 : never;
             }
           : never,
@@ -545,7 +543,7 @@ export interface InsertIntoResult<
                 | DataType
                 | Query<{ [key: string]: DataType | Expression<DataType, boolean, string> }>
                 | Expression<DataType, boolean, string>
-                | undefined
+                | DbNull
             : never;
         }
     : never,
@@ -572,7 +570,7 @@ export interface InsertIntoResult<
             >
               ? IsNotNull extends true
                 ? DataType | Expression<DataType, boolean, any>
-                : DataType | undefined | Expression<DataType | undefined, boolean, any>
+                : DataType | DbNull | Expression<DataType | DbNull, boolean, any>
               : never;
           }
         : never,
@@ -645,7 +643,7 @@ export const makeInsertInto =
                   >
                     ? IsNotNull extends true
                       ? DataType | Expression<DataType, boolean, any>
-                      : DataType | undefined | Expression<DataType | undefined, boolean, any>
+                      : DataType | DbNull | Expression<DataType | DbNull, boolean, any>
                     : never;
                 }
               : never,

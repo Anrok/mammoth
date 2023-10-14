@@ -1,170 +1,65 @@
 import type { Column } from './column';
 import { DeleteQuery } from './delete';
 import type { Expression } from './expression';
-import { GetDataType } from './types';
+import { DbNull, Expand, GetDataType } from './types';
 import { InsertQuery } from './insert';
 import { Query } from './query';
 import { SelectQuery } from './select';
 import { UpdateQuery } from './update';
 
-// export class GetDataType<Type, IsNull> {
-//   private _!: Type & IsNull;
-// }
+export type ResultSetDataType<Type, IsNotNull extends boolean> = IsNotNull extends true
+  ? Type
+  : Type | DbNull;
 
-export type ResultSetDataType<Type, IsNotNull> = IsNotNull extends true ? Type : Type | undefined;
+// This is not ideal, but the `ShouldCapture` flag can be used to map returning types to a a helper class that can
+// capture the nullability of the result and the data type separately.  This is used in the `FromItemQuery` type
+// to extract the correct nullability and data type on each key given a query.
+type MaybeCapturingResultSetDataType<
+  Type,
+  IsNotNull extends boolean,
+  ShouldCapture extends boolean,
+> = ShouldCapture extends true ? GetDataType<Type, IsNotNull> : ResultSetDataType<Type, IsNotNull>;
 
-// This is not ideal, but, using dts-jest and it's snapshotting it's not capable to snapshot an e.g.
-// optional number to `number | undefined`. Instead, it will snapshot to `number`. Because it's
-// important to get the optional behaviour under test as well (it's so easy to create a regression)
-// this flag is introduced to return a nominal class which gets snapshotted with the correct info.
-export type ResultSet<T extends Query<any>, Test extends boolean> = T extends SelectQuery<
-  infer Returning
->
-  ? {
-      [K in keyof Returning]: Returning[K] extends Column<
-        any,
-        any,
-        infer D,
-        infer N,
-        any,
-        infer JoinType
-      >
-        ? Extract<JoinType, 'left-join'> extends never
-          ? Extract<JoinType, 'left-side-of-right-join'> extends never
-            ? Extract<JoinType, 'full-join'> extends never
-              ? N extends true
-                ? Test extends true
-                  ? GetDataType<D, true>
-                  : ResultSetDataType<D, true>
-                : Test extends true
-                ? GetDataType<D, false>
-                : ResultSetDataType<D, false>
-              : Test extends true
-              ? GetDataType<D, false>
-              : ResultSetDataType<D, false>
-            : Test extends true
-            ? GetDataType<D, false>
-            : ResultSetDataType<D, false>
-          : Test extends true
-          ? GetDataType<D, false>
-          : ResultSetDataType<D, false>
-        : Returning[K] extends Expression<infer D, infer IsNotNull, any>
-        ? Test extends true
-          ? GetDataType<D, IsNotNull>
-          : ResultSetDataType<D, IsNotNull>
-        : Returning[K] extends Query<{}>
-        ? ResultSet<Returning[K], Test>[keyof ResultSet<Returning[K], Test>]
-        : never;
-    }
+type MaybeCapturingReturningResultSet<Returning, ShouldCapture extends boolean> = {
+  [K in keyof Returning]: Returning[K] extends Column<
+    any,
+    any,
+    infer D,
+    infer N,
+    any,
+    infer JoinType
+  >
+    ? Extract<JoinType, 'left-join'> extends never
+      ? Extract<JoinType, 'left-side-of-right-join'> extends never
+        ? Extract<JoinType, 'full-join'> extends never
+          ? N extends true
+            ? MaybeCapturingResultSetDataType<D, true, ShouldCapture>
+            : MaybeCapturingResultSetDataType<D, false, ShouldCapture>
+          : MaybeCapturingResultSetDataType<D, false, ShouldCapture>
+        : MaybeCapturingResultSetDataType<D, false, ShouldCapture>
+      : MaybeCapturingResultSetDataType<D, false, ShouldCapture>
+    : Returning[K] extends Expression<infer D, infer IsNotNull, any>
+    ? MaybeCapturingResultSetDataType<D, IsNotNull, ShouldCapture>
+    : Returning[K] extends Query<{}>
+    ? MaybeCapturingResultSet<Returning[K], ShouldCapture>[keyof MaybeCapturingResultSet<
+        Returning[K],
+        ShouldCapture
+      >]
+    : never;
+};
+
+type MaybeCapturingResultSet<
+  T extends Query<any>,
+  ShouldCapture extends boolean,
+> = T extends SelectQuery<infer Returning>
+  ? MaybeCapturingReturningResultSet<Returning, ShouldCapture>
   : T extends DeleteQuery<any, infer Returning>
-  ? {
-      [K in keyof Returning]: Returning[K] extends Column<
-        any,
-        any,
-        infer D,
-        infer N,
-        any,
-        infer JoinType
-      >
-        ? Extract<JoinType, 'left-join'> extends never
-          ? Extract<JoinType, 'left-side-of-right-join'> extends never
-            ? Extract<JoinType, 'full-join'> extends never
-              ? N extends true
-                ? Test extends true
-                  ? GetDataType<D, true>
-                  : ResultSetDataType<D, true>
-                : Test extends true
-                ? GetDataType<D, false>
-                : ResultSetDataType<D, false>
-              : Test extends true
-              ? GetDataType<D, false>
-              : ResultSetDataType<D, false>
-            : Test extends true
-            ? GetDataType<D, false>
-            : ResultSetDataType<D, false>
-          : Test extends true
-          ? GetDataType<D, false>
-          : ResultSetDataType<D, false>
-        : Returning[K] extends Expression<infer D, infer IsNotNull, any>
-        ? Test extends true
-          ? GetDataType<D, IsNotNull>
-          : ResultSetDataType<D, IsNotNull>
-        : Returning[K] extends Query<{}>
-        ? ResultSet<Returning[K], Test>[keyof ResultSet<Returning[K], Test>]
-        : never;
-    }
+  ? MaybeCapturingReturningResultSet<Returning, ShouldCapture>
   : T extends UpdateQuery<any, infer Returning>
-  ? {
-      [K in keyof Returning]: Returning[K] extends Column<
-        any,
-        any,
-        infer D,
-        infer N,
-        any,
-        infer JoinType
-      >
-        ? Extract<JoinType, 'left-join'> extends never
-          ? Extract<JoinType, 'left-side-of-right-join'> extends never
-            ? Extract<JoinType, 'full-join'> extends never
-              ? N extends true
-                ? Test extends true
-                  ? GetDataType<D, true>
-                  : ResultSetDataType<D, true>
-                : Test extends true
-                ? GetDataType<D, false>
-                : ResultSetDataType<D, false>
-              : Test extends true
-              ? GetDataType<D, false>
-              : ResultSetDataType<D, false>
-            : Test extends true
-            ? GetDataType<D, false>
-            : ResultSetDataType<D, false>
-          : Test extends true
-          ? GetDataType<D, false>
-          : ResultSetDataType<D, false>
-        : Returning[K] extends Expression<infer D, infer IsNotNull, any>
-        ? Test extends true
-          ? GetDataType<D, IsNotNull>
-          : ResultSetDataType<D, IsNotNull>
-        : Returning[K] extends Query<{}>
-        ? ResultSet<Returning[K], Test>[keyof ResultSet<Returning[K], Test>]
-        : never;
-    }
+  ? MaybeCapturingReturningResultSet<Returning, ShouldCapture>
   : T extends InsertQuery<any, infer Returning>
-  ? {
-      [K in keyof Returning]: Returning[K] extends Column<
-        any,
-        any,
-        infer D,
-        infer N,
-        any,
-        infer JoinType
-      >
-        ? Extract<JoinType, 'left-join'> extends never
-          ? Extract<JoinType, 'left-side-of-right-join'> extends never
-            ? Extract<JoinType, 'full-join'> extends never
-              ? N extends true
-                ? Test extends true
-                  ? GetDataType<D, true>
-                  : ResultSetDataType<D, true>
-                : Test extends true
-                ? GetDataType<D, false>
-                : ResultSetDataType<D, false>
-              : Test extends true
-              ? GetDataType<D, false>
-              : ResultSetDataType<D, false>
-            : Test extends true
-            ? GetDataType<D, false>
-            : ResultSetDataType<D, false>
-          : Test extends true
-          ? GetDataType<D, false>
-          : ResultSetDataType<D, false>
-        : Returning[K] extends Expression<infer D, infer IsNotNull, any>
-        ? Test extends true
-          ? GetDataType<D, IsNotNull>
-          : ResultSetDataType<D, IsNotNull>
-        : Returning[K] extends Query<{}>
-        ? ResultSet<Returning[K], Test>[keyof ResultSet<Returning[K], Test>]
-        : never;
-    }
+  ? MaybeCapturingReturningResultSet<Returning, ShouldCapture>
   : never;
+
+export type CapturingResultSet<T extends Query<any>> = Expand<MaybeCapturingResultSet<T, true>>;
+export type ResultSet<T extends Query<any>> = Expand<MaybeCapturingResultSet<T, false>>;

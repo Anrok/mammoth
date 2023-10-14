@@ -6,7 +6,7 @@ import {
   Token,
   createQueryState,
 } from './tokens';
-import { GetReturning, QueryExecutorFn, ResultType } from './types';
+import { DbNull, GetReturning, QueryExecutorFn, ResultType } from './types';
 
 import { Column } from './column';
 import { Expression } from './expression';
@@ -41,9 +41,7 @@ export class UpdateQuery<
   then<Result1, Result2 = never>(
     onFulfilled?:
       | ((
-          value: Returning extends number
-            ? Returning
-            : ResultSet<UpdateQuery<T, Returning>, false>[],
+          value: Returning extends number ? Returning : ResultSet<UpdateQuery<T, Returning>>[],
         ) => Result1 | PromiseLike<Result1>)
       | undefined
       | null,
@@ -343,7 +341,7 @@ export const makeUpdate =
               >
                 ? IsNotNull extends true
                   ? DataType | Expression<DataType, boolean, any>
-                  : DataType | undefined | Expression<DataType | undefined, boolean, any>
+                  : DataType | DbNull | Expression<DataType | DbNull, boolean, any>
                 : never;
             }
           : never,

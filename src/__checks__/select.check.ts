@@ -16,16 +16,15 @@ import {
 
 import { Query } from '../../.build/query';
 import { ResultSet } from '../../.build/result-set';
+import { expectType, expectError } from 'tsd-lite';
 
-const toSnap = <T extends Query<any>>(query: T): ResultSet<T, true> => {
+const toSnap = <T extends Query<any>>(query: T): ResultSet<T> => {
   return undefined as any;
 };
 
 const toTableRow = <T>(table: T): TableRow<T> => {
   return undefined as any;
 };
-
-/** @dts-jest enable:test-type */
 
 const foo = defineTable({
   id: uuid().primaryKey().default(`gen_random_uuid()`),
@@ -42,116 +41,233 @@ const bar = defineTable({
   fooId: uuid().references(foo, 'id'),
 });
 
-// @dts-jest:snap should output all columns and the data type
-toTableRow(foo);
+test('should output all columns and the data type', () => {
+  expectType<{
+    id: string;
+    createDate: Date;
+    name: string;
+    value: number | null;
+  }>(toTableRow(foo));
+});
 
 const db = defineDb({ foo, bar }, () => Promise.resolve({ rows: [], affectedCount: 0 }));
 
-// @dts-jest:group select
-{
-  // @dts-jest:snap should return null and not null properties
-  toSnap(db.select(db.foo.id, db.foo.createDate, db.foo.value).from(db.foo));
+describe('select', () => {
+  test('should return null and not null properties', () => {
+    expectType<{
+      id: string;
+      createDate: Date;
+      value: number | null;
+    }>(toSnap(db.select(db.foo.id, db.foo.createDate, db.foo.value).from(db.foo)));
+  });
 
-  // @dts-jest:snap should return nullable properties of left joined columns
-  toSnap(db.select(db.foo.id, db.bar.endDate, db.bar.value).from(db.foo).leftJoin(db.bar));
+  test('should return nullable properties of left joined columns', () => {
+    expectType<{
+      id: string;
+      endDate: Date | null;
+      value: number | null;
+    }>(toSnap(db.select(db.foo.id, db.bar.endDate, db.bar.value).from(db.foo).leftJoin(db.bar)));
+  });
 
-  // @dts-jest:snap should return nullable properties of left side properties when right joining
-  toSnap(db.select(db.foo.name, db.bar.startDate, db.bar.value).from(db.foo).rightJoin(db.bar));
+  test('should return nullable properties of left side properties when right joining', () => {
+    expectType<{
+      value: number | null;
+      name: string | null;
+      startDate: Date;
+    }>(
+      toSnap(db.select(db.foo.name, db.bar.startDate, db.bar.value).from(db.foo).rightJoin(db.bar)),
+    );
+  });
 
-  // @dts-jest:snap should select * and return nullable properties of left side properties when right joining
-  toSnap(db.select(star()).from(db.foo).rightJoin(db.bar));
+  test('should select * and return nullable properties of left side properties when right joining', () => {
+    expectType<{
+      id: string | null;
+      createDate: Date | null;
+      name: string | null;
+      value: number | null;
+      startDate: Date;
+      endDate: Date;
+      fooId: string | null;
+    }>(toSnap(db.select(star()).from(db.foo).rightJoin(db.bar)));
+  });
 
-  // @dts-jest:snap should select foo.* and ignore the rest
-  toSnap(db.select(star(db.foo)).from(db.foo).innerJoin(db.bar));
+  test('should select foo.* and ignore the rest', () => {
+    expectType<{
+      id: string;
+      createDate: Date;
+      name: string;
+      value: number | null;
+    }>(toSnap(db.select(star(db.foo)).from(db.foo).innerJoin(db.bar)));
+  });
 
-  // @dts-jest:snap should return renamed properties because of alias
-  toSnap(db.select(db.foo.name.as(`fooName`), db.foo.value.as(`fooValue`)).from(db.foo));
+  test('should return renamed properties because of alias', () => {
+    expectType<{
+      fooName: string;
+      fooValue: number | null;
+    }>(toSnap(db.select(db.foo.name.as(`fooName`), db.foo.value.as(`fooValue`)).from(db.foo)));
+  });
 
-  // @dts-jest:snap should return nullable properties of all sides because of full join
-  toSnap(db.select(db.foo.name, db.bar.startDate, db.bar.value).from(db.foo).fullJoin(db.bar));
+  test('should return nullable properties of all sides because of full join', () => {
+    expectType<{
+      value: number | null;
+      name: string | null;
+      startDate: Date | null;
+    }>(
+      toSnap(db.select(db.foo.name, db.bar.startDate, db.bar.value).from(db.foo).fullJoin(db.bar)),
+    );
+  });
 
-  // @dts-jest:snap should select expression
-  toSnap(db.select(db.foo.value.plus(1)).from(db.foo));
+  test('should select expression', () => {
+    expectType<{
+      '?column?': number | null;
+    }>(toSnap(db.select(db.foo.value.plus(1)).from(db.foo)));
+  });
 
-  // @dts-jest:snap should select named expression
-  toSnap(db.select(db.foo.value.plus(1).as(`test`)).from(db.foo));
+  test('should select named expression', () => {
+    expectType<{
+      test: number | null;
+    }>(toSnap(db.select(db.foo.value.plus(1).as(`test`)).from(db.foo)));
+  });
 
-  // @dts-jest:snap should select aggregate subquery
-  toSnap(db.select(db.foo.id, db.select(count()).from(db.foo)).from(db.foo));
+  test('should select aggregate subquery', () => {
+    expectType<{
+      id: string;
+      count: string;
+    }>(toSnap(db.select(db.foo.id, db.select(count()).from(db.foo)).from(db.foo)));
+  });
 
-  // @dts-jest:snap should select array_agg
-  toSnap(db.select(arrayAgg(db.foo.name)).from(db.foo));
+  test('should select array_agg', () => {
+    expectType<{
+      arrayAgg: string[] | null;
+    }>(toSnap(db.select(arrayAgg(db.foo.name)).from(db.foo)));
+  });
 
-  // @dts-jest:snap should select null column in subquery
-  toSnap(db.select(db.foo.id, db.select(db.foo.value).from(db.foo)).from(db.foo));
+  test('should select null column in subquery', () => {
+    expectType<{
+      id: string;
+      value: number | null;
+    }>(toSnap(db.select(db.foo.id, db.select(db.foo.value).from(db.foo)).from(db.foo)));
+  });
 
-  // @dts-jest:snap should select aggregate with alias
-  toSnap(db.select(db.foo.id, sum(db.foo.value).as(`total`)).from(db.foo));
+  test('should select aggregate with alias', () => {
+    expectType<{
+      id: string;
+      total: number | null;
+    }>(toSnap(db.select(db.foo.id, sum(db.foo.value).as(`total`)).from(db.foo)));
+  });
 
-  // @dts-jest:snap should convert null value to not null using coalesce
-  toSnap(db.select(coalesce(db.foo.value, 1)).from(db.foo));
+  test('should convert null value to not null using coalesce', () => {
+    expectType<{
+      coalesce: number;
+    }>(toSnap(db.select(coalesce(db.foo.value, 1)).from(db.foo)));
+  });
 
-  // @dts-jest:snap should select foo.* from foo
-  toSnap(db.select(star(db.foo)).from(db.foo));
+  test('should select foo.* from foo', () => {
+    expectType<{
+      id: string;
+      createDate: Date;
+      name: string;
+      value: number | null;
+    }>(toSnap(db.select(star(db.foo)).from(db.foo)));
+  });
 
-  // @dts-jest:snap should select * from foo
-  toSnap(db.select(star()).from(db.foo));
+  test('should select * from foo', () => {
+    expectType<{
+      id: string;
+      createDate: Date;
+      name: string;
+      value: number | null;
+    }>(toSnap(db.select(star()).from(db.foo)));
+  });
 
-  // @dts-jest:snap should select * from foo left join bar
-  toSnap(db.select(star()).from(db.foo).leftJoin(db.bar).on(db.bar.fooId.eq(db.foo.id)));
+  test('should select * from foo left join bar', () => {
+    expectType<{
+      id: string;
+      createDate: Date;
+      name: string;
+      value: number | null;
+      startDate: Date | null;
+      endDate: Date | null;
+      fooId: string | null;
+    }>(toSnap(db.select(star()).from(db.foo).leftJoin(db.bar).on(db.bar.fooId.eq(db.foo.id))));
+  });
 
-  // @dts-jest:snap should select * from foo right join bar
-  toSnap(db.select(star()).from(db.foo).rightJoin(db.bar).on(db.bar.fooId.eq(db.foo.id)));
+  test('should select * from foo right join bar', () => {
+    expectType<{
+      id: string | null;
+      createDate: Date | null;
+      name: string | null;
+      value: number | null;
+      startDate: Date;
+      endDate: Date;
+      fooId: string | null;
+    }>(toSnap(db.select(star()).from(db.foo).rightJoin(db.bar).on(db.bar.fooId.eq(db.foo.id))));
+  });
 
-  toSnap(
-    db
-      .select(db.foo.id)
-      .from(db.foo)
-      // @dts-jest:fail:snap should not use in with wrong data type
-      .where(db.foo.id.in(db.select(db.foo.createDate).from(db.foo))),
-  );
-
-  // @dts-jest with test as select * from foo select * from test
-  toSnap(
-    db.with(`test`, db.select(star()).from(db.foo), ({ test }) => db.select(star()).from(test)),
-  );
-
-  // @dts-jest:snap should select case with correct type and alias
-  toSnap(
-    db
-      .select(
+  test('should not use in with wrong data type', () => {
+    expectError(
+      toSnap(
         db
-          .case()
-          .when(db.foo.value.gt(100))
-          .then('A' as const)
-          .when(db.foo.value.gt(0))
-          .then('B' as const)
-          .else('C' as const)
-          .end()
-          .as(`bar`),
-      )
-      .from(db.foo),
-  );
+          .select(db.foo.id)
+          .from(db.foo)
+          // @dts-jest:fail:snap should not use in with wrong data type
+          .where(db.foo.id.in(db.select(db.foo.createDate).from(db.foo))),
+      ),
+    );
+  });
 
-  db.select(db.foo.id, db.foo.value)
-    .from(db.foo)
-    .then((result) => {
-      // @dts-jest:snap should select and await result set
-      result;
-    });
+  test('with test as select from foo from test', async () => {
+    expectType<
+      {
+        id: string;
+        createDate: Date;
+        name: string;
+        value: number | null;
+      }[]
+    >(
+      await db.with(
+        `test`,
+        () => db.select(db.foo.id, db.foo.createDate, db.foo.name, db.foo.value).from(db.foo),
+        ({ test }) => db.select(test.id, test.createDate, test.name, test.value).from(test),
+      ),
+    );
+  });
 
-  db.select(db.foo.id)
-    .from(db.foo)
-    .then((result) => {
-      // @dts-jest:snap should return correct result in then
-      result;
-      return 123;
-    })
-    .then((result) => {
-      // @dts-jest:snap should return previous return value in then
-      result;
-    });
+  test('should select case with correct type and alias', () => {
+    expectType<{
+      bar: 'A' | 'B' | 'C';
+    }>(
+      toSnap(
+        db
+          .select(
+            db
+              .case()
+              .when(db.foo.value.gt(100))
+              .then('A' as const)
+              .when(db.foo.value.gt(0))
+              .then('B' as const)
+              .else('C' as const)
+              .end()
+              .as(`bar`),
+          )
+          .from(db.foo),
+      ),
+    );
+  });
 
-  // @dts-jest:snap should select raw expression
-  toSnap(db.select(db.foo.id, raw<number, false, `test`>`test`).from(db.foo));
-}
+  test('should select and await result set', async () => {
+    expectType<
+      {
+        id: string;
+        value: number | null;
+      }[]
+    >(await db.select(db.foo.id, db.foo.value).from(db.foo));
+  });
+
+  test('should select raw expression', () => {
+    expectType<{
+      id: string;
+      test: number | null;
+    }>(toSnap(db.select(db.foo.id, raw<number, false, `test`>`test`).from(db.foo)));
+  });
+});

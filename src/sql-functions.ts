@@ -8,13 +8,21 @@ import {
   StringToken,
   createQueryState,
   TableStarToken,
+  Token,
 } from './tokens';
 import { AnyNumber, Int8 } from './data-types';
-import type { Column, ColumnSet } from './column';
+import type { ColumnSet } from './column';
 import { DefaultExpression, Expression } from './expression';
 
 import { Query } from './query';
 import { Table } from './TableType';
+
+export interface Tokenable {
+  toTokens(): Token[];
+}
+
+export const isTokenable = (value: any): value is Tokenable =>
+  value && typeof value === 'object' && 'toTokens' in value;
 
 export class Star {
   private _starBrand: any;
@@ -233,7 +241,7 @@ export const coalesce = <DataType>(
   );
 };
 
-export function toSql(query: Query<any>) {
+export function toSql(query: Query<any> | Tokenable) {
   const queryState = createQueryState(query.toTokens());
 
   return {

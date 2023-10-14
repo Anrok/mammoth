@@ -18,10 +18,11 @@
     ".build"
   ],
   "devDependencies": {
+    "@tsd/typescript": "^5.2.2",
     "@types/jest": "^26.0.24",
     "@types/node": "^16.4.10",
-    "dts-jest": "^23.3.0",
     "jest": "^26.6.3",
+    "jest-runner-tsd": "^6.0.0",
     "prettier": "^3.0.3",
     "ts-jest": "^26.5.6",
     "typescript": "^4.3.5"
@@ -35,23 +36,38 @@
     "prepublishOnly": "npm run build && npm test"
   },
   "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "coveragePathIgnorePatterns": [
-      "__tests__",
-      "__checks__"
-    ],
-    "testPathIgnorePatterns": [
-      "/\\.build/",
-      "/node_modules/",
-      "helpers"
-    ],
-    "testRegex": "/__tests__|__checks__/.*\\.(test|check)\\.ts$",
-    "transform": {
-      "\\.check\\.ts$": "dts-jest/transform",
-      "\\.ts$": "ts-jest"
-    }
+    "projects": [
+      {
+        "displayName": "unit",
+        "moduleFileExtensions": [
+          "ts",
+          "js"
+        ],
+        "coveragePathIgnorePatterns": [
+          "__tests__",
+          "__checks__"
+        ],
+        "testPathIgnorePatterns": [
+          "/\\.build/",
+          "/node_modules/",
+          "helpers"
+        ],
+        "testMatch": ["**/__tests__/*.test.ts"],
+        "transform": {
+          "\\.ts$": "ts-jest"
+        },
+        "reporters": [
+          "default"
+        ]
+      },
+      {
+        "displayName": {
+            "color": "blue",
+            "name": "types"
+        },
+        "runner": "jest-runner-tsd",
+        "testMatch": ["**/__checks__/*.check.ts"]
+      }
+    ]
   }
 }

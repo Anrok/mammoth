@@ -1,21 +1,12 @@
-import {
-  count,
-  defineDb,
-  defineTable,
-  integer,
-  text,
-  timestampWithTimeZone,
-  uuid,
-} from '../../.build';
+import { defineDb, defineTable, integer, text, timestampWithTimeZone, uuid } from '../../.build';
 
 import { Query } from '../../.build/query';
 import { ResultSet } from '../../.build/result-set';
+import { expectType } from 'tsd-lite';
 
-const toSnap = <T extends Query<any>>(query: T): ResultSet<T, true> => {
+const toSnap = <T extends Query<any>>(query: T): ResultSet<T> => {
   return undefined as any;
 };
-
-/** @dts-jest enable:test-type */
 
 const foo = defineTable({
   id: uuid().primaryKey().default(`gen_random_uuid()`),
@@ -26,29 +17,29 @@ const foo = defineTable({
 
 const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 }));
 
-// @dts-jest:group update
-{
-  // @dts-jest:snap should update and returning id
-  toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }).returning(`id`));
+describe('update', () => {
+  test('should update and returning id', () => {
+    expectType<{
+      id: string;
+    }>(toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }).returning(`id`)));
+  });
 
-  // @dts-jest:snap should update and returning two columns
-  toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }).returning(`id`, `name`));
+  test('should update and returning two columns', () => {
+    expectType<{
+      id: string;
+      name: string;
+    }>(toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }).returning(`id`, `name`)));
+  });
 
-  // @dts-jest:snap should update without returning and return number
-  toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }));
+  test('should update without returning and return number', () => {
+    expectType<number>(toSnap(db.update(db.foo).set({ name: `Test`, value: 123 })));
+  });
 
-  db.update(db.foo)
-    .set({ name: `Test` })
-    .then((result) => {
-      // @dts-jest:snap should update and await affected count
-      result;
-    });
+  test('should update and await affected count', async () => {
+    expectType<number>(await db.update(db.foo).set({ name: `Test` }));
+  });
 
-  db.update(db.foo)
-    .set({ name: `Test` })
-    .returning(`name`)
-    .then((result) => {
-      // @dts-jest:snap should update-returning and await rows
-      result;
-    });
-}
+  test('should update-returning and await rows', async () => {
+    expectType<{ name: string }[]>(await db.update(db.foo).set({ name: `Test` }).returning(`name`));
+  });
+});
