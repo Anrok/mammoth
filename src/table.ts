@@ -22,14 +22,14 @@ export class TableDefinition<Columns> {
 
 export const makeTable = <
   TableName extends string,
-  TableDefinition extends { [column: string]: ColumnDefinition<any, any, any> }
+  TableDefinition extends { [column: string]: ColumnDefinition<any, any, any> },
 >(
   tableName: TableName,
   originalTableName: string | undefined,
   tableDefinition: TableDefinition,
 ) => {
   const columnNames = Object.keys(
-    (tableDefinition as unknown) as object,
+    tableDefinition as unknown as object,
   ) as (keyof TableDefinition)[];
 
   const columns = columnNames.reduce(

@@ -5,19 +5,21 @@ import { Query } from './query';
 import { Table } from './TableType';
 import { TableDefinition } from './table';
 
-export const makeTruncate = (queryExecutor: QueryExecutorFn) => <T extends Table<any, any>>(
-  table: T,
-): T extends TableDefinition<any> ? never : TruncateQuery<T> => {
-  return new TruncateQuery<T>(queryExecutor, table, 'AFFECTED_COUNT', [
-    new StringToken(`TRUNCATE`),
-    new StringToken((table as Table<any, any>).getName()),
-  ]) as any;
-};
+export const makeTruncate =
+  (queryExecutor: QueryExecutorFn) =>
+  <T extends Table<any, any>>(
+    table: T,
+  ): T extends TableDefinition<any> ? never : TruncateQuery<T> => {
+    return new TruncateQuery<T>(queryExecutor, table, 'AFFECTED_COUNT', [
+      new StringToken(`TRUNCATE`),
+      new StringToken((table as Table<any, any>).getName()),
+    ]) as any;
+  };
 
 export class TruncateQuery<
   T extends Table<any, any>,
   Returning = number,
-  TableColumns = T extends Table<any, infer Columns> ? Columns : never
+  TableColumns = T extends Table<any, infer Columns> ? Columns : never,
 > extends Query<Returning> {
   constructor(
     private readonly queryExecutor: QueryExecutorFn,
