@@ -1,13 +1,4 @@
-import {
-  defineDb,
-  defineTable,
-  integer,
-  star,
-  sum,
-  text,
-  toSql,
-  uuid,
-} from '..';
+import { defineDb, defineTable, integer, star, sum, text, toSql, uuid } from '..';
 
 describe(`with`, () => {
   const orderLog = defineTable({

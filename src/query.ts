@@ -2,13 +2,9 @@
 // specify every query seperately. The private property is used to simulate a nominal type so only
 import { ResultSet } from './result-set';
 import { Token } from './tokens';
-import {DbNull} from './types';
+import { DbNull } from './types';
 
-export type SpecificQuery<
-  DataType,
-  Q extends Query<any>,
-  Result = ResultSet<Q>,
-> = Result extends {
+export type SpecificQuery<DataType, Q extends Query<any>, Result = ResultSet<Q>> = Result extends {
   [K in keyof Result]: DataType | DbNull;
 }
   ? Q

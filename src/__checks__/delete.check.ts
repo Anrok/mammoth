@@ -18,7 +18,7 @@ const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 
 
 describe('delete', () => {
   test('should delete and returning id', () => {
-    expectType<{id: string}>(toSnap(db.deleteFrom(db.foo).returning(`id`)))
+    expectType<{ id: string }>(toSnap(db.deleteFrom(db.foo).returning(`id`)));
   });
 
   test('should delete and await affected row count', async () => {
@@ -26,6 +26,6 @@ describe('delete', () => {
   });
 
   test('should delete and await rows', async () => {
-     expectType<{id: string}[]>(await db.deleteFrom(db.foo).returning(`id`))
+    expectType<{ id: string }[]>(await db.deleteFrom(db.foo).returning(`id`));
   });
 });

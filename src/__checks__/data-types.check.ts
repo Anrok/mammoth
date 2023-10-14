@@ -165,7 +165,7 @@ describe('data-types', () => {
       char: string | null;
       characterVarying: string | null;
       varchar: string | null;
-      circle: { x: number; y: number; radius: number; } | null;
+      circle: { x: number; y: number; radius: number } | null;
       cidr: string | null;
       caseInsensitiveText: string | null;
       citext: string | null;
@@ -186,7 +186,7 @@ describe('data-types', () => {
       macaddr8: string | null;
       money: string | null;
       numeric: string | null;
-      point: { x: number; y: number; } | null;
+      point: { x: number; y: number } | null;
       path: string | null;
       pgLsn: string | null;
       polygon: string | null;
@@ -214,74 +214,77 @@ describe('data-types', () => {
       enumType: 'A' | 'B' | 'C' | null;
       array: string[] | null;
       array2d: string[][] | null;
-    }>(toSnap(db
-      .select(
-        db.foo.int8,
-        db.foo.bigint,
-        db.foo.bigserial,
-        db.foo.serial8,
-        db.foo.bit,
-        db.foo.bitVarying,
-        db.foo.varbit,
-        db.foo.boolean,
-        db.foo.bool,
-        db.foo.box,
-        db.foo.bytea,
-        db.foo.character,
-        db.foo.char,
-        db.foo.characterVarying,
-        db.foo.varchar,
-        db.foo.circle,
-        db.foo.cidr,
-        db.foo.caseInsensitiveText,
-        db.foo.citext,
-        db.foo.date,
-        db.foo.doublePrecision,
-        db.foo.float8,
-        db.foo.inet,
-        db.foo.decimal,
-        db.foo.integer,
-        db.foo.int,
-        db.foo.int4,
-        db.foo.interval,
-        db.foo.json,
-        db.foo.jsonb,
-        db.foo.line,
-        db.foo.lseg,
-        db.foo.macaddr,
-        db.foo.macaddr8,
-        db.foo.money,
-        db.foo.numeric,
-        db.foo.point,
-        db.foo.path,
-        db.foo.pgLsn,
-        db.foo.polygon,
-        db.foo.real,
-        db.foo.float4,
-        db.foo.smallint,
-        db.foo.int2,
-        db.foo.serial,
-        db.foo.serial4,
-        db.foo.smallserial,
-        db.foo.serial2,
-        db.foo.text,
-        db.foo.time,
-        db.foo.timeWithoutTimeZone,
-        db.foo.timeWithTimeZone,
-        db.foo.timestamp,
-        db.foo.timestamptz,
-        db.foo.timestampWithoutTimeZone,
-        db.foo.timestampWithTimeZone,
-        db.foo.tsquery,
-        db.foo.tsvector,
-        db.foo.txidSnapshot,
-        db.foo.uuid,
-        db.foo.xml,
-        db.foo.enumType,
-        db.foo.array,
-        db.foo.array2d,
-      )
-      .from(db.foo),
-    ));
+    }>(
+      toSnap(
+        db
+          .select(
+            db.foo.int8,
+            db.foo.bigint,
+            db.foo.bigserial,
+            db.foo.serial8,
+            db.foo.bit,
+            db.foo.bitVarying,
+            db.foo.varbit,
+            db.foo.boolean,
+            db.foo.bool,
+            db.foo.box,
+            db.foo.bytea,
+            db.foo.character,
+            db.foo.char,
+            db.foo.characterVarying,
+            db.foo.varchar,
+            db.foo.circle,
+            db.foo.cidr,
+            db.foo.caseInsensitiveText,
+            db.foo.citext,
+            db.foo.date,
+            db.foo.doublePrecision,
+            db.foo.float8,
+            db.foo.inet,
+            db.foo.decimal,
+            db.foo.integer,
+            db.foo.int,
+            db.foo.int4,
+            db.foo.interval,
+            db.foo.json,
+            db.foo.jsonb,
+            db.foo.line,
+            db.foo.lseg,
+            db.foo.macaddr,
+            db.foo.macaddr8,
+            db.foo.money,
+            db.foo.numeric,
+            db.foo.point,
+            db.foo.path,
+            db.foo.pgLsn,
+            db.foo.polygon,
+            db.foo.real,
+            db.foo.float4,
+            db.foo.smallint,
+            db.foo.int2,
+            db.foo.serial,
+            db.foo.serial4,
+            db.foo.smallserial,
+            db.foo.serial2,
+            db.foo.text,
+            db.foo.time,
+            db.foo.timeWithoutTimeZone,
+            db.foo.timeWithTimeZone,
+            db.foo.timestamp,
+            db.foo.timestamptz,
+            db.foo.timestampWithoutTimeZone,
+            db.foo.timestampWithTimeZone,
+            db.foo.tsquery,
+            db.foo.tsvector,
+            db.foo.txidSnapshot,
+            db.foo.uuid,
+            db.foo.xml,
+            db.foo.enumType,
+            db.foo.array,
+            db.foo.array2d,
+          )
+          .from(db.foo),
+      ),
+    );
   });
 });

@@ -8,7 +8,7 @@ import {
   StringToken,
   createQueryState,
   TableStarToken,
-  Token
+  Token,
 } from './tokens';
 import { AnyNumber, Int8 } from './data-types';
 import type { ColumnSet } from './column';
@@ -18,10 +18,11 @@ import { Query } from './query';
 import { Table } from './TableType';
 
 export interface Tokenable {
-    toTokens(): Token[];
-  }
-  
-export const isTokenable = (value: any): value is Tokenable => value && typeof value === 'object' && 'toTokens' in value;
+  toTokens(): Token[];
+}
+
+export const isTokenable = (value: any): value is Tokenable =>
+  value && typeof value === 'object' && 'toTokens' in value;
 
 export class Star {
   private _starBrand: any;

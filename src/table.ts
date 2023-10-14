@@ -1,7 +1,7 @@
 import { Column, ColumnDefinition } from './column';
 
 import { Table } from './TableType';
-import {DbNull} from './types';
+import { DbNull } from './types';
 
 export type TableRow<T> = T extends TableDefinition<infer Columns>
   ? {
@@ -43,7 +43,11 @@ export const makeTable = <
       TableName,
       {
         [K in keyof TableDefinition]: K extends string
-          ? TableDefinition[K] extends ColumnDefinition<infer DataType, infer IsNotNull, infer HasDefault>
+          ? TableDefinition[K] extends ColumnDefinition<
+              infer DataType,
+              infer IsNotNull,
+              infer HasDefault
+            >
             ? Column<K, TableName, DataType, IsNotNull, HasDefault, undefined>
             : never
           : never;
@@ -66,7 +70,9 @@ export const makeTable = <
   return table;
 };
 
-export const defineTable = <Columns extends { [column: string]: ColumnDefinition<any, boolean, boolean> }>(
+export const defineTable = <
+  Columns extends { [column: string]: ColumnDefinition<any, boolean, boolean> },
+>(
   tableDefinition: Columns,
 ): TableDefinition<Columns> => {
   return tableDefinition as any;

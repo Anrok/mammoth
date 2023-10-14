@@ -24,9 +24,13 @@ const createTables = <TableDefinitions extends { [key: string]: TableDefinition<
         TableName,
         {
           [K in keyof ColumnDefinitions]: K extends string
-            ? ColumnDefinitions[K] extends ColumnDefinition<infer DataType, infer IsNotNull, infer HasDefault>
-                ? Column<K, TableName, DataType, IsNotNull, HasDefault, undefined>
-                : never
+            ? ColumnDefinitions[K] extends ColumnDefinition<
+                infer DataType,
+                infer IsNotNull,
+                infer HasDefault
+              >
+              ? Column<K, TableName, DataType, IsNotNull, HasDefault, undefined>
+              : never
             : never;
         }
       >

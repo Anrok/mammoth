@@ -1,11 +1,4 @@
-import {
-  defineDb,
-  defineTable,
-  integer,
-  text,
-  timestampWithTimeZone,
-  uuid,
-} from '../../.build';
+import { defineDb, defineTable, integer, text, timestampWithTimeZone, uuid } from '../../.build';
 
 import { Query } from '../../.build/query';
 import { ResultSet } from '../../.build/result-set';
@@ -14,7 +7,6 @@ import { expectType } from 'tsd-lite';
 const toSnap = <T extends Query<any>>(query: T): ResultSet<T> => {
   return undefined as any;
 };
-
 
 const foo = defineTable({
   id: uuid().primaryKey().default(`gen_random_uuid()`),
@@ -48,7 +40,6 @@ describe('update', () => {
   });
 
   test('should update-returning and await rows', async () => {
-    expectType<{name: string}[]>(await db.update(db.foo).set({ name: `Test` }).returning(`name`));
+    expectType<{ name: string }[]>(await db.update(db.foo).set({ name: `Test` }).returning(`name`));
   });
 });
-  
