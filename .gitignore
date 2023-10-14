@@ -31,3 +31,6 @@ build
 .build
 .TODO
 .env
+
+# WebStorm project folder
+/.idea

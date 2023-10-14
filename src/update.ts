@@ -19,7 +19,7 @@ import { wrapQuotes } from './naming';
 export class UpdateQuery<
   T extends Table<any, any>,
   Returning = number,
-  TableColumns = T extends Table<any, infer Columns> ? Columns : never
+  TableColumns = T extends Table<any, infer Columns> ? Columns : never,
 > extends Query<Returning> {
   private _updateQueryBrand: any;
 
@@ -41,9 +41,7 @@ export class UpdateQuery<
   then<Result1, Result2 = never>(
     onFulfilled?:
       | ((
-          value: Returning extends number
-            ? Returning
-            : ResultSet<UpdateQuery<T, Returning>>[],
+          value: Returning extends number ? Returning : ResultSet<UpdateQuery<T, Returning>>[],
         ) => Result1 | PromiseLike<Result1>)
       | undefined
       | null,
@@ -100,7 +98,7 @@ export class UpdateQuery<
   returning<
     C1 extends keyof TableColumns,
     C2 extends keyof TableColumns,
-    C3 extends keyof TableColumns
+    C3 extends keyof TableColumns,
   >(
     column1: C1,
     column2: C2,
@@ -113,7 +111,7 @@ export class UpdateQuery<
     C1 extends keyof TableColumns,
     C2 extends keyof TableColumns,
     C3 extends keyof TableColumns,
-    C4 extends keyof TableColumns
+    C4 extends keyof TableColumns,
   >(
     column1: C1,
     column2: C2,
@@ -131,7 +129,7 @@ export class UpdateQuery<
     C2 extends keyof TableColumns,
     C3 extends keyof TableColumns,
     C4 extends keyof TableColumns,
-    C5 extends keyof TableColumns
+    C5 extends keyof TableColumns,
   >(
     column1: C1,
     column2: C2,
@@ -152,7 +150,7 @@ export class UpdateQuery<
     C3 extends keyof TableColumns,
     C4 extends keyof TableColumns,
     C5 extends keyof TableColumns,
-    C6 extends keyof TableColumns
+    C6 extends keyof TableColumns,
   >(
     column1: C1,
     column2: C2,
@@ -176,7 +174,7 @@ export class UpdateQuery<
     C4 extends keyof TableColumns,
     C5 extends keyof TableColumns,
     C6 extends keyof TableColumns,
-    C7 extends keyof TableColumns
+    C7 extends keyof TableColumns,
   >(
     column1: C1,
     column2: C2,
@@ -203,7 +201,7 @@ export class UpdateQuery<
     C5 extends keyof TableColumns,
     C6 extends keyof TableColumns,
     C7 extends keyof TableColumns,
-    C8 extends keyof TableColumns
+    C8 extends keyof TableColumns,
   >(
     column1: C1,
     column2: C2,
@@ -233,7 +231,7 @@ export class UpdateQuery<
     C6 extends keyof TableColumns,
     C7 extends keyof TableColumns,
     C8 extends keyof TableColumns,
-    C9 extends keyof TableColumns
+    C9 extends keyof TableColumns,
   >(
     column1: C1,
     column2: C2,
@@ -266,7 +264,7 @@ export class UpdateQuery<
     C7 extends keyof TableColumns,
     C8 extends keyof TableColumns,
     C9 extends keyof TableColumns,
-    C10 extends keyof TableColumns
+    C10 extends keyof TableColumns,
   >(
     column1: C1,
     column2: C2,
@@ -316,60 +314,60 @@ export class UpdateQuery<
   }
 }
 
-export const makeUpdate = (queryExecutor: QueryExecutorFn) => <T extends Table<any, any>>(
-  table: T,
-) => {
-  const getTableStringToken = (table: Table<any, any>) => {
-    if (table.getOriginalName()) {
-      return new StringToken(
-        `${wrapQuotes(table.getOriginalName())} ${wrapQuotes(table.getName())}`,
-      );
-    }
+export const makeUpdate =
+  (queryExecutor: QueryExecutorFn) =>
+  <T extends Table<any, any>>(table: T) => {
+    const getTableStringToken = (table: Table<any, any>) => {
+      if (table.getOriginalName()) {
+        return new StringToken(
+          `${wrapQuotes(table.getOriginalName())} ${wrapQuotes(table.getName())}`,
+        );
+      }
 
-    return new StringToken(wrapQuotes(table.getName()));
+      return new StringToken(wrapQuotes(table.getName()));
+    };
+
+    return {
+      set(
+        values: T extends Table<any, infer Columns>
+          ? {
+              [K in keyof Columns]?: Columns[K] extends Column<
+                any,
+                any,
+                infer DataType,
+                infer IsNotNull,
+                any,
+                any
+              >
+                ? IsNotNull extends true
+                  ? DataType | Expression<DataType, boolean, any>
+                  : DataType | DbNull | Expression<DataType | DbNull, boolean, any>
+                : never;
+            }
+          : never,
+      ): UpdateQuery<T, number> {
+        const keys = Object.keys(values);
+
+        return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
+          new StringToken(`UPDATE`),
+          getTableStringToken(table),
+          new StringToken(`SET`),
+          new SeparatorToken(
+            `,`,
+            keys.map((key) => {
+              const column = (table as any)[key] as Column<any, any, any, any, any, any>;
+              const value = (values as any)[key];
+
+              return new CollectionToken([
+                new StringToken(wrapQuotes(column.getSnakeCaseName())),
+                new StringToken(`=`),
+                value && typeof value === `object` && 'toTokens' in value
+                  ? value.toTokens()
+                  : new ParameterToken(value),
+              ]);
+            }),
+          ),
+        ]);
+      },
+    };
   };
-
-  return {
-    set(
-      values: T extends Table<any, infer Columns>
-        ? {
-            [K in keyof Columns]?: Columns[K] extends Column<
-              any,
-              any,
-              infer DataType,
-              infer IsNotNull,
-              any,
-              any
-            >
-              ? IsNotNull extends true
-                ? DataType | Expression<DataType, boolean, any>
-                : DataType | DbNull | Expression<DataType | DbNull, boolean, any>
-              : never;
-          }
-        : never,
-    ): UpdateQuery<T, number> {
-      const keys = Object.keys(values);
-
-      return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
-        new StringToken(`UPDATE`),
-        getTableStringToken(table),
-        new StringToken(`SET`),
-        new SeparatorToken(
-          `,`,
-          keys.map((key) => {
-            const column = (table as any)[key] as Column<any, any, any, any, any, any>;
-            const value = (values as any)[key];
-
-            return new CollectionToken([
-              new StringToken(wrapQuotes(column.getSnakeCaseName())),
-              new StringToken(`=`),
-              value && typeof value === `object` && 'toTokens' in value
-                ? value.toTokens()
-                : new ParameterToken(value),
-            ]);
-          }),
-        ),
-      ]);
-    },
-  };
-};
