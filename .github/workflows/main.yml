@@ -2,8 +2,6 @@ name: Lint, build & test
 
 on:
   push:
-    branches:
-      - main
 
 jobs:
   build:
