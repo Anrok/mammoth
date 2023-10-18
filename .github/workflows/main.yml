@@ -2,8 +2,6 @@ name: Lint, build & test
 
 on:
   push:
-    branches:
-      - main
 
 jobs:
   build:
@@ -17,7 +15,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install
+      - run: npm ci
       - run: npm run build
       - run: npm test -- --coverage
         env:
