@@ -17,6 +17,9 @@
   "files": [
     ".build"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@tsd/typescript": "^5.2.2",
     "@types/jest": "^26.0.24",
