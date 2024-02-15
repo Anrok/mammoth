@@ -1,4 +1,4 @@
-import { defineDb, defineTable, integer, text, timestampWithTimeZone, uuid } from '..';
+import { defineDb, defineTable, integer, star, text, timestampWithTimeZone, uuid } from '..';
 
 describe(`execute`, () => {
   const foo = defineTable({
@@ -77,6 +77,63 @@ describe(`execute`, () => {
 
   it(`insert with returning should return rows`, async () => {
     const rows = await db.insertInto(db.foo).defaultValues().returning(`id`);
+
+    expect(rows).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "a": "1",
+        },
+        Object {
+          "b": "2",
+        },
+      ]
+    `);
+  });
+
+  it('with update query should return count', async () => {
+    const count = await db.with(
+      `test`, () => db.select(star(db.foo)).from(db.foo),
+      ({ test }) => db.update(db.foo).set({name: 'foo'}).from(test).where(db.foo.id.eq(test.id)),
+    );
+
+    expect(count).toMatchInlineSnapshot(`123`);
+  });
+
+  it('with delete query should return count', async () => {
+    const count = await db.with(
+      `test`, () => db.select(star(db.foo)).from(db.foo),
+      ({ test }) => db.deleteFrom(db.foo).using(test).where(db.foo.id.eq(test.id)),
+    );
+
+    expect(count).toMatchInlineSnapshot(`123`);;
+  });
+
+  it('with insert query should return rows', async () => {
+    const rows = await db.with(
+      `test`, () => db.select(star(db.foo)).from(db.foo),
+      ({ test }) => db
+        .insertInto(db.foo, ['createDate', 'name', 'value'])
+        .select(test.createDate, test.name, test.value)
+        .from(test),
+    );
+
+    expect(rows).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "a": "1",
+        },
+        Object {
+          "b": "2",
+        },
+      ]
+    `);
+  });
+
+  it('with select query should return rows', async () => {
+    const rows = await db.with(
+      `test`, () => db.select(star(db.foo)).from(db.foo),
+      ({ test }) => db.select(test.id).from(test),
+    );
 
     expect(rows).toMatchInlineSnapshot(`
       Array [

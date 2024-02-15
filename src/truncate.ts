@@ -21,6 +21,12 @@ export class TruncateQuery<
   Returning = number,
   TableColumns = T extends Table<any, infer Columns> ? Columns : never,
 > extends Query<Returning> {
+
+  /** @internal */
+  newQueryWithTokens(tokens: Array<Token>) {
+    return new TruncateQuery(this.queryExecutor, this.table, this.resultType, tokens) as any;
+  }
+
   constructor(
     private readonly queryExecutor: QueryExecutorFn,
     private readonly table: T,
