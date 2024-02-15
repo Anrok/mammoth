@@ -30,7 +30,13 @@ export class UpdateQuery<
 
   /** @internal */
   newQueryWithTokens(tokens: Array<Token>) {
-    return new UpdateQuery(this.queryExecutor, this.returningKeys, this.table, this.resultType, tokens) as any;
+    return new UpdateQuery(
+      this.queryExecutor,
+      this.returningKeys,
+      this.table,
+      this.resultType,
+      tokens,
+    ) as any;
   }
 
   constructor(

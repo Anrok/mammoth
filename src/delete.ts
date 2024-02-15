@@ -43,7 +43,13 @@ export class DeleteQuery<
 
   /** @internal */
   newQueryWithTokens(tokens: Array<Token>) {
-    return new DeleteQuery(this.queryExecutor, this.returningKeys, this.table, this.resultType, tokens) as any;
+    return new DeleteQuery(
+      this.queryExecutor,
+      this.returningKeys,
+      this.table,
+      this.resultType,
+      tokens,
+    ) as any;
   }
 
   constructor(

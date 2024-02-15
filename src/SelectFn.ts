@@ -41,9 +41,7 @@ type TupleToIntersection<T extends Array<any>> = UnboxIntersection<
 type ToColumns<T> = T extends { [column: string]: any } ? T : never;
 
 export interface SelectFn {
-  <Columns extends Array<Selectable>>(
-    ...columns: [...Columns]
-  ): SelectQuery<
+  <Columns extends Array<Selectable>>(...columns: [...Columns]): SelectQuery<
     ToColumns<TupleToIntersection<GetSelectables<Columns>>>,
     ContainsStar<Columns[number]>
   >;

@@ -6,8 +6,8 @@ import { Query } from './query';
 import { CapturingResultSet } from './result-set';
 import { SelectQuery } from './select';
 import { wrapQuotes } from './naming';
-import {UpdateQuery} from './update';
-import {DeleteQuery} from './delete';
+import { UpdateQuery } from './update';
+import { DeleteQuery } from './delete';
 
 export type FromItem<Q> = Q extends Query<any>
   ? FromItemQuery<Q>
@@ -85,9 +85,12 @@ export interface WithFn {
     name4: N4,
     with4: W4,
     callback: (
-      args: { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & {
-        [K in N3]: FromItem<W3>;
-      } & { [K in N4]: FromItem<W4> },
+      args: { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        {
+          [K in N3]: FromItem<W3>;
+        } &
+        { [K in N4]: FromItem<W4> },
     ) => Q,
   ): Q;
   <
@@ -103,9 +106,12 @@ export interface WithFn {
     >,
     N5 extends string,
     W5 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        }
     >,
     Q extends Query<any>,
   >(
@@ -120,9 +126,13 @@ export interface WithFn {
     name5: N5,
     with5: W5,
     callback: (
-      args: { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & {
-        [K in N3]: FromItem<W3>;
-      } & { [K in N4]: FromItem<W4> } & { [K in N5]: FromItem<W5> },
+      args: { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        {
+          [K in N3]: FromItem<W3>;
+        } &
+        { [K in N4]: FromItem<W4> } &
+        { [K in N5]: FromItem<W5> },
     ) => Q,
   ): Q;
   <
@@ -138,15 +148,22 @@ export interface WithFn {
     >,
     N5 extends string,
     W5 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        }
     >,
     N6 extends string,
     W6 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> }
     >,
     Q extends Query<any>,
   >(
@@ -163,9 +180,14 @@ export interface WithFn {
     name6: N6,
     with6: W6,
     callback: (
-      args: { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & {
-        [K in N3]: FromItem<W3>;
-      } & { [K in N4]: FromItem<W4> } & { [K in N5]: FromItem<W5> } & { [K in N6]: FromItem<W6> },
+      args: { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        {
+          [K in N3]: FromItem<W3>;
+        } &
+        { [K in N4]: FromItem<W4> } &
+        { [K in N5]: FromItem<W5> } &
+        { [K in N6]: FromItem<W6> },
     ) => Q,
   ): Q;
   <
@@ -181,21 +203,33 @@ export interface WithFn {
     >,
     N5 extends string,
     W5 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        }
     >,
     N6 extends string,
     W6 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> }
     >,
     N7 extends string,
     W7 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> } & { [K in N6]: FromItem<W6> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> } &
+        { [K in N6]: FromItem<W6> }
     >,
     Q extends Query<any>,
   >(
@@ -214,11 +248,17 @@ export interface WithFn {
     name7: N7,
     with7: W7,
     callback: (
-      args: { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & {
-        [K in N3]: FromItem<W3>;
-      } & { [K in N4]: FromItem<W4> } & { [K in N5]: FromItem<W5> } & {
-        [K in N6]: FromItem<W6>;
-      } & { [K in N7]: FromItem<W7> },
+      args: { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        {
+          [K in N3]: FromItem<W3>;
+        } &
+        { [K in N4]: FromItem<W4> } &
+        { [K in N5]: FromItem<W5> } &
+        {
+          [K in N6]: FromItem<W6>;
+        } &
+        { [K in N7]: FromItem<W7> },
     ) => Q,
   ): Q;
   <
@@ -234,27 +274,45 @@ export interface WithFn {
     >,
     N5 extends string,
     W5 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        }
     >,
     N6 extends string,
     W6 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> }
     >,
     N7 extends string,
     W7 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> } & { [K in N6]: FromItem<W6> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> } &
+        { [K in N6]: FromItem<W6> }
     >,
     N8 extends string,
     W8 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> } & { [K in N6]: FromItem<W6> } & { [K in N7]: FromItem<W7> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> } &
+        { [K in N6]: FromItem<W6> } &
+        { [K in N7]: FromItem<W7> }
     >,
     Q extends Query<any>,
   >(
@@ -275,11 +333,18 @@ export interface WithFn {
     name8: N8,
     with8: W8,
     callback: (
-      args: { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & {
-        [K in N3]: FromItem<W3>;
-      } & { [K in N4]: FromItem<W4> } & { [K in N5]: FromItem<W5> } & {
-        [K in N6]: FromItem<W6>;
-      } & { [K in N7]: FromItem<W7> } & { [K in N8]: FromItem<W8> },
+      args: { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        {
+          [K in N3]: FromItem<W3>;
+        } &
+        { [K in N4]: FromItem<W4> } &
+        { [K in N5]: FromItem<W5> } &
+        {
+          [K in N6]: FromItem<W6>;
+        } &
+        { [K in N7]: FromItem<W7> } &
+        { [K in N8]: FromItem<W8> },
     ) => Q,
   ): Q;
   <
@@ -295,35 +360,60 @@ export interface WithFn {
     >,
     N5 extends string,
     W5 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        }
     >,
     N6 extends string,
     W6 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> }
     >,
     N7 extends string,
     W7 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> } & { [K in N6]: FromItem<W6> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> } &
+        { [K in N6]: FromItem<W6> }
     >,
     N8 extends string,
     W8 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> } & { [K in N6]: FromItem<W6> } & { [K in N7]: FromItem<W7> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> } &
+        { [K in N6]: FromItem<W6> } &
+        { [K in N7]: FromItem<W7> }
     >,
     N9 extends string,
     W9 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> } & { [K in N6]: FromItem<W6> } & {
-        [K in N7]: FromItem<W7>;
-      } & { [K in N8]: FromItem<W8> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> } &
+        { [K in N6]: FromItem<W6> } &
+        {
+          [K in N7]: FromItem<W7>;
+        } &
+        { [K in N8]: FromItem<W8> }
     >,
     Q extends Query<any>,
   >(
@@ -346,11 +436,19 @@ export interface WithFn {
     name9: N9,
     with9: W9,
     callback: (
-      args: { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & {
-        [K in N3]: FromItem<W3>;
-      } & { [K in N4]: FromItem<W4> } & { [K in N5]: FromItem<W5> } & {
-        [K in N6]: FromItem<W6>;
-      } & { [K in N7]: FromItem<W7> } & { [K in N8]: FromItem<W8> } & { [K in N9]: FromItem<W9> },
+      args: { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        {
+          [K in N3]: FromItem<W3>;
+        } &
+        { [K in N4]: FromItem<W4> } &
+        { [K in N5]: FromItem<W5> } &
+        {
+          [K in N6]: FromItem<W6>;
+        } &
+        { [K in N7]: FromItem<W7> } &
+        { [K in N8]: FromItem<W8> } &
+        { [K in N9]: FromItem<W9> },
     ) => Q,
   ): Q;
   <
@@ -366,43 +464,76 @@ export interface WithFn {
     >,
     N5 extends string,
     W5 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        }
     >,
     N6 extends string,
     W6 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> }
     >,
     N7 extends string,
     W7 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> } & { [K in N6]: FromItem<W6> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> } &
+        { [K in N6]: FromItem<W6> }
     >,
     N8 extends string,
     W8 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> } & { [K in N6]: FromItem<W6> } & { [K in N7]: FromItem<W7> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> } &
+        { [K in N6]: FromItem<W6> } &
+        { [K in N7]: FromItem<W7> }
     >,
     N9 extends string,
     W9 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> } & { [K in N6]: FromItem<W6> } & {
-        [K in N7]: FromItem<W7>;
-      } & { [K in N8]: FromItem<W8> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> } &
+        { [K in N6]: FromItem<W6> } &
+        {
+          [K in N7]: FromItem<W7>;
+        } &
+        { [K in N8]: FromItem<W8> }
     >,
     N10 extends string,
     W10 extends QueryFn<
-      { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> } & {
-        [K in N4]: FromItem<W4>;
-      } & { [K in N5]: FromItem<W5> } & { [K in N6]: FromItem<W6> } & {
-        [K in N7]: FromItem<W7>;
-      } & { [K in N8]: FromItem<W8> } & { [K in N9]: FromItem<W9> }
+      { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        { [K in N3]: FromItem<W3> } &
+        {
+          [K in N4]: FromItem<W4>;
+        } &
+        { [K in N5]: FromItem<W5> } &
+        { [K in N6]: FromItem<W6> } &
+        {
+          [K in N7]: FromItem<W7>;
+        } &
+        { [K in N8]: FromItem<W8> } &
+        { [K in N9]: FromItem<W9> }
     >,
     Q extends Query<any>,
   >(
@@ -427,13 +558,22 @@ export interface WithFn {
     name10: N10,
     with10: W10,
     callback: (
-      args: { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & {
-        [K in N3]: FromItem<W3>;
-      } & { [K in N4]: FromItem<W4> } & { [K in N5]: FromItem<W5> } & {
-        [K in N6]: FromItem<W6>;
-      } & { [K in N7]: FromItem<W7> } & { [K in N8]: FromItem<W8> } & {
-        [K in N9]: FromItem<W9>;
-      } & { [K in N10]: FromItem<W10> },
+      args: { [K in N1]: FromItem<W1> } &
+        { [K in N2]: FromItem<W2> } &
+        {
+          [K in N3]: FromItem<W3>;
+        } &
+        { [K in N4]: FromItem<W4> } &
+        { [K in N5]: FromItem<W5> } &
+        {
+          [K in N6]: FromItem<W6>;
+        } &
+        { [K in N7]: FromItem<W7> } &
+        { [K in N8]: FromItem<W8> } &
+        {
+          [K in N9]: FromItem<W9>;
+        } &
+        { [K in N10]: FromItem<W10> },
     ) => Q,
   ): Q;
 }
