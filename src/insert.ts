@@ -531,32 +531,31 @@ export interface InsertIntoResult<
               | Query<{ [key: string]: DataType | Expression<DataType, boolean, string> }>
               | Expression<DataType, boolean, string>
           : never;
-      } &
-        {
-          [K in keyof PickByValue<
-            {
-              [K in keyof Columns]: Columns[K] extends Column<
-                any,
-                any,
-                any,
-                infer IsNotNull,
-                infer HasDefault,
-                any
-              >
-                ? HasDefault extends true
-                  ? false
-                  : IsNotNull
-                : never;
-            },
-            false
-          >]?: Columns[K] extends Column<any, any, infer DataType, boolean, any, any>
-            ?
-                | DataType
-                | Query<{ [key: string]: DataType | Expression<DataType, boolean, string> }>
-                | Expression<DataType, boolean, string>
-                | DbNull
-            : never;
-        }
+      } & {
+        [K in keyof PickByValue<
+          {
+            [K in keyof Columns]: Columns[K] extends Column<
+              any,
+              any,
+              any,
+              infer IsNotNull,
+              infer HasDefault,
+              any
+            >
+              ? HasDefault extends true
+                ? false
+                : IsNotNull
+              : never;
+          },
+          false
+        >]?: Columns[K] extends Column<any, any, infer DataType, boolean, any, any>
+          ?
+              | DataType
+              | Query<{ [key: string]: DataType | Expression<DataType, boolean, string> }>
+              | Expression<DataType, boolean, string>
+              | DbNull
+          : never;
+      }
     : never,
 > {
   select: SelectFn;

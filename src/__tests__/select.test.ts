@@ -797,11 +797,12 @@ describe(`select`, () => {
     type A = 'a' | 'b';
     type B = { [K in A]: K };
 
-    type BooleanQuery<Q extends Query<any>> = ResultSet<Q> extends {
-      [K in keyof ResultSet<Q>]: boolean;
-    }
-      ? true
-      : false;
+    type BooleanQuery<Q extends Query<any>> =
+      ResultSet<Q> extends {
+        [K in keyof ResultSet<Q>]: boolean;
+      }
+        ? true
+        : false;
 
     type Is = BooleanQuery<typeof test>;
 
