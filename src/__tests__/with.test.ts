@@ -112,4 +112,44 @@ describe(`with`, () => {
       }
     `);
   });
+
+  it('should return affected count from update query', async () => {
+    const query = db.with(
+      `test`, () => db.select(star(db.orderLog)).from(db.orderLog),
+      ({ test }) => db.update(db.orderLog).set({product: 'foo'}).from(test).where(db.orderLog.id.eq(test.id)),
+    );
+
+    const result = await query;
+    expect(result).toEqual(0);
+  });
+
+  it('should return affected count from delete query', async () => {
+    const result = await db.with(
+      `test`, () => db.select(star(db.orderLog)).from(db.orderLog),
+      ({ test }) => db.deleteFrom(db.orderLog).using(test).where(db.orderLog.id.eq(test.id)),
+    );
+
+    expect(result).toEqual(0);
+  });
+
+  it('should return rows from insert query', async () => {
+    const result = await db.with(
+      `test`, () => db.select(star(db.orderLog)).from(db.orderLog),
+      ({ test }) => db
+        .insertInto(db.orderLog, ['amount', 'product', 'quantity', 'region'])
+        .select(test.amount, test.product, test.quantity, test.region)
+        .from(test),
+    );
+
+    expect(result).toEqual([]);
+  });
+
+  it('should return rows from select query', async () => {
+    const result = await db.with(
+      `test`, () => db.select(star(db.orderLog)).from(db.orderLog),
+      ({ test }) => db.select(test.id).from(test),
+    );
+
+    expect(result).toEqual([]);
+  });
 });

@@ -144,6 +144,11 @@ export class SelectQuery<
     return this.returningKeys;
   }
 
+  /** @internal */
+  newQueryWithTokens(tokens: Token[]): Query<Columns> {
+    return this.newSelectQuery(tokens);
+  }
+
   constructor(
     private readonly queryExecutor: QueryExecutorFn,
     private readonly returningKeys: string[],
