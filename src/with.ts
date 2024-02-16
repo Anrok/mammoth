@@ -9,14 +9,13 @@ import { wrapQuotes } from './naming';
 import { UpdateQuery } from './update';
 import { DeleteQuery } from './delete';
 
-export type FromItem<Q> =
-  Q extends Query<any>
-    ? FromItemQuery<Q>
-    : Q extends (args: any) => infer R
-      ? R extends Query<any>
-        ? FromItemQuery<R>
-        : never
-      : never;
+export type FromItem<Q> = Q extends Query<any>
+  ? FromItemQuery<Q>
+  : Q extends (args: any) => infer R
+  ? R extends Query<any>
+    ? FromItemQuery<R>
+    : never
+  : never;
 
 type FromItemQuery<Q, Result = Q extends Query<any> ? CapturingResultSet<Q> : never> = {
   [K in keyof Result]: Result[K] extends GetDataType<infer DataType, infer IsNotNull>
