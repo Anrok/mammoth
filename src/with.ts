@@ -4,10 +4,7 @@ import { GetDataType, QueryExecutorFn } from './types';
 import { Expression } from './expression';
 import { Query } from './query';
 import { CapturingResultSet } from './result-set';
-import { SelectQuery } from './select';
 import { wrapQuotes } from './naming';
-import { UpdateQuery } from './update';
-import { DeleteQuery } from './delete';
 
 export type FromItem<Q> = Q extends Query<any>
   ? FromItemQuery<Q>
