@@ -90,7 +90,7 @@ describe(`execute`, () => {
     `);
   });
 
-  it('with update query should return count', async () => {
+  it('with update should return count', async () => {
     const count = await db.with(
       `test`,
       () => db.select(star(db.foo)).from(db.foo),
@@ -100,7 +100,7 @@ describe(`execute`, () => {
     expect(count).toMatchInlineSnapshot(`123`);
   });
 
-  it('with delete query should return count', async () => {
+  it('with delete should return count', async () => {
     const count = await db.with(
       `test`,
       () => db.select(star(db.foo)).from(db.foo),
@@ -110,15 +110,21 @@ describe(`execute`, () => {
     expect(count).toMatchInlineSnapshot(`123`);
   });
 
-  it('with insert query should return rows', async () => {
+  it('with insert should return count', async () => {
+    const count = await db.with(
+      `test`,
+      () => db.select(star(db.foo)).from(db.foo),
+      ({ test }) => db.insertInto(db.foo).defaultValues()
+    );
+
+    expect(count).toMatchInlineSnapshot(`123`);
+  });
+
+  it('with insert with returning should return rows', async () => {
     const rows = await db.with(
       `test`,
       () => db.select(star(db.foo)).from(db.foo),
-      ({ test }) =>
-        db
-          .insertInto(db.foo, ['createDate', 'name', 'value'])
-          .select(test.createDate, test.name, test.value)
-          .from(test),
+      ({ test }) => db.insertInto(db.foo).defaultValues().returning('id'),
     );
 
     expect(rows).toMatchInlineSnapshot(`
@@ -133,7 +139,7 @@ describe(`execute`, () => {
     `);
   });
 
-  it('with select query should return rows', async () => {
+  it('with select should return rows', async () => {
     const rows = await db.with(
       `test`,
       () => db.select(star(db.foo)).from(db.foo),
