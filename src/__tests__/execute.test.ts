@@ -114,7 +114,7 @@ describe(`execute`, () => {
     const count = await db.with(
       `test`,
       () => db.select(star(db.foo)).from(db.foo),
-      ({ test }) => db.insertInto(db.foo).defaultValues()
+      ({ test }) => db.insertInto(db.foo).defaultValues(),
     );
 
     expect(count).toMatchInlineSnapshot(`123`);

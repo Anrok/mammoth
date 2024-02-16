@@ -22,8 +22,8 @@ export class TruncateQuery<
   TableColumns = T extends Table<any, infer Columns> ? Columns : never,
 > extends Query<Returning> {
   /** @internal */
-  newQueryWithTokens(tokens: Array<Token>) {
-    return new TruncateQuery(this.queryExecutor, this.table, this.resultType, tokens) as any;
+  newQueryWithTokens(tokens: Array<Token>): TruncateQuery<T, Returning, TableColumns> {
+    return new TruncateQuery(this.queryExecutor, this.table, this.resultType, tokens);
   }
 
   constructor(
@@ -47,23 +47,19 @@ export class TruncateQuery<
   }
 
   restartIdentity<T extends Table<any, any>>() {
-    return this.newTruncateQuery([...this.tokens, new StringToken(`RESTART IDENTITY`)]) as any;
+    return this.newQueryWithTokens([...this.tokens, new StringToken(`RESTART IDENTITY`)]) as any;
   }
 
   continueIdentity<T extends Table<any, any>>() {
-    return this.newTruncateQuery([...this.tokens, new StringToken(`CONTINUE IDENTITY`)]) as any;
+    return this.newQueryWithTokens([...this.tokens, new StringToken(`CONTINUE IDENTITY`)]) as any;
   }
 
   cascade<T extends Table<any, any>>() {
-    return this.newTruncateQuery([...this.tokens, new StringToken('CASCADE')]);
+    return this.newQueryWithTokens([...this.tokens, new StringToken('CASCADE')]);
   }
 
   restrict<T extends Table<any, any>>() {
-    return this.newTruncateQuery([...this.tokens, new StringToken('RESTRICT')]);
-  }
-
-  private newTruncateQuery(tokens: Token[]): TruncateQuery<any> {
-    return new TruncateQuery(this.queryExecutor, this.table, 'AFFECTED_COUNT', tokens);
+    return this.newQueryWithTokens([...this.tokens, new StringToken('RESTRICT')]);
   }
 
   getReturningKeys(): string[] {

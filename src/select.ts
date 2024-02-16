@@ -145,7 +145,7 @@ export class SelectQuery<
   }
 
   /** @internal */
-  newQueryWithTokens(tokens: Token[]): Query<Columns> {
+  newQueryWithTokens(tokens: Token[]): SelectQuery<Columns> {
     return this.newSelectQuery(tokens);
   }
 

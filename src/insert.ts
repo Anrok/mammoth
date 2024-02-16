@@ -35,14 +35,14 @@ export class InsertQuery<
   }
 
   /** @internal */
-  newQueryWithTokens(tokens: Array<Token>) {
+  newQueryWithTokens(tokens: Array<Token>): InsertQuery<T, Returning, TableColumns> {
     return new InsertQuery(
       this.queryExecutor,
       this.returningKeys,
       this.table,
       this.resultType,
       tokens,
-    ) as any;
+    );
   }
 
   constructor(
@@ -298,7 +298,7 @@ export class InsertQuery<
   }
 
   where(expression: Expression<boolean, boolean, string>) {
-    return new InsertQuery(this.queryExecutor, this.returningKeys, this.table, this.resultType, [
+    return this.newQueryWithTokens([
       ...this.tokens,
       new StringToken(`WHERE`),
       ...expression.toTokens(),
