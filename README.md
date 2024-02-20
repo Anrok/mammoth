@@ -4,6 +4,7 @@ This fork is based on the 1.x version rather than newer 2.x version.  We made th
 
 ### List of changes ([commits](https://github.com/Anrok/mammoth/compare/upstream-v1...main))
 - Changes nullable expressions to use the `null` data type, rather than `undefined`.
+- Fixes `with` query to return the value provided by constructed query.
 
 ---
 

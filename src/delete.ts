@@ -41,6 +41,17 @@ export class DeleteQuery<
     return this.returningKeys;
   }
 
+  /** @internal */
+  newQueryWithTokens(tokens: Array<Token>): DeleteQuery<T, Returning, TableColumns> {
+    return new DeleteQuery(
+      this.queryExecutor,
+      this.returningKeys,
+      this.table,
+      this.resultType,
+      tokens,
+    );
+  }
+
   constructor(
     private readonly queryExecutor: QueryExecutorFn,
     private readonly returningKeys: string[],
@@ -74,7 +85,7 @@ export class DeleteQuery<
   }
 
   using(...fromItems: Table<any, any>[]): DeleteQuery<T, Returning> {
-    return new DeleteQuery(this.queryExecutor, [], this.table, this.resultType, [
+    return this.newQueryWithTokens([
       ...this.tokens,
       new StringToken(`USING`),
       new SeparatorToken(
@@ -87,7 +98,7 @@ export class DeleteQuery<
   }
 
   where(condition: Expression<boolean, boolean, string>): DeleteQuery<T, Returning> {
-    return new DeleteQuery(this.queryExecutor, [], this.table, this.resultType, [
+    return this.newQueryWithTokens([
       ...this.tokens,
       new StringToken(`WHERE`),
       ...condition.toTokens(),
@@ -95,7 +106,7 @@ export class DeleteQuery<
   }
 
   whereCurrentOf(cursorName: string): DeleteQuery<T, Returning> {
-    return new DeleteQuery(this.queryExecutor, [], this.table, this.resultType, [
+    return this.newQueryWithTokens([
       ...this.tokens,
       new StringToken(`WHERE CURRENT OF`),
       new ParameterToken(cursorName),

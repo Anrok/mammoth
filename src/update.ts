@@ -28,6 +28,17 @@ export class UpdateQuery<
     return this.returningKeys;
   }
 
+  /** @internal */
+  newQueryWithTokens(tokens: Array<Token>): UpdateQuery<T, Returning, TableColumns> {
+    return new UpdateQuery(
+      this.queryExecutor,
+      this.returningKeys,
+      this.table,
+      this.resultType,
+      tokens,
+    );
+  }
+
   constructor(
     private readonly queryExecutor: QueryExecutorFn,
     private readonly returningKeys: string[],
@@ -61,7 +72,7 @@ export class UpdateQuery<
   }
 
   where(condition: Expression<boolean, boolean, string>): UpdateQuery<T, Returning> {
-    return new UpdateQuery(this.queryExecutor, this.returningKeys, this.table, this.resultType, [
+    return this.newQueryWithTokens([
       ...this.tokens,
       new StringToken(`WHERE`),
       ...condition.toTokens(),
@@ -69,7 +80,7 @@ export class UpdateQuery<
   }
 
   whereCurrentOf(cursorName: string) {
-    return new UpdateQuery(this.queryExecutor, this.returningKeys, this.table, this.resultType, [
+    return this.newQueryWithTokens([
       ...this.tokens,
       new StringToken(`WHERE CURRENT OF`),
       new ParameterToken(cursorName),
@@ -77,7 +88,7 @@ export class UpdateQuery<
   }
 
   from(fromItem: Table<any, any>): UpdateQuery<T, Returning> {
-    return new UpdateQuery(this.queryExecutor, this.returningKeys, this.table, this.resultType, [
+    return this.newQueryWithTokens([
       ...this.tokens,
       new StringToken(`FROM`),
       fromItem.getOriginalName()

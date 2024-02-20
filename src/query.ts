@@ -19,4 +19,6 @@ export abstract class Query<Returning> {
   abstract toTokens(includeAlias?: boolean): Token[];
   /** @internal */
   abstract getReturningKeys(): string[];
+
+  abstract newQueryWithTokens(tokens: Token[]): Query<Returning>;
 }
