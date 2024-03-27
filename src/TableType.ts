@@ -1,4 +1,5 @@
 import { Column } from './column';
+import {Token} from './tokens';
 
 export type Table<TableName, Columns> = Columns & InternalTable<TableName, Columns>;
 
@@ -11,6 +12,9 @@ export interface InternalTable<TableName, Columns> {
 
   /** @internal */
   getOriginalName(): string;
+
+  /** @internal */
+  toTokens(): Array<Token>;
 
   // Because we use the column's table name to determine whether the data type should be nullable
   // when joining, we change the column's table name to the alias.
