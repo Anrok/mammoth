@@ -17,7 +17,7 @@ describe(`valuesList`, () => {
   );
 
   it(`should select from a values list`, () => {
-    const valuesList = db.valuesList(
+    const valuesList = db.values(
       {
         id: text().notNull(),
         region: text().notNull(),
@@ -49,7 +49,7 @@ describe(`valuesList`, () => {
   });
 
   it(`should join a values list`, () => {
-    const valuesList = db.valuesList(
+    const valuesList = db.values(
       {
         region: text().notNull(),
         product: text().notNull(),

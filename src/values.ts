@@ -14,7 +14,7 @@ type ColumnDefinitionsToColumns<
         : never
 };
 
-export function makeValuesList<
+export function makeValues<
   TableDefinitionT extends { [column: string]: ColumnDefinition<any, any, any> },
   TableName extends string,
 >(
@@ -52,7 +52,7 @@ export function makeValuesList<
   const table = {
     ...columns,
     as<T extends string>(alias: T) {
-      return makeValuesList(definition, values, alias, tableName) as any;
+      return makeValues(definition, values, alias, tableName) as any;
     },
     getName() {
       return tableName;

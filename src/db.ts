@@ -13,7 +13,7 @@ import { makeTruncate } from './truncate';
 import { makeUpdate } from './update';
 import { makeWith } from './with';
 import { toSnakeCase } from './naming';
-import {makeValuesList} from './values-list';
+import {makeValues} from './values';
 
 const createTables = <TableDefinitions extends { [key: string]: TableDefinition<any> }>(
   tableDefinitions: TableDefinitions,
@@ -79,7 +79,7 @@ export const defineDb = <TableDefinitions extends { [key: string]: TableDefiniti
     update: makeUpdate(queryExecutor),
     with: makeWith(queryExecutor),
     truncate: makeTruncate(queryExecutor),
-    valuesList: makeValuesList,
+    values: makeValues,
     case: () => new CaseStatement<never>([]),
     ...sqlFunctions,
 
