@@ -1,7 +1,7 @@
 import { Column, ColumnDefinition } from './column';
 
 import { Table } from './TableType';
-import {TableToken} from './tokens';
+import { TableToken } from './tokens';
 import { DbNull } from './types';
 
 export type TableRow<T> = T extends TableDefinition<infer Columns>

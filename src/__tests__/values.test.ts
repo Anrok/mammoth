@@ -1,4 +1,4 @@
-import { defineDb, defineTable, integer, text, toSql } from '..';
+import { defineDb, defineTable, integer, text, timestamp, toSql } from '..';
 
 describe(`valuesList`, () => {
   const orderLog = defineTable({
@@ -7,6 +7,7 @@ describe(`valuesList`, () => {
     product: text().notNull(),
     quantity: integer().notNull(),
     amount: integer().notNull(),
+    createDate: timestamp().notNull()
   });
 
   const db = defineDb(
@@ -16,16 +17,14 @@ describe(`valuesList`, () => {
     () => Promise.resolve({ rows: [], affectedCount: 0 }),
   );
 
-  const valuesList = db.values(
-    {
+  const valuesList = db.values('vals', {
       id: integer().notNull(),
       product: text().notNull(),
-    },
-    [
-      {id: 1, product: 'foo'},
-      {id: 2, product: 'bar'},
+      fooId: text(),
+    }, [
+      {id: 1, product: 'foo', fooId: 'a1'},
+      {id: 2, product: 'bar', fooId: null},
     ],
-    'vals',
   );
 
   test('should select star from values list', () => {
@@ -38,10 +37,12 @@ describe(`valuesList`, () => {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT vals.id, vals.product FROM (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS vals (\\"id\\", \\"product\\")",
+        "text": "SELECT vals.id, vals.product, vals.foo_id \\"fooId\\" FROM (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\")",
       }
     `);
   });
@@ -56,10 +57,12 @@ describe(`valuesList`, () => {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT test.id, test.product FROM (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS test (\\"id\\", \\"product\\")",
+        "text": "SELECT test.id, test.product, test.foo_id \\"fooId\\" FROM (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS test (\\"id\\", \\"product\\", \\"foo_id\\")",
       }
     `);
   });
@@ -67,11 +70,12 @@ describe(`valuesList`, () => {
   it('should select from a values list with single row', () => {
     const query = db
       .select(db.star())
-      .from(db.values(
-        {id: integer().notNull(), region: text().notNull()},
-        [{id: 1, region: 'foo'}],
-        'logs',
-      ));
+      .from(db.values('logs', {
+        id: integer().notNull(),
+        region: text().notNull()
+      }, [
+        {id: 1, region: 'foo'}
+      ]));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -97,10 +101,12 @@ describe(`valuesList`, () => {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT vals.id, vals.product FROM (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS vals (\\"id\\", \\"product\\")",
+        "text": "SELECT vals.id, vals.product FROM (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\")",
       }
     `);
   });
@@ -119,10 +125,12 @@ describe(`valuesList`, () => {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT order_log.id FROM order_log JOIN (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS vals (\\"id\\", \\"product\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
+        "text": "SELECT order_log.id FROM order_log JOIN (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
       }
     `);
   });
@@ -136,15 +144,17 @@ describe(`valuesList`, () => {
         .and(db.orderLog.product.eq(valuesList.product))
       );
 
-      expect(toSql(query)).toMatchInlineSnapshot(`
+    expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT order_log.id FROM order_log INNER JOIN (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS vals (\\"id\\", \\"product\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
+        "text": "SELECT order_log.id FROM order_log INNER JOIN (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
       }
     `);
   });
@@ -158,15 +168,17 @@ describe(`valuesList`, () => {
         .and(db.orderLog.product.eq(valuesList.product))
       );
 
-      expect(toSql(query)).toMatchInlineSnapshot(`
+    expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT order_log.id FROM order_log LEFT OUTER JOIN (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS vals (\\"id\\", \\"product\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
+        "text": "SELECT order_log.id FROM order_log LEFT OUTER JOIN (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
       }
     `);
   });
@@ -180,15 +192,17 @@ describe(`valuesList`, () => {
         .and(db.orderLog.product.eq(valuesList.product))
       );
 
-      expect(toSql(query)).toMatchInlineSnapshot(`
+    expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT order_log.id FROM order_log LEFT JOIN (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS vals (\\"id\\", \\"product\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
+        "text": "SELECT order_log.id FROM order_log LEFT JOIN (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
       }
     `);
   });
@@ -202,15 +216,17 @@ describe(`valuesList`, () => {
         .and(db.orderLog.product.eq(valuesList.product))
       );
 
-      expect(toSql(query)).toMatchInlineSnapshot(`
+    expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT order_log.id FROM order_log RIGHT OUTER JOIN (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS vals (\\"id\\", \\"product\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
+        "text": "SELECT order_log.id FROM order_log RIGHT OUTER JOIN (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
       }
     `);
   });
@@ -224,15 +240,17 @@ describe(`valuesList`, () => {
         .and(db.orderLog.product.eq(valuesList.product))
       );
 
-      expect(toSql(query)).toMatchInlineSnapshot(`
+    expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT order_log.id FROM order_log INNER JOIN (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS vals (\\"id\\", \\"product\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
+        "text": "SELECT order_log.id FROM order_log INNER JOIN (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
       }
     `);
   });
@@ -246,15 +264,17 @@ describe(`valuesList`, () => {
         .and(db.orderLog.product.eq(valuesList.product))
       );
 
-      expect(toSql(query)).toMatchInlineSnapshot(`
+    expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT order_log.id FROM order_log RIGHT JOIN (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS vals (\\"id\\", \\"product\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
+        "text": "SELECT order_log.id FROM order_log RIGHT JOIN (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
       }
     `);
   });
@@ -268,15 +288,17 @@ describe(`valuesList`, () => {
         .and(db.orderLog.product.eq(valuesList.product))
       );
 
-      expect(toSql(query)).toMatchInlineSnapshot(`
+    expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT order_log.id FROM order_log FULL OUTER JOIN (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS vals (\\"id\\", \\"product\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
+        "text": "SELECT order_log.id FROM order_log FULL OUTER JOIN (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
       }
     `);
   });
@@ -291,15 +313,17 @@ describe(`valuesList`, () => {
         .and(db.orderLog.product.eq(valuesList.product))
       );
 
-      expect(toSql(query)).toMatchInlineSnapshot(`
+    expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT order_log.id FROM order_log FULL JOIN (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS vals (\\"id\\", \\"product\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
+        "text": "SELECT order_log.id FROM order_log FULL JOIN (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
       }
     `);
   });
@@ -313,16 +337,39 @@ describe(`valuesList`, () => {
         .and(db.orderLog.product.eq(valuesList.product))
       );
 
-      expect(toSql(query)).toMatchInlineSnapshot(`
+    expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
         "parameters": Array [
           1,
           "foo",
+          "a1",
           2,
           "bar",
+          null,
         ],
-        "text": "SELECT order_log.id FROM order_log CROSS JOIN (VALUES ($1 :: integer, $2 :: text), ($3, $4)) AS vals (\\"id\\", \\"product\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
+        "text": "SELECT order_log.id FROM order_log CROSS JOIN (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\") ON (order_log.id = vals.id AND order_log.product = vals.product)",
       }
     `);
   });
+
+  it('should select from with values list', () => {
+    const query = db.with(
+      'test', () => db.select(db.star()).from(valuesList),
+      ({ test }) => db.select(db.star()).from(test),
+    );
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      Object {
+        "parameters": Array [
+          1,
+          "foo",
+          "a1",
+          2,
+          "bar",
+          null,
+        ],
+        "text": "WITH test AS (SELECT vals.id, vals.product, vals.foo_id \\"fooId\\" FROM (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\")) SELECT test.id, test.product, test.\\"fooId\\" \\"fooId\\" FROM test",
+      }
+    `);
+  })
 });

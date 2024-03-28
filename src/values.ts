@@ -1,5 +1,6 @@
 import {Table} from "./TableType";
 import {Column, ColumnDefinition} from "./column";
+import {toSnakeCase} from "./naming";
 import {TableDefinition, TableRow} from "./table";
 import {CollectionToken, GroupToken, ParameterToken, SeparatorToken, StringToken, TableToken} from "./tokens";
 
@@ -15,12 +16,12 @@ type ColumnDefinitionsToColumns<
 };
 
 export function makeValues<
-  TableDefinitionT extends { [column: string]: ColumnDefinition<any, any, any> },
   TableName extends string,
+  TableDefinitionT extends { [column: string]: ColumnDefinition<any, any, any> },
 >(
+  tableName: TableName,
   definition: TableDefinitionT,
   values: Array<TableRow<TableDefinition<TableDefinitionT>>>,
-  tableName: TableName,
 ): Table<TableName, ColumnDefinitionsToColumns<TableName, TableDefinitionT>> {
   const columnNames = Object.keys(
     definition as unknown as object,
@@ -51,7 +52,7 @@ export function makeValues<
   const table = {
     ...columns,
     as<T extends string>(alias: T) {
-      return makeValues(definition, values, alias) as any;
+      return makeValues(alias, definition, values) as any;
     },
     getName() {
       return tableName;
@@ -83,10 +84,10 @@ export function makeValues<
         new StringToken('AS'),
         new TableToken(this),
         new GroupToken([
-          new SeparatorToken(',', columnNames.map(key => new StringToken(`"${key as string}"`))),
+          new SeparatorToken(',', columnNames.map(key => new StringToken(`"${toSnakeCase(key as string)}"`))),
         ]),
       ]
     }
   };
-  return table as any;
+  return table;
 }
