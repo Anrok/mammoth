@@ -7,7 +7,7 @@ describe(`valuesList`, () => {
     product: text().notNull(),
     quantity: integer().notNull(),
     amount: integer().notNull(),
-    createDate: timestamp().notNull()
+    createDate: timestamp().notNull(),
   });
 
   const db = defineDb(
@@ -17,20 +17,21 @@ describe(`valuesList`, () => {
     () => Promise.resolve({ rows: [], affectedCount: 0 }),
   );
 
-  const valuesList = db.values('vals', {
+  const valuesList = db.values(
+    'vals',
+    {
       id: integer().notNull(),
       product: text().notNull(),
       fooId: text(),
-    }, [
-      {id: 1, product: 'foo', fooId: 'a1'},
-      {id: 2, product: 'bar', fooId: null},
+    },
+    [
+      { id: 1, product: 'foo', fooId: 'a1' },
+      { id: 2, product: 'bar', fooId: null },
     ],
   );
 
   test('should select star from values list', () => {
-    const query = db
-      .select(db.star())
-      .from(valuesList);
+    const query = db.select(db.star()).from(valuesList);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -48,9 +49,7 @@ describe(`valuesList`, () => {
   });
 
   test('should select star from values list with alias', () => {
-    const query = db
-      .select(db.star())
-      .from(valuesList.as('test'));
+    const query = db.select(db.star()).from(valuesList.as('test'));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -68,14 +67,16 @@ describe(`valuesList`, () => {
   });
 
   it('should select from a values list with single row', () => {
-    const query = db
-      .select(db.star())
-      .from(db.values('logs', {
-        id: integer().notNull(),
-        region: text().notNull()
-      }, [
-        {id: 1, region: 'foo'}
-      ]));
+    const query = db.select(db.star()).from(
+      db.values(
+        'logs',
+        {
+          id: integer().notNull(),
+          region: text().notNull(),
+        },
+        [{ id: 1, region: 'foo' }],
+      ),
+    );
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -89,12 +90,7 @@ describe(`valuesList`, () => {
   });
 
   it(`should select from a values list with multiple rows`, () => {
-    const query = db
-      .select(
-        valuesList.id,
-        valuesList.product
-      )
-      .from(valuesList);
+    const query = db.select(valuesList.id, valuesList.product).from(valuesList);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -115,10 +111,8 @@ describe(`valuesList`, () => {
     const query = db
       .select(db.orderLog.id)
       .from(db.orderLog)
-      .join(valuesList).on(
-        db.orderLog.id.eq(valuesList.id)
-        .and(db.orderLog.product.eq(valuesList.product))
-      );
+      .join(valuesList)
+      .on(db.orderLog.id.eq(valuesList.id).and(db.orderLog.product.eq(valuesList.product)));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -139,10 +133,8 @@ describe(`valuesList`, () => {
     const query = db
       .select(db.orderLog.id)
       .from(db.orderLog)
-      .innerJoin(valuesList).on(
-        db.orderLog.id.eq(valuesList.id)
-        .and(db.orderLog.product.eq(valuesList.product))
-      );
+      .innerJoin(valuesList)
+      .on(db.orderLog.id.eq(valuesList.id).and(db.orderLog.product.eq(valuesList.product)));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -163,10 +155,8 @@ describe(`valuesList`, () => {
     const query = db
       .select(db.orderLog.id)
       .from(db.orderLog)
-      .leftOuterJoin(valuesList).on(
-        db.orderLog.id.eq(valuesList.id)
-        .and(db.orderLog.product.eq(valuesList.product))
-      );
+      .leftOuterJoin(valuesList)
+      .on(db.orderLog.id.eq(valuesList.id).and(db.orderLog.product.eq(valuesList.product)));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -187,10 +177,8 @@ describe(`valuesList`, () => {
     const query = db
       .select(db.orderLog.id)
       .from(db.orderLog)
-      .leftJoin(valuesList).on(
-        db.orderLog.id.eq(valuesList.id)
-        .and(db.orderLog.product.eq(valuesList.product))
-      );
+      .leftJoin(valuesList)
+      .on(db.orderLog.id.eq(valuesList.id).and(db.orderLog.product.eq(valuesList.product)));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -211,10 +199,8 @@ describe(`valuesList`, () => {
     const query = db
       .select(db.orderLog.id)
       .from(db.orderLog)
-      .rightOuterJoin(valuesList).on(
-        db.orderLog.id.eq(valuesList.id)
-        .and(db.orderLog.product.eq(valuesList.product))
-      );
+      .rightOuterJoin(valuesList)
+      .on(db.orderLog.id.eq(valuesList.id).and(db.orderLog.product.eq(valuesList.product)));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -235,10 +221,8 @@ describe(`valuesList`, () => {
     const query = db
       .select(db.orderLog.id)
       .from(db.orderLog)
-      .innerJoin(valuesList).on(
-        db.orderLog.id.eq(valuesList.id)
-        .and(db.orderLog.product.eq(valuesList.product))
-      );
+      .innerJoin(valuesList)
+      .on(db.orderLog.id.eq(valuesList.id).and(db.orderLog.product.eq(valuesList.product)));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -259,10 +243,8 @@ describe(`valuesList`, () => {
     const query = db
       .select(db.orderLog.id)
       .from(db.orderLog)
-      .rightJoin(valuesList).on(
-        db.orderLog.id.eq(valuesList.id)
-        .and(db.orderLog.product.eq(valuesList.product))
-      );
+      .rightJoin(valuesList)
+      .on(db.orderLog.id.eq(valuesList.id).and(db.orderLog.product.eq(valuesList.product)));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -283,10 +265,8 @@ describe(`valuesList`, () => {
     const query = db
       .select(db.orderLog.id)
       .from(db.orderLog)
-      .fullOuterJoin(valuesList).on(
-        db.orderLog.id.eq(valuesList.id)
-        .and(db.orderLog.product.eq(valuesList.product))
-      );
+      .fullOuterJoin(valuesList)
+      .on(db.orderLog.id.eq(valuesList.id).and(db.orderLog.product.eq(valuesList.product)));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -303,15 +283,12 @@ describe(`valuesList`, () => {
     `);
   });
 
-
   it(`should full join a values list`, () => {
     const query = db
       .select(db.orderLog.id)
       .from(db.orderLog)
-      .fullJoin(valuesList).on(
-        db.orderLog.id.eq(valuesList.id)
-        .and(db.orderLog.product.eq(valuesList.product))
-      );
+      .fullJoin(valuesList)
+      .on(db.orderLog.id.eq(valuesList.id).and(db.orderLog.product.eq(valuesList.product)));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -332,10 +309,8 @@ describe(`valuesList`, () => {
     const query = db
       .select(db.orderLog.id)
       .from(db.orderLog)
-      .crossJoin(valuesList).on(
-        db.orderLog.id.eq(valuesList.id)
-        .and(db.orderLog.product.eq(valuesList.product))
-      );
+      .crossJoin(valuesList)
+      .on(db.orderLog.id.eq(valuesList.id).and(db.orderLog.product.eq(valuesList.product)));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       Object {
@@ -354,7 +329,8 @@ describe(`valuesList`, () => {
 
   it('should select from with values list', () => {
     const query = db.with(
-      'test', () => db.select(db.star()).from(valuesList),
+      'test',
+      () => db.select(db.star()).from(valuesList),
       ({ test }) => db.select(db.star()).from(test),
     );
 
@@ -371,5 +347,5 @@ describe(`valuesList`, () => {
         "text": "WITH test AS (SELECT vals.id, vals.product, vals.foo_id \\"fooId\\" FROM (VALUES ($1 :: integer, $2 :: text, $3 :: text), ($4, $5, $6)) AS vals (\\"id\\", \\"product\\", \\"foo_id\\")) SELECT test.id, test.product, test.\\"fooId\\" \\"fooId\\" FROM test",
       }
     `);
-  })
+  });
 });

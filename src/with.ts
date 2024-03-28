@@ -1,4 +1,11 @@
-import { CollectionToken, GroupToken, SeparatorToken, StringToken, TableToken, Token } from './tokens';
+import {
+  CollectionToken,
+  GroupToken,
+  SeparatorToken,
+  StringToken,
+  TableToken,
+  Token,
+} from './tokens';
 import { GetDataType, QueryExecutorFn } from './types';
 
 import { Expression } from './expression';
@@ -467,7 +474,7 @@ export const makeWith =
         },
         toTokens() {
           return [new TableToken(this)];
-        }
+        },
       };
 
       return fromItem;

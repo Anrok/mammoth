@@ -69,7 +69,7 @@ export const makeTable = <
     },
     toTokens() {
       return [new TableToken(this)];
-    }
+    },
   };
   return table;
 };

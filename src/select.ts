@@ -218,7 +218,11 @@ export class SelectQuery<
     table: JoinTable,
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
-      [...this.tokens, new StringToken(`LEFT OUTER JOIN`), ...(table as Table<any, any>).toTokens()],
+      [
+        ...this.tokens,
+        new StringToken(`LEFT OUTER JOIN`),
+        ...(table as Table<any, any>).toTokens(),
+      ],
       table,
     ) as any;
   }
@@ -236,7 +240,11 @@ export class SelectQuery<
     table: JoinTable,
   ): RightJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
-      [...this.tokens, new StringToken(`RIGHT OUTER JOIN`), ...(table as Table<any, any>).toTokens()],
+      [
+        ...this.tokens,
+        new StringToken(`RIGHT OUTER JOIN`),
+        ...(table as Table<any, any>).toTokens(),
+      ],
       table,
     ) as any;
   }
@@ -254,7 +262,11 @@ export class SelectQuery<
     table: JoinTable,
   ): FullJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
-      [...this.tokens, new StringToken(`FULL OUTER JOIN`), ...(table as Table<any, any>).toTokens()],
+      [
+        ...this.tokens,
+        new StringToken(`FULL OUTER JOIN`),
+        ...(table as Table<any, any>).toTokens(),
+      ],
       table,
     ) as any;
   }
