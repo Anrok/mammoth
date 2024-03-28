@@ -11,7 +11,7 @@ export interface InternalTable<TableName, Columns> {
   getName(): string;
 
   /** @internal */
-  getOriginalName(): string;
+  getOriginalName(): string | undefined;
 
   /** @internal */
   toTokens(): Array<Token>;
