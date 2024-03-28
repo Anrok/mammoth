@@ -1,10 +1,8 @@
 import * as sqlFunctions from './sql-functions';
-
 import { Column, ColumnDefinition, ColumnDefinitionFormat } from './column';
-import { InsertIntoResult, makeInsertInto } from './insert';
-import { SelectFn, makeSelect } from './select';
+import { makeInsertInto } from './insert';
+import { makeSelect } from './select';
 import { TableDefinition, makeTable } from './table';
-
 import { CaseStatement } from './case';
 import { QueryExecutorFn } from './types';
 import { Table } from './TableType';
@@ -13,7 +11,7 @@ import { makeTruncate } from './truncate';
 import { makeUpdate } from './update';
 import { makeWith } from './with';
 import { toSnakeCase } from './naming';
-import {makeValues} from './values';
+import { makeValues } from './values';
 
 const createTables = <TableDefinitions extends { [key: string]: TableDefinition<any> }>(
   tableDefinitions: TableDefinitions,

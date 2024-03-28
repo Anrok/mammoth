@@ -1,7 +1,7 @@
 import {Table} from "./TableType";
 import {Column, ColumnDefinition} from "./column";
 import {TableDefinition, TableRow} from "./table";
-import {CollectionToken, GroupToken, ParameterToken, SeparatorToken, StringToken} from "./tokens";
+import {CollectionToken, GroupToken, ParameterToken, SeparatorToken, StringToken, TableToken} from "./tokens";
 
 type ColumnDefinitionsToColumns<
     TableNameT extends string,
@@ -21,7 +21,6 @@ export function makeValues<
   definition: TableDefinitionT,
   values: Array<TableRow<TableDefinition<TableDefinitionT>>>,
   tableName: TableName,
-  originalTableName: string | undefined = undefined,
 ): Table<TableName, ColumnDefinitionsToColumns<TableName, TableDefinitionT>> {
   const columnNames = Object.keys(
     definition as unknown as object,
@@ -52,13 +51,13 @@ export function makeValues<
   const table = {
     ...columns,
     as<T extends string>(alias: T) {
-      return makeValues(definition, values, alias, tableName) as any;
+      return makeValues(definition, values, alias) as any;
     },
     getName() {
       return tableName;
     },
     getOriginalName() {
-      return originalTableName;
+      return undefined;
     },
     toTokens() {
       return [
@@ -82,11 +81,9 @@ export function makeValues<
           ]))),
         ]),
         new StringToken('AS'),
-        new CollectionToken([
-          new StringToken('v'),
-          new GroupToken([
-            new SeparatorToken(',', columnNames.map(key => new StringToken(`"${key as string}"`))),
-          ]),
+        new TableToken(this),
+        new GroupToken([
+          new SeparatorToken(',', columnNames.map(key => new StringToken(`"${key as string}"`))),
         ]),
       ]
     }
