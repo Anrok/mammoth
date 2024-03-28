@@ -234,14 +234,12 @@ describe('select', () => {
   });
 
   test('should select from values list', async () => {
-    const valuesList = db.values(
-      {
+    const valuesList = db.values('test', {
         id: text().notNull(),
         createDate: timestampWithTimeZone().notNull(),
         name: text().notNull(),
         value: integer(),
-      },
-      [
+      }, [
         {
           id: 'foo',
           createDate: new Date(),
@@ -249,7 +247,6 @@ describe('select', () => {
           value: 1,
         },
       ],
-      'test',
     );
 
     expectType<
