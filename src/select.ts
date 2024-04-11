@@ -19,7 +19,6 @@ import { ResultSet } from './result-set';
 import { Star } from './sql-functions';
 import { Table } from './TableType';
 import { TableDefinition } from './table';
-import { wrapQuotes } from './naming';
 
 export { SelectFn };
 

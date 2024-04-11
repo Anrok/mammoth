@@ -85,10 +85,10 @@ describe('select', () => {
 
   test('should select * and return nullable properties of left side properties when right joining', () => {
     expect(toSnap(db.select(star()).from(db.foo).rightJoin(db.bar))).type.toEqual<{
-      id: string | null;
+      id: unknown;
       createDate: Date | null;
       name: string | null;
-      value: number | null;
+      value: unknown;
       startDate: Date;
       endDate: Date;
       fooId: string | null;
@@ -194,10 +194,10 @@ describe('select', () => {
     expect(
       toSnap(db.select(star()).from(db.foo).leftJoin(db.bar).on(db.bar.fooId.eq(db.foo.id))),
     ).type.toEqual<{
-      id: string;
+      id: unknown;
       createDate: Date;
       name: string;
-      value: number | null;
+      value: unknown;
       startDate: Date | null;
       endDate: Date | null;
       fooId: string | null;
@@ -208,10 +208,10 @@ describe('select', () => {
     expect(
       toSnap(db.select(star()).from(db.foo).rightJoin(db.bar).on(db.bar.fooId.eq(db.foo.id))),
     ).type.toEqual<{
-      id: string | null;
+      id: unknown;
       createDate: Date | null;
       name: string | null;
-      value: number | null;
+      value: unknown;
       startDate: Date;
       endDate: Date;
       fooId: string | null;
