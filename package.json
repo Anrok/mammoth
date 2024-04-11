@@ -31,12 +31,13 @@
     "typescript": "^5.4.3"
   },
   "scripts": {
-    "test": "jest && tstyche",
+    "test": "jest",
+    "check": "tstyche",
     "prettier": "prettier --write src",
     "prettier-check": "prettier --check src",
     "prebuild": "rm -rf .build && rm -rf coverage",
     "build": "tsc",
-    "prepublishOnly": "npm run build && npm test"
+    "prepublishOnly": "npm run build &&  npm run check && npm test"
   },
   "jest": {
     "projects": [
