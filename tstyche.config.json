@@ -1,0 +1,3 @@
+{
+  "testFileMatch": ["**/__checks__/*.check.ts"]
+}

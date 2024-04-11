@@ -1,7 +1,7 @@
-import { defineDb, defineTable, integer, text, timestampWithTimeZone, uuid } from '../../.build';
-import { Query } from '../../.build/query';
-import { ResultSet } from '../../.build/result-set';
-import { expectType } from 'tsd-lite';
+import { defineDb, defineTable, integer, text, timestampWithTimeZone, uuid } from '../';
+import { Query } from '../query';
+import { ResultSet } from '../result-set';
+import { expect, describe, test } from 'tstyche';
 
 const toSnap = <T extends Query<any>>(query: T): ResultSet<T> => {
   return undefined as any;
@@ -18,10 +18,10 @@ const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 
 
 describe('truncate', () => {
   test('should truncate', () => {
-    expectType<never>(toSnap(db.truncate(db.foo)));
+    expect(toSnap(db.truncate(db.foo))).type.toEqual<never>();
   });
 
   test('should truncate ans await affected row count', async () => {
-    expectType<number>(await db.truncate(db.foo));
+    expect(await db.truncate(db.foo)).type.toEqual<number>();
   });
 });

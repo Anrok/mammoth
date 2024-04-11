@@ -7,13 +7,13 @@ import {
   text,
   timestampWithTimeZone,
   uuid,
-} from '../../.build';
-import { Table } from '../../.build/TableType';
-import { Column } from '../../.build/column';
-import { InsertQuery } from '../../.build/insert';
-import { Query } from '../../.build/query';
-import { ResultSet } from '../../.build/result-set';
-import { expectType, expectError } from 'tsd-lite';
+} from '../';
+import { Table } from '../TableType';
+import { Column } from '../column';
+import { InsertQuery } from '../insert';
+import { Query } from '../query';
+import { ResultSet } from '../result-set';
+import { expect, describe, test } from 'tstyche';
 
 const toSnap = <T extends Query<any>>(query: T): ResultSet<T> => {
   return undefined as any;
@@ -35,47 +35,47 @@ const db = defineDb({ foo, serialTest }, () => Promise.resolve({ rows: [], affec
 
 describe('insert', () => {
   test('should insert and returning count', () => {
-    expectType<number>(toSnap(db.insertInto(db.foo).values({ name: `Test` })));
+    expect(toSnap(db.insertInto(db.foo).values({ name: `Test` }))).type.toEqual<number>();
   });
 
   test('should insert multiple rows and returning count', () => {
-    expectType<number>(
+    expect(
       toSnap(db.insertInto(db.foo).values([{ name: `Test` }, { name: `Test 2` }])),
-    );
+    ).type.toEqual<number>();
   });
 
   test('should insert default column', () => {
-    expectType<number>(
+    expect(
       toSnap(db.insertInto(db.foo).values({ name: `Test`, createDate: new Date() })),
-    );
+    ).type.toEqual<number>();
   });
 
   test('should not insert unknown column', () => {
-    expectError(toSnap(db.insertInto(db.foo).values({ name: `Test`, asd: `Test` })));
+    expect(toSnap(db.insertInto(db.foo).values({ name: `Test`, asd: `Test` }))).type.toRaiseError();
   });
 
   test('should not insert invalid type in known column', () => {
-    expectError(toSnap(db.insertInto(db.foo).values({ name: 123 })));
+    expect(toSnap(db.insertInto(db.foo).values({ name: 123 }))).type.toRaiseError();
   });
 
   test('should not insert multiple rows with invalid colums', () => {
-    expectError(
+    expect(
       toSnap(db.insertInto(db.foo).values([{ name: `Test` }, { name: `Test 2`, asd: 123 }])),
-    );
+    ).type.toRaiseError();
   });
 
   test('should insert and await affect count', async () => {
-    expectType<number>(await db.insertInto(db.foo).values({ name: `Test` }));
+    expect(await db.insertInto(db.foo).values({ name: `Test` })).type.toEqual<number>();
   });
 
   test('should insert-returning and await rows', async () => {
-    expectType<{ name: string }[]>(
-      await db.insertInto(db.foo).values({ name: `Test` }).returning(`name`),
-    );
+    expect(await db.insertInto(db.foo).values({ name: `Test` }).returning(`name`)).type.toEqual<
+      { name: string }[]
+    >();
   });
 
   test('should insert without explicit value for column serial', () => {
-    expectType<
+    expect(db.insertInto(db.serialTest).values({ value: 123 })).type.toEqual<
       InsertQuery<
         Table<
           'serialTest',
@@ -90,11 +90,13 @@ describe('insert', () => {
           value: Column<'value', 'serialTest', number, false, false, undefined>;
         }
       >
-    >(db.insertInto(db.serialTest).values({ value: 123 }));
+    >();
   });
 
   test('should insert with expression of the not-null correct type', () => {
-    expectType<
+    expect(
+      db.insertInto(db.serialTest).values({ value: raw<number, true>`get_value()` }),
+    ).type.toEqual<
       InsertQuery<
         Table<
           'serialTest',
@@ -109,11 +111,13 @@ describe('insert', () => {
           value: Column<'value', 'serialTest', number, false, false, undefined>;
         }
       >
-    >(db.insertInto(db.serialTest).values({ value: raw<number, true>`get_value()` }));
+    >();
   });
 
   test('should insert with expression of the nullable correct type', () => {
-    expectType<
+    expect(
+      db.insertInto(db.serialTest).values({ value: raw<number, false>`get_value()` }),
+    ).type.toEqual<
       InsertQuery<
         Table<
           'serialTest',
@@ -128,15 +132,21 @@ describe('insert', () => {
           value: Column<'value', 'serialTest', number, false, false, undefined>;
         }
       >
-    >(db.insertInto(db.serialTest).values({ value: raw<number, false>`get_value()` }));
+    >();
   });
 
   test('should not insert with wrong type of expression', () => {
-    expectError(db.insertInto(db.serialTest).values({ value: raw<string>`get_value()` }));
+    expect(
+      db.insertInto(db.serialTest).values({ value: raw<string>`get_value()` }),
+    ).type.toRaiseError();
   });
 
   test('should insert using subquery', () => {
-    expectType<
+    expect(
+      db
+        .insertInto(db.foo)
+        .values({ name: db.select(db.foo.name.concat(` 2`)).from(db.foo).limit(1) }),
+    ).type.toEqual<
       InsertQuery<
         Table<
           'foo',
@@ -155,10 +165,6 @@ describe('insert', () => {
           value: Column<'value', 'foo', number, false, false, undefined>;
         }
       >
-    >(
-      db
-        .insertInto(db.foo)
-        .values({ name: db.select(db.foo.name.concat(` 2`)).from(db.foo).limit(1) }),
-    );
+    >();
   });
 });

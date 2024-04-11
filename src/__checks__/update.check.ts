@@ -1,8 +1,8 @@
-import { defineDb, defineTable, integer, text, timestampWithTimeZone, uuid } from '../../.build';
+import { defineDb, defineTable, integer, text, timestampWithTimeZone, uuid } from '../';
 
-import { Query } from '../../.build/query';
-import { ResultSet } from '../../.build/result-set';
-import { expectType } from 'tsd-lite';
+import { Query } from '../query';
+import { ResultSet } from '../result-set';
+import { expect, describe, test } from 'tstyche';
 
 const toSnap = <T extends Query<any>>(query: T): ResultSet<T> => {
   return undefined as any;
@@ -19,27 +19,33 @@ const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 
 
 describe('update', () => {
   test('should update and returning id', () => {
-    expectType<{
+    expect(
+      toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }).returning(`id`)),
+    ).type.toEqual<{
       id: string;
-    }>(toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }).returning(`id`)));
+    }>();
   });
 
   test('should update and returning two columns', () => {
-    expectType<{
+    expect(
+      toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }).returning(`id`, `name`)),
+    ).type.toEqual<{
       id: string;
       name: string;
-    }>(toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }).returning(`id`, `name`)));
+    }>();
   });
 
   test('should update without returning and return number', () => {
-    expectType<number>(toSnap(db.update(db.foo).set({ name: `Test`, value: 123 })));
+    expect(toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }))).type.toEqual<number>();
   });
 
   test('should update and await affected count', async () => {
-    expectType<number>(await db.update(db.foo).set({ name: `Test` }));
+    expect(await db.update(db.foo).set({ name: `Test` })).type.toEqual<number>();
   });
 
   test('should update-returning and await rows', async () => {
-    expectType<{ name: string }[]>(await db.update(db.foo).set({ name: `Test` }).returning(`name`));
+    expect(await db.update(db.foo).set({ name: `Test` }).returning(`name`)).type.toEqual<
+      { name: string }[]
+    >();
   });
 });

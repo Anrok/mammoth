@@ -4,17 +4,17 @@ import { Expression } from './expression';
 import { SelectQuery } from './select';
 import { Star } from './sql-functions';
 
-export type GetSelectableName<S> = S extends Column<infer A2, string, any, boolean, boolean, any>
-  ? A2
-  : S extends Expression<any, boolean, infer A1>
-  ? A1
-  : S extends SelectQuery<infer Columns>
-  ? keyof Columns // This only works if the query has one select clause
-  : never;
+export type GetSelectableName<S> =
+  S extends Column<infer A2, string, any, boolean, boolean, any>
+    ? A2
+    : S extends Expression<any, boolean, infer A1>
+      ? A1
+      : S extends SelectQuery<infer Columns>
+        ? keyof Columns // This only works if the query has one select clause
+        : never;
 
-export type GetSelectable<C extends Selectable> = C extends ColumnSet<infer Columns>
-  ? Columns
-  : { [K in GetSelectableName<C>]: C };
+export type GetSelectable<C extends Selectable> =
+  C extends ColumnSet<infer Columns> ? Columns : { [K in GetSelectableName<C>]: C };
 
 export type Selectable =
   | Expression<any, any, any>

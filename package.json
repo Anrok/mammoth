@@ -25,13 +25,13 @@
     "@types/jest": "^29.5.12",
     "@types/node": "^16.18.94",
     "jest": "^29.7.0",
-    "jest-runner-tsd": "^6.0.0",
     "prettier": "^3.2.5",
     "ts-jest": "^29.1.2",
+    "tstyche": "^1.1.0",
     "typescript": "^5.4.3"
   },
   "scripts": {
-    "test": "jest",
+    "test": "jest && tstyche",
     "prettier": "prettier --write src",
     "prettier-check": "prettier --check src",
     "prebuild": "rm -rf .build && rm -rf coverage",
@@ -55,21 +55,12 @@
           "/node_modules/",
           "helpers"
         ],
-        "testMatch": ["**/__tests__/*.test.ts"],
+        "testMatch": [
+          "**/__tests__/*.test.ts"
+        ],
         "transform": {
           "\\.ts$": "ts-jest"
-        },
-        "reporters": [
-          "default"
-        ]
-      },
-      {
-        "displayName": {
-            "color": "blue",
-            "name": "types"
-        },
-        "runner": "jest-runner-tsd",
-        "testMatch": ["**/__checks__/*.check.ts"]
+        }
       }
     ]
   }
