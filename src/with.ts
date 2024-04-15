@@ -23,6 +23,8 @@ export type FromItem<Q> =
       : never;
 
 type FromItemQuery<Q, Result = Q extends Query<any> ? CapturingResultSet<Q> : never> = {
+  toTokens: () => Array<Token>;
+} & {
   [K in keyof Result]: Result[K] extends GetDataType<infer DataType, infer IsNotNull>
     ? Expression<DataType, IsNotNull, K extends string ? K : never>
     : never;

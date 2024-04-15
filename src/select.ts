@@ -29,6 +29,8 @@ type ToJoinType<OldType, NewType extends JoinType> =
 // of any as the second argument to the table.
 type GetTableName<T extends Table<any, any>> = T extends Table<infer A, object> ? A : never;
 
+type FromItemOrTable = FromItem<any> | Table<string, unknown>;
+
 type AddLeftJoin<Columns, JoinTable> = {
   [K in keyof Columns]: Columns[K] extends Column<
     infer Name,
@@ -81,7 +83,7 @@ type AddJoinType<Columns, NewJoinType extends JoinType> = {
 
 type Join<
   Query extends SelectQuery<any, boolean>,
-  JoinTable extends Table<any, any> | FromItem<any>,
+  JoinTable extends FromItemOrTable,
 > =
   Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
     ? IncludesStar extends true
@@ -89,7 +91,7 @@ type Join<
       : SelectQuery<ExistingColumns, false>
     : never;
 
-type GetColumns<From extends Table<any, any> | FromItem<any>> =
+type GetColumns<From extends FromItemOrTable> =
   From extends Table<any, infer Columns>
     ? Columns
     : From extends FromItem<infer Q>
@@ -100,7 +102,7 @@ type GetColumns<From extends Table<any, any> | FromItem<any>> =
 
 type LeftJoin<
   Query extends SelectQuery<any, boolean>,
-  JoinTable extends Table<any, any> | FromItem<any>,
+  JoinTable extends FromItemOrTable,
 > =
   Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
     ? IncludesStar extends true
@@ -110,7 +112,7 @@ type LeftJoin<
 
 type RightJoin<
   Query extends SelectQuery<any, boolean>,
-  JoinTable extends Table<any, any> | FromItem<any>,
+  JoinTable extends FromItemOrTable,
 > =
   Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
     ? IncludesStar extends true
@@ -120,7 +122,7 @@ type RightJoin<
 
 type FullJoin<
   Query extends SelectQuery<any, boolean>,
-  JoinTable extends Table<any, any> | FromItem<any>,
+  JoinTable extends FromItemOrTable,
 > =
   Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
     ? IncludesStar extends true
@@ -183,102 +185,88 @@ export class SelectQuery<
   }
 
   // [ FROM from_item [, ...] ]
-  from<T extends Table<any, any>>(
+  from<T extends FromItemOrTable>(
     fromItem: T,
   ): T extends TableDefinition<any> ? never : Join<SelectQuery<Columns, IncludesStar>, T> {
-    const table = fromItem as Table<any, any>;
-
     return this.newSelectQuery(
-      [...this.tokens, new StringToken(`FROM`), ...table.toTokens()],
+      [...this.tokens, new StringToken(`FROM`), ...fromItem.toTokens()],
+      fromItem,
+    ) as any;
+  }
+
+  join<T extends FromItemOrTable>(table: T): Join<SelectQuery<Columns, IncludesStar>, T> {
+    return this.newSelectQuery(
+      [...this.tokens, new StringToken(`JOIN`), ...table.toTokens()],
       table,
     ) as any;
   }
 
-  join<T extends Table<any, any>>(table: T): Join<SelectQuery<Columns, IncludesStar>, T> {
-    return this.newSelectQuery(
-      [...this.tokens, new StringToken(`JOIN`), ...(table as Table<any, any>).toTokens()],
-      table,
-    ) as any;
-  }
-
-  innerJoin<JoinTable extends Table<string, any>>(
+  innerJoin<JoinTable extends FromItemOrTable>(
     table: JoinTable,
   ): Join<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
-      [...this.tokens, new StringToken(`INNER JOIN`), ...(table as Table<any, any>).toTokens()],
+      [...this.tokens, new StringToken(`INNER JOIN`), ...table.toTokens()],
       table,
     ) as any;
   }
 
-  leftOuterJoin<JoinTable extends Table<any, any>>(
+  leftOuterJoin<JoinTable extends FromItemOrTable>(
     table: JoinTable,
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
-      [
-        ...this.tokens,
-        new StringToken(`LEFT OUTER JOIN`),
-        ...(table as Table<any, any>).toTokens(),
-      ],
+      [...this.tokens, new StringToken(`LEFT OUTER JOIN`), ...table.toTokens()],
       table,
     ) as any;
   }
 
-  leftJoin<JoinTable extends Table<any, any>>(
+  leftJoin<JoinTable extends FromItemOrTable>(
     table: JoinTable,
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
-      [...this.tokens, new StringToken(`LEFT JOIN`), ...(table as Table<any, any>).toTokens()],
+      [...this.tokens, new StringToken(`LEFT JOIN`), ...table.toTokens()],
       table,
     ) as any;
   }
 
-  rightOuterJoin<JoinTable extends Table<any, any>>(
+  rightOuterJoin<JoinTable extends FromItemOrTable>(
     table: JoinTable,
   ): RightJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
-      [
-        ...this.tokens,
-        new StringToken(`RIGHT OUTER JOIN`),
-        ...(table as Table<any, any>).toTokens(),
-      ],
+      [...this.tokens, new StringToken(`RIGHT OUTER JOIN`), ...table.toTokens()],
       table,
     ) as any;
   }
 
-  rightJoin<JoinTable extends Table<any, any>>(
+  rightJoin<JoinTable extends FromItemOrTable>(
     table: JoinTable,
   ): RightJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
-      [...this.tokens, new StringToken(`RIGHT JOIN`), ...(table as Table<any, any>).toTokens()],
+      [...this.tokens, new StringToken(`RIGHT JOIN`), ...table.toTokens()],
       table,
     ) as any;
   }
 
-  fullOuterJoin<JoinTable extends Table<any, any>>(
+  fullOuterJoin<JoinTable extends FromItemOrTable>(
     table: JoinTable,
   ): FullJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
-      [
-        ...this.tokens,
-        new StringToken(`FULL OUTER JOIN`),
-        ...(table as Table<any, any>).toTokens(),
-      ],
+      [...this.tokens, new StringToken(`FULL OUTER JOIN`), ...table.toTokens()],
       table,
     ) as any;
   }
 
-  fullJoin<JoinTable extends Table<any, any>>(
+  fullJoin<JoinTable extends FromItemOrTable>(
     table: JoinTable,
   ): FullJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
-      [...this.tokens, new StringToken(`FULL JOIN`), ...(table as Table<any, any>).toTokens()],
+      [...this.tokens, new StringToken(`FULL JOIN`), ...table.toTokens()],
       table,
     ) as any;
   }
 
   // This doesn't go with an ON or USING afterwards
-  crossJoin<JoinTable extends Table<any, any>>(
-    table: Table<any, any>,
+  crossJoin<JoinTable extends FromItemOrTable>(
+    table: FromItemOrTable,
   ): Join<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`CROSS JOIN`), ...table.toTokens()],

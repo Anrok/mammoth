@@ -265,18 +265,18 @@ describe('select', () => {
       ],
     );
 
-    expectType<
+    expect(
+      await db
+        .select(valuesList.id, valuesList.createDate, valuesList.name, valuesList.value)
+        .from(valuesList),
+    ).type.toEqual<
       {
         id: string;
         createDate: Date;
         name: string;
         value: number | null;
       }[]
-    >(
-      await db
-        .select(valuesList.id, valuesList.createDate, valuesList.name, valuesList.value)
-        .from(valuesList),
-    );
+    >();
   });
 
   test('should select case with correct type and alias', () => {
