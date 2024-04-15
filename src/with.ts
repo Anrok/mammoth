@@ -13,13 +13,14 @@ import { Query } from './query';
 import { CapturingResultSet } from './result-set';
 import { wrapQuotes } from './naming';
 
-export type FromItem<Q> = Q extends Query<any>
-  ? FromItemQuery<Q>
-  : Q extends (args: any) => infer R
-  ? R extends Query<any>
-    ? FromItemQuery<R>
-    : never
-  : never;
+export type FromItem<Q> =
+  Q extends Query<any>
+    ? FromItemQuery<Q>
+    : Q extends (args: any) => infer R
+      ? R extends Query<any>
+        ? FromItemQuery<R>
+        : never
+      : never;
 
 type FromItemQuery<Q, Result = Q extends Query<any> ? CapturingResultSet<Q> : never> = {
   [K in keyof Result]: Result[K] extends GetDataType<infer DataType, infer IsNotNull>

@@ -4,19 +4,20 @@ import { Table } from './TableType';
 import { TableToken } from './tokens';
 import { DbNull } from './types';
 
-export type TableRow<T> = T extends TableDefinition<infer Columns>
-  ? {
-      [K in keyof Columns]: Columns[K] extends ColumnDefinition<
-        infer DataType,
-        infer IsNotNull,
-        boolean
-      >
-        ? IsNotNull extends true
-          ? DataType
-          : DataType | DbNull
-        : never;
-    }
-  : never;
+export type TableRow<T> =
+  T extends TableDefinition<infer Columns>
+    ? {
+        [K in keyof Columns]: Columns[K] extends ColumnDefinition<
+          infer DataType,
+          infer IsNotNull,
+          boolean
+        >
+          ? IsNotNull extends true
+            ? DataType
+            : DataType | DbNull
+          : never;
+      }
+    : never;
 
 export class TableDefinition<Columns> {
   private _tableDefinitionBrand: any;

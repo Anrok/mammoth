@@ -16,11 +16,11 @@ describe(`execute`, () => {
     const rows = await db.select(db.foo.id).from(db.foo);
 
     expect(rows).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "a": "1",
         },
-        Object {
+        {
           "b": "2",
         },
       ]
@@ -37,11 +37,11 @@ describe(`execute`, () => {
     const rows = await db.update(db.foo).set({ name: `Test` }).returning(`id`);
 
     expect(rows).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "a": "1",
         },
-        Object {
+        {
           "b": "2",
         },
       ]
@@ -58,11 +58,11 @@ describe(`execute`, () => {
     const rows = await db.deleteFrom(db.foo).returning(`id`);
 
     expect(rows).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "a": "1",
         },
-        Object {
+        {
           "b": "2",
         },
       ]
@@ -79,11 +79,11 @@ describe(`execute`, () => {
     const rows = await db.insertInto(db.foo).defaultValues().returning(`id`);
 
     expect(rows).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "a": "1",
         },
-        Object {
+        {
           "b": "2",
         },
       ]
@@ -128,11 +128,11 @@ describe(`execute`, () => {
     );
 
     expect(rows).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "a": "1",
         },
-        Object {
+        {
           "b": "2",
         },
       ]
@@ -147,11 +147,11 @@ describe(`execute`, () => {
     );
 
     expect(rows).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "a": "1",
         },
-        Object {
+        {
           "b": "2",
         },
       ]

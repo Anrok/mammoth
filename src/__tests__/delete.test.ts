@@ -35,9 +35,9 @@ describe(`delete`, () => {
       .returning(`id`, `name`, `createDate`);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [],
-        "text": "DELETE FROM foo USING bar, baz WHERE foo.id <> bar.id RETURNING id, name, create_date \\"createDate\\"",
+      {
+        "parameters": [],
+        "text": "DELETE FROM foo USING bar, baz WHERE foo.id <> bar.id RETURNING id, name, create_date "createDate"",
       }
     `);
   });

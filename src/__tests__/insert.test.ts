@@ -16,8 +16,8 @@ describe(`insert`, () => {
     });
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           "Test",
         ],
         "text": "INSERT INTO foo (name) VALUES ($1)",
@@ -36,8 +36,8 @@ describe(`insert`, () => {
     ]);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           "Test",
           "Test 2",
         ],
@@ -58,8 +58,8 @@ describe(`insert`, () => {
       });
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           "Test",
           "Test 2",
         ],
@@ -80,8 +80,8 @@ describe(`insert`, () => {
       });
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           "Test",
           "Test 2",
         ],
@@ -94,8 +94,8 @@ describe(`insert`, () => {
     const query = db.insertInto(db.foo).defaultValues();
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [],
+      {
+        "parameters": [],
         "text": "INSERT INTO foo DEFAULT VALUES",
       }
     `);
@@ -105,8 +105,8 @@ describe(`insert`, () => {
     const query = db.insertInto(db.foo).values({ name: `Test` }).returning(`id`);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           "Test",
         ],
         "text": "INSERT INTO foo (name) VALUES ($1) RETURNING id",
@@ -121,9 +121,9 @@ describe(`insert`, () => {
       .from(db.foo);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [],
-        "text": "INSERT INTO foo (name, value, create_date) SELECT foo.id, foo.name, foo.create_date \\"createDate\\" FROM foo",
+      {
+        "parameters": [],
+        "text": "INSERT INTO foo (name, value, create_date) SELECT foo.id, foo.name, foo.create_date "createDate" FROM foo",
       }
     `);
   });
@@ -136,11 +136,11 @@ describe(`insert`, () => {
       .returning(`name`, `value`, `createDate`);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           123,
         ],
-        "text": "INSERT INTO foo (name, value, create_date) UPDATE foo SET value = $1 RETURNING name, value, create_date \\"createDate\\"",
+        "text": "INSERT INTO foo (name, value, create_date) UPDATE foo SET value = $1 RETURNING name, value, create_date "createDate"",
       }
     `);
   });
@@ -153,11 +153,11 @@ describe(`insert`, () => {
       .returning(`name`, `value`, `createDate`);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           123,
         ],
-        "text": "INSERT INTO foo (name, value, create_date) DELETE FROM foo WHERE foo.value < $1 RETURNING name, value, create_date \\"createDate\\"",
+        "text": "INSERT INTO foo (name, value, create_date) DELETE FROM foo WHERE foo.value < $1 RETURNING name, value, create_date "createDate"",
       }
     `);
   });
@@ -166,8 +166,8 @@ describe(`insert`, () => {
     const query = db.insertInto(db.foo).values({ name: `Test` }).onConflict().doNothing();
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           "Test",
         ],
         "text": "INSERT INTO foo (name) VALUES ($1) ON CONFLICT DO NOTHING",
@@ -181,8 +181,8 @@ describe(`insert`, () => {
     });
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [],
+      {
+        "parameters": [],
         "text": "INSERT INTO foo (name) VALUES ((get_some_text()))",
       }
     `);
@@ -194,8 +194,8 @@ describe(`insert`, () => {
     });
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           " 2",
           1,
         ],
@@ -210,8 +210,8 @@ describe(`insert`, () => {
       createDate: new Date('2023-01-01T06:00:00.000Z'),
     });
     expect(toSql(query)).toMatchInlineSnapshot(`
-    Object {
-      "parameters": Array [
+    {
+      "parameters": [
         "Test",
         2023-01-01T06:00:00.000Z,
       ],

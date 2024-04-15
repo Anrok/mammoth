@@ -25,11 +25,11 @@ describe(`update`, () => {
       .returning(`id`, `createDate`);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           "Test",
         ],
-        "text": "UPDATE foo SET name = $1 WHERE foo.value IS NULL RETURNING id, create_date \\"createDate\\"",
+        "text": "UPDATE foo SET name = $1 WHERE foo.value IS NULL RETURNING id, create_date "createDate"",
       }
     `);
   });
@@ -42,8 +42,8 @@ describe(`update`, () => {
       .where(db.bar.fooId.eq(db.foo.id).and(db.bar.name.isNotNull()));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           "Test",
         ],
         "text": "UPDATE foo SET name = $1 FROM bar WHERE bar.foo_id = foo.id AND bar.name IS NOT NULL",
@@ -60,11 +60,11 @@ describe(`update`, () => {
       .where(test.fooId.eq(db.foo.id).and(test.name.isNotNull()));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           "Test",
         ],
-        "text": "UPDATE foo SET name = $1 FROM bar \\"user\\" WHERE \\"user\\".foo_id = foo.id AND \\"user\\".name IS NOT NULL",
+        "text": "UPDATE foo SET name = $1 FROM bar "user" WHERE "user".foo_id = foo.id AND "user".name IS NOT NULL",
       }
     `);
   });
@@ -73,8 +73,8 @@ describe(`update`, () => {
     const query = db.update(db.foo).set({ name: `Test` }).whereCurrentOf(`cursor1`);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           "Test",
           "cursor1",
         ],
@@ -87,11 +87,11 @@ describe(`update`, () => {
     const query = db.update(db.bar).set({ with: `Test` });
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           "Test",
         ],
-        "text": "UPDATE bar SET \\"with\\" = $1",
+        "text": "UPDATE bar SET "with" = $1",
       }
     `);
   });

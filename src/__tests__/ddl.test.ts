@@ -22,10 +22,10 @@ describe(`ddl`, () => {
     const tableDefinitions = db.getTableDefinitions();
 
     expect(tableDefinitions).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "columns": Array [
-            Object {
+      [
+        {
+          "columns": [
+            {
               "checkExpression": undefined,
               "dataType": "uuid",
               "defaultExpression": "gen_random_uuid()",
@@ -38,7 +38,7 @@ describe(`ddl`, () => {
               "referencesSelf": false,
               "referencesTable": undefined,
             },
-            Object {
+            {
               "checkExpression": undefined,
               "dataType": "timestamp with time zone",
               "defaultExpression": "now()",
@@ -51,7 +51,7 @@ describe(`ddl`, () => {
               "referencesSelf": false,
               "referencesTable": undefined,
             },
-            Object {
+            {
               "checkExpression": undefined,
               "dataType": "text",
               "defaultExpression": undefined,
@@ -64,7 +64,7 @@ describe(`ddl`, () => {
               "referencesSelf": false,
               "referencesTable": undefined,
             },
-            Object {
+            {
               "checkExpression": undefined,
               "dataType": "integer",
               "defaultExpression": undefined,
@@ -77,11 +77,11 @@ describe(`ddl`, () => {
               "referencesSelf": false,
               "referencesTable": undefined,
             },
-            Object {
+            {
               "checkExpression": undefined,
               "dataType": "my_enum_type",
               "defaultExpression": undefined,
-              "enumValues": Array [
+              "enumValues": [
                 "A",
                 "B",
                 "C",
@@ -96,8 +96,8 @@ describe(`ddl`, () => {
             },
           ],
           "name": "foo",
-          "originalDefinition": Object {
-            "createDate": Object {
+          "originalDefinition": {
+            "createDate": {
               "check": [Function],
               "default": [Function],
               "getDefinition": [Function],
@@ -107,7 +107,7 @@ describe(`ddl`, () => {
               "referencesSelf": [Function],
               "unique": [Function],
             },
-            "enumTest": Object {
+            "enumTest": {
               "check": [Function],
               "default": [Function],
               "getDefinition": [Function],
@@ -117,7 +117,7 @@ describe(`ddl`, () => {
               "referencesSelf": [Function],
               "unique": [Function],
             },
-            "id": Object {
+            "id": {
               "check": [Function],
               "default": [Function],
               "getDefinition": [Function],
@@ -127,7 +127,7 @@ describe(`ddl`, () => {
               "referencesSelf": [Function],
               "unique": [Function],
             },
-            "name": Object {
+            "name": {
               "check": [Function],
               "default": [Function],
               "getDefinition": [Function],
@@ -137,7 +137,7 @@ describe(`ddl`, () => {
               "referencesSelf": [Function],
               "unique": [Function],
             },
-            "value": Object {
+            "value": {
               "check": [Function],
               "default": [Function],
               "getDefinition": [Function],

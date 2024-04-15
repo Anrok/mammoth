@@ -39,27 +39,25 @@ type MaybeCapturingReturningResultSet<Returning, ShouldCapture extends boolean> 
         : MaybeCapturingResultSetDataType<D, false, ShouldCapture>
       : MaybeCapturingResultSetDataType<D, false, ShouldCapture>
     : Returning[K] extends Expression<infer D, infer IsNotNull, any>
-    ? MaybeCapturingResultSetDataType<D, IsNotNull, ShouldCapture>
-    : Returning[K] extends Query<{}>
-    ? MaybeCapturingResultSet<Returning[K], ShouldCapture>[keyof MaybeCapturingResultSet<
-        Returning[K],
-        ShouldCapture
-      >]
-    : never;
+      ? MaybeCapturingResultSetDataType<D, IsNotNull, ShouldCapture>
+      : Returning[K] extends Query<{}>
+        ? MaybeCapturingResultSet<Returning[K], ShouldCapture>[keyof MaybeCapturingResultSet<
+            Returning[K],
+            ShouldCapture
+          >]
+        : never;
 };
 
-type MaybeCapturingResultSet<
-  T extends Query<any>,
-  ShouldCapture extends boolean,
-> = T extends SelectQuery<infer Returning>
-  ? MaybeCapturingReturningResultSet<Returning, ShouldCapture>
-  : T extends DeleteQuery<any, infer Returning>
-  ? MaybeCapturingReturningResultSet<Returning, ShouldCapture>
-  : T extends UpdateQuery<any, infer Returning>
-  ? MaybeCapturingReturningResultSet<Returning, ShouldCapture>
-  : T extends InsertQuery<any, infer Returning>
-  ? MaybeCapturingReturningResultSet<Returning, ShouldCapture>
-  : never;
+type MaybeCapturingResultSet<T extends Query<any>, ShouldCapture extends boolean> =
+  T extends SelectQuery<infer Returning>
+    ? MaybeCapturingReturningResultSet<Returning, ShouldCapture>
+    : T extends DeleteQuery<any, infer Returning>
+      ? MaybeCapturingReturningResultSet<Returning, ShouldCapture>
+      : T extends UpdateQuery<any, infer Returning>
+        ? MaybeCapturingReturningResultSet<Returning, ShouldCapture>
+        : T extends InsertQuery<any, infer Returning>
+          ? MaybeCapturingReturningResultSet<Returning, ShouldCapture>
+          : never;
 
 export type CapturingResultSet<T extends Query<any>> = Expand<MaybeCapturingResultSet<T, true>>;
 export type ResultSet<T extends Query<any>> = Expand<MaybeCapturingResultSet<T, false>>;

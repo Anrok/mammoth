@@ -22,12 +22,8 @@ import { TableDefinition } from './table';
 export { SelectFn };
 
 type JoinType = 'left-join' | 'left-side-of-right-join' | 'full-join';
-type ToJoinType<OldType, NewType extends JoinType> = Extract<
-  OldType,
-  'left-side-of-right-join'
-> extends never
-  ? NewType
-  : OldType;
+type ToJoinType<OldType, NewType extends JoinType> =
+  Extract<OldType, 'left-side-of-right-join'> extends never ? NewType : OldType;
 
 // It's important to note that to make sure we infer the table name, we should pass object instead
 // of any as the second argument to the table.
@@ -86,49 +82,51 @@ type AddJoinType<Columns, NewJoinType extends JoinType> = {
 type Join<
   Query extends SelectQuery<any, boolean>,
   JoinTable extends Table<any, any> | FromItem<any>,
-> = Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
-  ? IncludesStar extends true
-    ? SelectQuery<ExistingColumns & Omit<GetColumns<JoinTable>, keyof ExistingColumns>, true>
-    : SelectQuery<ExistingColumns, false>
-  : never;
+> =
+  Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
+    ? IncludesStar extends true
+      ? SelectQuery<ExistingColumns & Omit<GetColumns<JoinTable>, keyof ExistingColumns>, true>
+      : SelectQuery<ExistingColumns, false>
+    : never;
 
-type GetColumns<From extends Table<any, any> | FromItem<any>> = From extends Table<
-  any,
-  infer Columns
->
-  ? Columns
-  : From extends FromItem<infer Q>
-  ? Q extends Query<infer Returning>
-    ? Returning
-    : never
-  : never;
+type GetColumns<From extends Table<any, any> | FromItem<any>> =
+  From extends Table<any, infer Columns>
+    ? Columns
+    : From extends FromItem<infer Q>
+      ? Q extends Query<infer Returning>
+        ? Returning
+        : never
+      : never;
 
 type LeftJoin<
   Query extends SelectQuery<any, boolean>,
   JoinTable extends Table<any, any> | FromItem<any>,
-> = Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
-  ? IncludesStar extends true
-    ? SelectQuery<ExistingColumns & AddJoinType<GetColumns<JoinTable>, 'left-join'>>
-    : SelectQuery<AddLeftJoin<ExistingColumns, JoinTable>>
-  : never;
+> =
+  Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
+    ? IncludesStar extends true
+      ? SelectQuery<ExistingColumns & AddJoinType<GetColumns<JoinTable>, 'left-join'>>
+      : SelectQuery<AddLeftJoin<ExistingColumns, JoinTable>>
+    : never;
 
 type RightJoin<
   Query extends SelectQuery<any, boolean>,
   JoinTable extends Table<any, any> | FromItem<any>,
-> = Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
-  ? IncludesStar extends true
-    ? SelectQuery<AddJoinType<ExistingColumns, 'left-side-of-right-join'> & GetColumns<JoinTable>>
-    : SelectQuery<AddRightJoin<ExistingColumns, JoinTable>>
-  : never;
+> =
+  Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
+    ? IncludesStar extends true
+      ? SelectQuery<AddJoinType<ExistingColumns, 'left-side-of-right-join'> & GetColumns<JoinTable>>
+      : SelectQuery<AddRightJoin<ExistingColumns, JoinTable>>
+    : never;
 
 type FullJoin<
   Query extends SelectQuery<any, boolean>,
   JoinTable extends Table<any, any> | FromItem<any>,
-> = Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
-  ? IncludesStar extends true
-    ? SelectQuery<AddJoinType<ExistingColumns & GetColumns<JoinTable>, 'full-join'>>
-    : SelectQuery<AddJoinType<ExistingColumns, 'full-join'>>
-  : never;
+> =
+  Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
+    ? IncludesStar extends true
+      ? SelectQuery<AddJoinType<ExistingColumns & GetColumns<JoinTable>, 'full-join'>>
+      : SelectQuery<AddJoinType<ExistingColumns, 'full-join'>>
+    : never;
 
 // https://www.postgresql.org/docs/12/sql-select.html
 export class SelectQuery<

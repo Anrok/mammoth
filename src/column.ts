@@ -210,8 +210,8 @@ export class Column<
       return this.originalColumnName
         ? toStringTokens(this.tableName, toSnakeCase(this.originalColumnName), this.columnName)
         : snakeCaseColumnName === (this.columnName as unknown)
-        ? toStringTokens(this.tableName, snakeCaseColumnName)
-        : toStringTokens(this.tableName, snakeCaseColumnName, this.columnName);
+          ? toStringTokens(this.tableName, snakeCaseColumnName)
+          : toStringTokens(this.tableName, snakeCaseColumnName, this.columnName);
     }
 
     return this.originalColumnName
