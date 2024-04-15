@@ -48,11 +48,11 @@ describe(`with`, () => {
     );
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [
+      {
+        "parameters": [
           10,
         ],
-        "text": "WITH \\"regionalSales\\" AS (SELECT order_log.region, SUM (order_log.amount) \\"totalSales\\" FROM order_log GROUP BY order_log.region), \\"topRegions\\" AS (SELECT \\"regionalSales\\".region FROM \\"regionalSales\\" WHERE \\"regionalSales\\".\\"totalSales\\" > (SELECT SUM (\\"regionalSales\\".\\"totalSales\\") / $1 FROM \\"regionalSales\\")) SELECT order_log.region, order_log.product, SUM (order_log.quantity) \\"productUnits\\", SUM (order_log.amount) \\"productSales\\" FROM order_log WHERE order_log.region IN (SELECT \\"topRegions\\".region FROM \\"topRegions\\") GROUP BY order_log.region, order_log.product",
+        "text": "WITH "regionalSales" AS (SELECT order_log.region, SUM (order_log.amount) "totalSales" FROM order_log GROUP BY order_log.region), "topRegions" AS (SELECT "regionalSales".region FROM "regionalSales" WHERE "regionalSales"."totalSales" > (SELECT SUM ("regionalSales"."totalSales") / $1 FROM "regionalSales")) SELECT order_log.region, order_log.product, SUM (order_log.quantity) "productUnits", SUM (order_log.amount) "productSales" FROM order_log WHERE order_log.region IN (SELECT "topRegions".region FROM "topRegions") GROUP BY order_log.region, order_log.product",
       }
     `);
   });
@@ -64,8 +64,8 @@ describe(`with`, () => {
       ({ test }) => db.select(test.id).from(test),
     );
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [],
+      {
+        "parameters": [],
         "text": "WITH test AS (SELECT order_log.id, order_log.region, order_log.product, order_log.quantity, order_log.amount FROM order_log) SELECT test.id FROM test",
       }
     `);
@@ -78,8 +78,8 @@ describe(`with`, () => {
       ({ test }) => db.select(star()).from(test),
     );
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [],
+      {
+        "parameters": [],
         "text": "WITH test AS (SELECT order_log.id, order_log.region, order_log.product, order_log.quantity, order_log.amount FROM order_log) SELECT test.id, test.region, test.product, test.quantity, test.amount FROM test",
       }
     `);
@@ -92,8 +92,8 @@ describe(`with`, () => {
       ({ test }) => db.select(test.id).from(test),
     );
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [],
+      {
+        "parameters": [],
         "text": "WITH test AS (SELECT order_log.id, order_log.region, order_log.product, order_log.quantity, order_log.amount FROM order_log) SELECT test.id FROM test",
       }
     `);
@@ -106,8 +106,8 @@ describe(`with`, () => {
       ({ test }) => db.select(test.id).from(test),
     );
     expect(toSql(query)).toMatchInlineSnapshot(`
-      Object {
-        "parameters": Array [],
+      {
+        "parameters": [],
         "text": "WITH test AS (SELECT order_log.id, order_log.region, order_log.product, order_log.quantity, order_log.amount FROM order_log) SELECT test.id FROM test",
       }
     `);

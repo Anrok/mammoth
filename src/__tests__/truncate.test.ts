@@ -29,8 +29,8 @@ describe(`truncate`, () => {
     const query = db.truncate(db.foo);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-                Object {
-                  "parameters": Array [],
+                {
+                  "parameters": [],
                   "text": "TRUNCATE foo",
                 }
             `);
@@ -40,8 +40,8 @@ describe(`truncate`, () => {
     const query = db.truncate(db.foo).restartIdentity();
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-                Object {
-                  "parameters": Array [],
+                {
+                  "parameters": [],
                   "text": "TRUNCATE foo RESTART IDENTITY",
                 }
             `);
@@ -51,8 +51,8 @@ describe(`truncate`, () => {
     const query = db.truncate(db.foo).continueIdentity();
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-                Object {
-                  "parameters": Array [],
+                {
+                  "parameters": [],
                   "text": "TRUNCATE foo CONTINUE IDENTITY",
                 }
             `);
@@ -62,8 +62,8 @@ describe(`truncate`, () => {
     const query = db.truncate(db.foo).cascade();
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-                Object {
-                  "parameters": Array [],
+                {
+                  "parameters": [],
                   "text": "TRUNCATE foo CASCADE",
                 }
             `);
@@ -73,8 +73,8 @@ describe(`truncate`, () => {
     const query = db.truncate(db.foo).restrict();
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-                Object {
-                  "parameters": Array [],
+                {
+                  "parameters": [],
                   "text": "TRUNCATE foo RESTRICT",
                 }
             `);

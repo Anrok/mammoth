@@ -12,11 +12,11 @@ import {
   text,
   timestampWithTimeZone,
   uuid,
-} from '../../.build';
+} from '../';
 
-import { Query } from '../../.build/query';
-import { ResultSet } from '../../.build/result-set';
-import { expectType, expectError } from 'tsd-lite';
+import { Query } from '../query';
+import { ResultSet } from '../result-set';
+import { expect, describe, test } from 'tstyche';
 
 const toSnap = <T extends Query<any>>(query: T): ResultSet<T> => {
   return undefined as any;
@@ -42,201 +42,212 @@ const bar = defineTable({
 });
 
 test('should output all columns and the data type', () => {
-  expectType<{
+  expect(toTableRow(foo)).type.toEqual<{
     id: string;
     createDate: Date;
     name: string;
     value: number | null;
-  }>(toTableRow(foo));
+  }>();
 });
 
 const db = defineDb({ foo, bar }, () => Promise.resolve({ rows: [], affectedCount: 0 }));
 
 describe('select', () => {
   test('should return null and not null properties', () => {
-    expectType<{
+    expect(
+      toSnap(db.select(db.foo.id, db.foo.createDate, db.foo.value).from(db.foo)),
+    ).type.toEqual<{
       id: string;
       createDate: Date;
       value: number | null;
-    }>(toSnap(db.select(db.foo.id, db.foo.createDate, db.foo.value).from(db.foo)));
+    }>();
   });
 
   test('should return nullable properties of left joined columns', () => {
-    expectType<{
+    expect(
+      toSnap(db.select(db.foo.id, db.bar.endDate, db.bar.value).from(db.foo).leftJoin(db.bar)),
+    ).type.toEqual<{
       id: string;
       endDate: Date | null;
       value: number | null;
-    }>(toSnap(db.select(db.foo.id, db.bar.endDate, db.bar.value).from(db.foo).leftJoin(db.bar)));
+    }>();
   });
 
   test('should return nullable properties of left side properties when right joining', () => {
-    expectType<{
+    expect(
+      toSnap(db.select(db.foo.name, db.bar.startDate, db.bar.value).from(db.foo).rightJoin(db.bar)),
+    ).type.toEqual<{
       value: number | null;
       name: string | null;
       startDate: Date;
-    }>(
-      toSnap(db.select(db.foo.name, db.bar.startDate, db.bar.value).from(db.foo).rightJoin(db.bar)),
-    );
+    }>();
   });
 
   test('should select * and return nullable properties of left side properties when right joining', () => {
-    expectType<{
-      id: string | null;
+    expect(toSnap(db.select(star()).from(db.foo).rightJoin(db.bar))).type.toEqual<{
+      id: unknown;
       createDate: Date | null;
       name: string | null;
-      value: number | null;
+      value: unknown;
       startDate: Date;
       endDate: Date;
       fooId: string | null;
-    }>(toSnap(db.select(star()).from(db.foo).rightJoin(db.bar)));
+    }>();
   });
 
   test('should select foo.* and ignore the rest', () => {
-    expectType<{
+    expect(toSnap(db.select(star(db.foo)).from(db.foo).innerJoin(db.bar))).type.toEqual<{
       id: string;
       createDate: Date;
       name: string;
       value: number | null;
-    }>(toSnap(db.select(star(db.foo)).from(db.foo).innerJoin(db.bar)));
+    }>();
   });
 
   test('should return renamed properties because of alias', () => {
-    expectType<{
+    expect(
+      toSnap(db.select(db.foo.name.as(`fooName`), db.foo.value.as(`fooValue`)).from(db.foo)),
+    ).type.toEqual<{
       fooName: string;
       fooValue: number | null;
-    }>(toSnap(db.select(db.foo.name.as(`fooName`), db.foo.value.as(`fooValue`)).from(db.foo)));
+    }>();
   });
 
   test('should return nullable properties of all sides because of full join', () => {
-    expectType<{
+    expect(
+      toSnap(db.select(db.foo.name, db.bar.startDate, db.bar.value).from(db.foo).fullJoin(db.bar)),
+    ).type.toEqual<{
       value: number | null;
       name: string | null;
       startDate: Date | null;
-    }>(
-      toSnap(db.select(db.foo.name, db.bar.startDate, db.bar.value).from(db.foo).fullJoin(db.bar)),
-    );
+    }>;
   });
 
   test('should select expression', () => {
-    expectType<{
+    expect(toSnap(db.select(db.foo.value.plus(1)).from(db.foo))).type.toEqual<{
       '?column?': number | null;
-    }>(toSnap(db.select(db.foo.value.plus(1)).from(db.foo)));
+    }>();
   });
 
   test('should select named expression', () => {
-    expectType<{
+    expect(toSnap(db.select(db.foo.value.plus(1).as(`test`)).from(db.foo))).type.toEqual<{
       test: number | null;
-    }>(toSnap(db.select(db.foo.value.plus(1).as(`test`)).from(db.foo)));
+    }>();
   });
 
   test('should select aggregate subquery', () => {
-    expectType<{
+    expect(
+      toSnap(db.select(db.foo.id, db.select(count()).from(db.foo)).from(db.foo)),
+    ).type.toEqual<{
       id: string;
       count: string;
-    }>(toSnap(db.select(db.foo.id, db.select(count()).from(db.foo)).from(db.foo)));
+    }>();
   });
 
   test('should select array_agg', () => {
-    expectType<{
+    expect(toSnap(db.select(arrayAgg(db.foo.name)).from(db.foo))).type.toEqual<{
       arrayAgg: string[] | null;
-    }>(toSnap(db.select(arrayAgg(db.foo.name)).from(db.foo)));
+    }>();
   });
 
   test('should select null column in subquery', () => {
-    expectType<{
+    expect(
+      toSnap(db.select(db.foo.id, db.select(db.foo.value).from(db.foo)).from(db.foo)),
+    ).type.toEqual<{
       id: string;
       value: number | null;
-    }>(toSnap(db.select(db.foo.id, db.select(db.foo.value).from(db.foo)).from(db.foo)));
+    }>();
   });
 
   test('should select aggregate with alias', () => {
-    expectType<{
+    expect(toSnap(db.select(db.foo.id, sum(db.foo.value).as(`total`)).from(db.foo))).type.toEqual<{
       id: string;
       total: number | null;
-    }>(toSnap(db.select(db.foo.id, sum(db.foo.value).as(`total`)).from(db.foo)));
+    }>();
   });
 
   test('should convert null value to not null using coalesce', () => {
-    expectType<{
+    expect(toSnap(db.select(coalesce(db.foo.value, 1)).from(db.foo))).type.toEqual<{
       coalesce: number;
-    }>(toSnap(db.select(coalesce(db.foo.value, 1)).from(db.foo)));
+    }>();
   });
 
   test('should select foo.* from foo', () => {
-    expectType<{
+    expect(toSnap(db.select(star(db.foo)).from(db.foo))).type.toEqual<{
       id: string;
       createDate: Date;
       name: string;
       value: number | null;
-    }>(toSnap(db.select(star(db.foo)).from(db.foo)));
+    }>();
   });
 
   test('should select * from foo', () => {
-    expectType<{
+    expect(toSnap(db.select(star()).from(db.foo))).type.toEqual<{
       id: string;
       createDate: Date;
       name: string;
       value: number | null;
-    }>(toSnap(db.select(star()).from(db.foo)));
+    }>();
   });
 
   test('should select * from foo left join bar', () => {
-    expectType<{
-      id: string;
+    expect(
+      toSnap(db.select(star()).from(db.foo).leftJoin(db.bar).on(db.bar.fooId.eq(db.foo.id))),
+    ).type.toEqual<{
+      id: unknown;
       createDate: Date;
       name: string;
-      value: number | null;
+      value: unknown;
       startDate: Date | null;
       endDate: Date | null;
       fooId: string | null;
-    }>(toSnap(db.select(star()).from(db.foo).leftJoin(db.bar).on(db.bar.fooId.eq(db.foo.id))));
+    }>();
   });
 
   test('should select * from foo right join bar', () => {
-    expectType<{
-      id: string | null;
+    expect(
+      toSnap(db.select(star()).from(db.foo).rightJoin(db.bar).on(db.bar.fooId.eq(db.foo.id))),
+    ).type.toEqual<{
+      id: unknown;
       createDate: Date | null;
       name: string | null;
-      value: number | null;
+      value: unknown;
       startDate: Date;
       endDate: Date;
       fooId: string | null;
-    }>(toSnap(db.select(star()).from(db.foo).rightJoin(db.bar).on(db.bar.fooId.eq(db.foo.id))));
+    }>();
   });
 
   test('should not use in with wrong data type', () => {
-    expectError(
+    expect(
       toSnap(
         db
           .select(db.foo.id)
           .from(db.foo)
-          // @dts-jest:fail:snap should not use in with wrong data type
           .where(db.foo.id.in(db.select(db.foo.createDate).from(db.foo))),
       ),
-    );
+    ).type.toRaiseError();
   });
 
   test('with test as select from foo from test', async () => {
-    expectType<
+    expect(
+      await db.with(
+        `test`,
+        () => db.select(db.foo.id, db.foo.createDate, db.foo.name, db.foo.value).from(db.foo),
+        ({ test }) => db.select(test.id, test.createDate, test.name, test.value).from(test),
+      ),
+    ).type.toEqual<
       {
         id: string;
         createDate: Date;
         name: string;
         value: number | null;
       }[]
-    >(
-      await db.with(
-        `test`,
-        () => db.select(db.foo.id, db.foo.createDate, db.foo.name, db.foo.value).from(db.foo),
-        ({ test }) => db.select(test.id, test.createDate, test.name, test.value).from(test),
-      ),
-    );
+    >();
   });
 
   test('should select case with correct type and alias', () => {
-    expectType<{
-      bar: 'A' | 'B' | 'C';
-    }>(
+    expect(
       toSnap(
         db
           .select(
@@ -252,22 +263,26 @@ describe('select', () => {
           )
           .from(db.foo),
       ),
-    );
+    ).type.toEqual<{
+      bar: 'A' | 'B' | 'C';
+    }>();
   });
 
   test('should select and await result set', async () => {
-    expectType<
+    expect(await db.select(db.foo.id, db.foo.value).from(db.foo)).type.toEqual<
       {
         id: string;
         value: number | null;
       }[]
-    >(await db.select(db.foo.id, db.foo.value).from(db.foo));
+    >();
   });
 
   test('should select raw expression', () => {
-    expectType<{
+    expect(
+      toSnap(db.select(db.foo.id, raw<number, false, `test`>`test`).from(db.foo)),
+    ).type.toEqual<{
       id: string;
       test: number | null;
-    }>(toSnap(db.select(db.foo.id, raw<number, false, `test`>`test`).from(db.foo)));
+    }>();
   });
 });
