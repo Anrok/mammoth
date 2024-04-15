@@ -81,10 +81,7 @@ type AddJoinType<Columns, NewJoinType extends JoinType> = {
     : never;
 };
 
-type Join<
-  Query extends SelectQuery<any, boolean>,
-  JoinTable extends FromItemOrTable,
-> =
+type Join<Query extends SelectQuery<any, boolean>, JoinTable extends FromItemOrTable> =
   Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
     ? IncludesStar extends true
       ? SelectQuery<ExistingColumns & Omit<GetColumns<JoinTable>, keyof ExistingColumns>, true>
@@ -100,30 +97,21 @@ type GetColumns<From extends FromItemOrTable> =
         : never
       : never;
 
-type LeftJoin<
-  Query extends SelectQuery<any, boolean>,
-  JoinTable extends FromItemOrTable,
-> =
+type LeftJoin<Query extends SelectQuery<any, boolean>, JoinTable extends FromItemOrTable> =
   Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
     ? IncludesStar extends true
       ? SelectQuery<ExistingColumns & AddJoinType<GetColumns<JoinTable>, 'left-join'>>
       : SelectQuery<AddLeftJoin<ExistingColumns, JoinTable>>
     : never;
 
-type RightJoin<
-  Query extends SelectQuery<any, boolean>,
-  JoinTable extends FromItemOrTable,
-> =
+type RightJoin<Query extends SelectQuery<any, boolean>, JoinTable extends FromItemOrTable> =
   Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
     ? IncludesStar extends true
       ? SelectQuery<AddJoinType<ExistingColumns, 'left-side-of-right-join'> & GetColumns<JoinTable>>
       : SelectQuery<AddRightJoin<ExistingColumns, JoinTable>>
     : never;
 
-type FullJoin<
-  Query extends SelectQuery<any, boolean>,
-  JoinTable extends FromItemOrTable,
-> =
+type FullJoin<Query extends SelectQuery<any, boolean>, JoinTable extends FromItemOrTable> =
   Query extends SelectQuery<infer ExistingColumns, infer IncludesStar>
     ? IncludesStar extends true
       ? SelectQuery<AddJoinType<ExistingColumns & GetColumns<JoinTable>, 'full-join'>>
