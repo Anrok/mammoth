@@ -246,6 +246,39 @@ describe('select', () => {
     >();
   });
 
+  test('should select from values list', async () => {
+    const valuesList = db.values(
+      'test',
+      {
+        id: text().notNull(),
+        createDate: timestampWithTimeZone().notNull(),
+        name: text().notNull(),
+        value: integer(),
+      },
+      [
+        {
+          id: 'foo',
+          createDate: new Date(),
+          name: 'bar',
+          value: 1,
+        },
+      ],
+    );
+
+    expect(
+      await db
+        .select(valuesList.id, valuesList.createDate, valuesList.name, valuesList.value)
+        .from(valuesList),
+    ).type.toEqual<
+      {
+        id: string;
+        createDate: Date;
+        name: string;
+        value: number | null;
+      }[]
+    >();
+  });
+
   test('should select case with correct type and alias', () => {
     expect(
       toSnap(

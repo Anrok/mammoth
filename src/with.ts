@@ -1,4 +1,11 @@
-import { CollectionToken, GroupToken, SeparatorToken, StringToken, Token } from './tokens';
+import {
+  CollectionToken,
+  GroupToken,
+  SeparatorToken,
+  StringToken,
+  TableToken,
+  Token,
+} from './tokens';
 import { GetDataType, QueryExecutorFn } from './types';
 
 import { Expression } from './expression';
@@ -16,6 +23,8 @@ export type FromItem<Q> =
       : never;
 
 type FromItemQuery<Q, Result = Q extends Query<any> ? CapturingResultSet<Q> : never> = {
+  toTokens: () => Array<Token>;
+} & {
   [K in keyof Result]: Result[K] extends GetDataType<infer DataType, infer IsNotNull>
     ? Expression<DataType, IsNotNull, K extends string ? K : never>
     : never;
@@ -465,6 +474,9 @@ export const makeWith =
 
         getOriginalName() {
           return undefined;
+        },
+        toTokens() {
+          return [new TableToken(this)];
         },
       };
 
