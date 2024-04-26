@@ -20,6 +20,7 @@ import { Table } from './TableType';
 import { TableDefinition } from './table';
 import { UpdateQuery } from './update';
 import { wrapQuotes } from './naming';
+import { isTokenable } from './sql-functions';
 
 // https://www.postgresql.org/docs/12/sql-insert.html
 export class InsertQuery<
@@ -364,12 +365,7 @@ export class InsertQuery<
                 >;
                 const value = (values as any)[columnName];
 
-                if (
-                  value &&
-                  typeof value === `object` &&
-                  'toTokens' in value &&
-                  typeof value.toTokens === `function`
-                ) {
+                if (isTokenable(value)) {
                   return new CollectionToken([
                     new StringToken(column.getSnakeCaseName()),
                     new StringToken(`=`),
@@ -467,12 +463,7 @@ export class InsertQuery<
                 >;
                 const value = (values as any)[columnName];
 
-                if (
-                  value &&
-                  typeof value === `object` &&
-                  'toTokens' in value &&
-                  typeof value.toTokens === `function`
-                ) {
+                if (isTokenable(value)) {
                   return new CollectionToken([
                     new StringToken(column.getSnakeCaseName()),
                     new StringToken(`=`),
@@ -692,9 +683,7 @@ export const makeInsertInto =
                   return new CollectionToken([
                     new StringToken(column.getSnakeCaseName()),
                     new StringToken(`=`),
-                    value && typeof value === `object` && 'toTokens' in value
-                      ? value.toTokens()
-                      : new ParameterToken(value),
+                    ...(isTokenable(value) ? value.toTokens() : [new ParameterToken(value)]),
                   ]);
                 }),
               ),
@@ -742,12 +731,7 @@ export const makeInsertInto =
                   Object.keys(values).map((columnName) => {
                     const value = (values as any)[columnName];
 
-                    if (
-                      value &&
-                      typeof value === `object` &&
-                      'toTokens' in value &&
-                      typeof value.toTokens === `function`
-                    ) {
+                    if (isTokenable(value)) {
                       return new GroupToken([new CollectionToken(value.toTokens())]);
                     } else {
                       return new ParameterToken(value);

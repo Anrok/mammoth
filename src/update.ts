@@ -15,6 +15,7 @@ import { ResultSet } from './result-set';
 import { Table } from './TableType';
 import { wrapQuotes } from './naming';
 import { FromItem } from './with';
+import { isTokenable } from './sql-functions';
 
 // https://www.postgresql.org/docs/12/sql-update.html
 export class UpdateQuery<
@@ -359,9 +360,7 @@ export const makeUpdate =
               return new CollectionToken([
                 new StringToken(wrapQuotes(column.getSnakeCaseName())),
                 new StringToken(`=`),
-                ...(value && typeof value === `object` && 'toTokens' in value
-                  ? value.toTokens()
-                  : [new ParameterToken(value)]),
+                ...(isTokenable(value) ? value.toTokens() : [new ParameterToken(value)]),
               ]);
             }),
           ),
