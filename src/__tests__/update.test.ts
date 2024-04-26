@@ -51,6 +51,33 @@ describe(`update`, () => {
     `);
   });
 
+  it(`should update from values list`, () => {
+    const valuesList = db.values(
+      'vals',
+      {
+        name: text().notNull(),
+        value: integer(),
+      },
+      [{ name: 'foo', value: 1 }],
+    );
+
+    const query = db
+      .update(db.foo)
+      .set({ value: valuesList.value })
+      .from(valuesList)
+      .where(db.foo.name.eq(valuesList.name));
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          "foo",
+          1,
+        ],
+        "text": "UPDATE foo SET value = vals.value FROM (VALUES ($1 :: text, $2 :: integer)) AS vals ("name", "value") WHERE foo.name = vals.name",
+      }
+    `);
+  });
+
   it(`should update-from foo with reserved keyword alias`, () => {
     const test = db.bar.as('user');
     const query = db
