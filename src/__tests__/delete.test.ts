@@ -41,4 +41,25 @@ describe(`delete`, () => {
       }
     `);
   });
+
+  it(`should delete from values list`, () => {
+    const valuesList = db.values(
+      'vals',
+      {
+        name: text().notNull(),
+      },
+      [{ name: 'foo' }],
+    );
+
+    const query = db.deleteFrom(db.foo).using(valuesList).where(db.foo.name.eq(valuesList.name));
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          "foo",
+        ],
+        "text": "DELETE FROM foo USING (VALUES ($1 :: text)) AS vals ("name") WHERE foo.name = vals.name",
+      }
+    `);
+  });
 });

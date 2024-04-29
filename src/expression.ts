@@ -9,6 +9,7 @@ import {
 } from './tokens';
 
 import { wrapQuotes } from './naming';
+import { isTokenable } from './sql-functions';
 
 export class Expression<DataType, IsNotNull extends boolean, Name extends string> {
   private _expressionBrand!: ['expression', DataType, IsNotNull, Name];
@@ -32,12 +33,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   ) {}
 
   private getDataTypeTokens(value: DataType | Expression<DataType, boolean, any> | Query<any>) {
-    if (
-      value &&
-      typeof value === `object` &&
-      'toTokens' in value &&
-      typeof value.toTokens === `function`
-    ) {
+    if (isTokenable(value)) {
       if (value instanceof Query) {
         return [new GroupToken(value.toTokens())];
       }

@@ -1,6 +1,5 @@
 import {
   CollectionToken,
-  GroupToken,
   ParameterToken,
   SeparatorToken,
   StringToken,
@@ -16,15 +15,16 @@ import type { ResultSet } from './result-set';
 import type { Table } from './TableType';
 import type { TableDefinition } from './table';
 import { wrapQuotes } from './naming';
+import { FromItem } from './with';
 
 export const makeDeleteFrom =
   (queryExecutor: QueryExecutorFn) =>
-  <T extends Table<any, any>>(
+  <T extends Table<string, unknown>>(
     table: T,
   ): T extends TableDefinition<any> ? never : DeleteQuery<T> => {
     return new DeleteQuery<T>(queryExecutor, [], table, 'AFFECTED_COUNT', [
       new StringToken(`DELETE FROM`),
-      new StringToken((table as Table<any, any>).getName()),
+      ...table.toTokens(),
     ]) as any;
   };
 
@@ -84,14 +84,14 @@ export class DeleteQuery<
       .catch(onRejected);
   }
 
-  using(...fromItems: Table<any, any>[]): DeleteQuery<T, Returning> {
+  using(...fromItems: Array<FromItem<any> | Table<string, unknown>>): DeleteQuery<T, Returning> {
     return this.newQueryWithTokens([
       ...this.tokens,
       new StringToken(`USING`),
       new SeparatorToken(
         `,`,
         fromItems.map((fromItem) => {
-          return new StringToken(fromItem.getName());
+          return new CollectionToken(fromItem.toTokens());
         }),
       ),
     ]);

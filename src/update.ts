@@ -14,6 +14,8 @@ import { Query } from './query';
 import { ResultSet } from './result-set';
 import { Table } from './TableType';
 import { wrapQuotes } from './naming';
+import { FromItem } from './with';
+import { isTokenable } from './sql-functions';
 
 // https://www.postgresql.org/docs/12/sql-update.html
 export class UpdateQuery<
@@ -87,15 +89,11 @@ export class UpdateQuery<
     ]);
   }
 
-  from(fromItem: Table<any, any>): UpdateQuery<T, Returning> {
+  from(fromItem: FromItem<any> | Table<string, unknown>): UpdateQuery<T, Returning> {
     return this.newQueryWithTokens([
       ...this.tokens,
       new StringToken(`FROM`),
-      fromItem.getOriginalName()
-        ? new StringToken(
-            `${wrapQuotes(fromItem.getOriginalName())} ${wrapQuotes(fromItem.getName())}`,
-          )
-        : new StringToken(wrapQuotes(fromItem.getName())),
+      ...fromItem.toTokens(),
     ]);
   }
 
@@ -327,17 +325,7 @@ export class UpdateQuery<
 
 export const makeUpdate =
   (queryExecutor: QueryExecutorFn) =>
-  <T extends Table<any, any>>(table: T) => {
-    const getTableStringToken = (table: Table<any, any>) => {
-      if (table.getOriginalName()) {
-        return new StringToken(
-          `${wrapQuotes(table.getOriginalName())} ${wrapQuotes(table.getName())}`,
-        );
-      }
-
-      return new StringToken(wrapQuotes(table.getName()));
-    };
-
+  <T extends Table<string, unknown>>(table: T) => {
     return {
       set(
         values: T extends Table<any, infer Columns>
@@ -361,7 +349,7 @@ export const makeUpdate =
 
         return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
           new StringToken(`UPDATE`),
-          getTableStringToken(table),
+          ...table.toTokens(),
           new StringToken(`SET`),
           new SeparatorToken(
             `,`,
@@ -372,9 +360,7 @@ export const makeUpdate =
               return new CollectionToken([
                 new StringToken(wrapQuotes(column.getSnakeCaseName())),
                 new StringToken(`=`),
-                value && typeof value === `object` && 'toTokens' in value
-                  ? value.toTokens()
-                  : new ParameterToken(value),
+                ...(isTokenable(value) ? value.toTokens() : [new ParameterToken(value)]),
               ]);
             }),
           ),

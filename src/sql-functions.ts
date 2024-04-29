@@ -22,7 +22,7 @@ export interface Tokenable {
 }
 
 export const isTokenable = (value: any): value is Tokenable =>
-  value && typeof value === 'object' && 'toTokens' in value;
+  value && typeof value === 'object' && 'toTokens' in value && typeof value.toTokens === `function`;
 
 export class Star {
   private _starBrand: any;
