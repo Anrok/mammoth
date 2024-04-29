@@ -107,6 +107,27 @@ describe(`valuesList`, () => {
     `);
   });
 
+  it(`should only include parameters from definition`, () => {
+    const params = [
+      { id: 1, product: 'foo', fooId: 'a1' },
+      { id: 2, product: 'bar', fooId: null },
+    ];
+
+    const valuesList = db.values('vals', {id: integer().notNull()}, params);
+
+    const query = db.select(valuesList.id).from(valuesList);
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          1,
+          2,
+        ],
+        "text": "SELECT vals.id FROM (VALUES ($1 :: integer), ($2)) AS vals ("id")",
+      }
+    `);
+  });
+
   it(`should join a values list`, () => {
     const query = db
       .select(db.orderLog.id)
