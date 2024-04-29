@@ -113,7 +113,7 @@ describe(`valuesList`, () => {
       { id: 2, product: 'bar', fooId: null },
     ];
 
-    const valuesList = db.values('vals', {id: integer().notNull()}, params);
+    const valuesList = db.values('vals', { id: integer().notNull() }, params);
 
     const query = db.select(valuesList.id).from(valuesList);
 
