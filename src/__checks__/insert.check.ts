@@ -35,19 +35,19 @@ const db = defineDb({ foo, serialTest }, () => Promise.resolve({ rows: [], affec
 
 describe('insert', () => {
   test('should insert and returning count', () => {
-    expect(toSnap(db.insertInto(db.foo).values({ name: `Test` }))).type.toEqual<number>();
+    expect(toSnap(db.insertInto(db.foo).values({ name: `Test` }))).type.toBeNumber();
   });
 
   test('should insert multiple rows and returning count', () => {
     expect(
       toSnap(db.insertInto(db.foo).values([{ name: `Test` }, { name: `Test 2` }])),
-    ).type.toEqual<number>();
+    ).type.toBeNumber();
   });
 
   test('should insert default column', () => {
     expect(
       toSnap(db.insertInto(db.foo).values({ name: `Test`, createDate: new Date() })),
-    ).type.toEqual<number>();
+    ).type.toBeNumber();
   });
 
   test('should not insert unknown column', () => {
@@ -65,17 +65,17 @@ describe('insert', () => {
   });
 
   test('should insert and await affect count', async () => {
-    expect(await db.insertInto(db.foo).values({ name: `Test` })).type.toEqual<number>();
+    expect(await db.insertInto(db.foo).values({ name: `Test` })).type.toBeNumber();
   });
 
   test('should insert-returning and await rows', async () => {
-    expect(await db.insertInto(db.foo).values({ name: `Test` }).returning(`name`)).type.toEqual<
+    expect(await db.insertInto(db.foo).values({ name: `Test` }).returning(`name`)).type.toBe<
       { name: string }[]
     >();
   });
 
   test('should insert without explicit value for column serial', () => {
-    expect(db.insertInto(db.serialTest).values({ value: 123 })).type.toEqual<
+    expect(db.insertInto(db.serialTest).values({ value: 123 })).type.toBe<
       InsertQuery<
         Table<
           'serialTest',
@@ -96,7 +96,7 @@ describe('insert', () => {
   test('should insert with expression of the not-null correct type', () => {
     expect(
       db.insertInto(db.serialTest).values({ value: raw<number, true>`get_value()` }),
-    ).type.toEqual<
+    ).type.toBe<
       InsertQuery<
         Table<
           'serialTest',
@@ -117,7 +117,7 @@ describe('insert', () => {
   test('should insert with expression of the nullable correct type', () => {
     expect(
       db.insertInto(db.serialTest).values({ value: raw<number, false>`get_value()` }),
-    ).type.toEqual<
+    ).type.toBe<
       InsertQuery<
         Table<
           'serialTest',
@@ -146,7 +146,7 @@ describe('insert', () => {
       db
         .insertInto(db.foo)
         .values({ name: db.select(db.foo.name.concat(` 2`)).from(db.foo).limit(1) }),
-    ).type.toEqual<
+    ).type.toBe<
       InsertQuery<
         Table<
           'foo',

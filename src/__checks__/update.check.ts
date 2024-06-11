@@ -21,7 +21,7 @@ describe('update', () => {
   test('should update and returning id', () => {
     expect(
       toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }).returning(`id`)),
-    ).type.toEqual<{
+    ).type.toBe<{
       id: string;
     }>();
   });
@@ -29,22 +29,22 @@ describe('update', () => {
   test('should update and returning two columns', () => {
     expect(
       toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }).returning(`id`, `name`)),
-    ).type.toEqual<{
+    ).type.toBe<{
       id: string;
       name: string;
     }>();
   });
 
   test('should update without returning and return number', () => {
-    expect(toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }))).type.toEqual<number>();
+    expect(toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }))).type.toBeNumber();
   });
 
   test('should update and await affected count', async () => {
-    expect(await db.update(db.foo).set({ name: `Test` })).type.toEqual<number>();
+    expect(await db.update(db.foo).set({ name: `Test` })).type.toBeNumber();
   });
 
   test('should update-returning and await rows', async () => {
-    expect(await db.update(db.foo).set({ name: `Test` }).returning(`name`)).type.toEqual<
+    expect(await db.update(db.foo).set({ name: `Test` }).returning(`name`)).type.toBe<
       { name: string }[]
     >();
   });
