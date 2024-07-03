@@ -167,4 +167,32 @@ describe('insert', () => {
       >
     >();
   });
+
+  test('insert with select', () => {
+    expect(
+      db
+        .insertInto(db.foo)
+        .select(db.serialTest.id, db.serialTest.value)
+        .from(db.serialTest)
+    ).type.toEqual<
+      InsertQuery<
+        Table<
+          'foo',
+          {
+            id: Column<'id', 'foo', string, true, true, undefined>;
+            createDate: Column<'createDate', 'foo', Date, true, true, undefined>;
+            name: Column<'name', 'foo', string, true, false, undefined>;
+            value: Column<'value', 'foo', number, false, false, undefined>;
+          }
+        >,
+        number,
+        {
+          id: Column<'id', 'foo', string, true, true, undefined>;
+          createDate: Column<'createDate', 'foo', Date, true, true, undefined>;
+          name: Column<'name', 'foo', string, true, false, undefined>;
+          value: Column<'value', 'foo', number, false, false, undefined>;
+        }
+      >
+    >();
+  })
 });
