@@ -189,11 +189,27 @@ export class SelectQuery<
     ) as any;
   }
 
+  joinLateral<T extends FromItemOrTable>(table: T): Join<SelectQuery<Columns, IncludesStar>, T> {
+    return this.newSelectQuery(
+      [...this.tokens, new StringToken(`JOIN LATERAL`), ...table.toTokens()],
+      table,
+    ) as any;
+  }
+
   innerJoin<JoinTable extends FromItemOrTable>(
     table: JoinTable,
   ): Join<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`INNER JOIN`), ...table.toTokens()],
+      table,
+    ) as any;
+  }
+
+  innerJoinLateral<JoinTable extends FromItemOrTable>(
+    table: JoinTable,
+  ): Join<SelectQuery<Columns, IncludesStar>, JoinTable> {
+    return this.newSelectQuery(
+      [...this.tokens, new StringToken(`INNER JOIN LATERAL`), ...table.toTokens()],
       table,
     ) as any;
   }
@@ -207,11 +223,29 @@ export class SelectQuery<
     ) as any;
   }
 
+  leftOuterJoinLateral<JoinTable extends FromItemOrTable>(
+    table: JoinTable,
+  ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
+    return this.newSelectQuery(
+      [...this.tokens, new StringToken(`LEFT OUTER JOIN LATERAL`), ...table.toTokens()],
+      table,
+    ) as any;
+  }
+
   leftJoin<JoinTable extends FromItemOrTable>(
     table: JoinTable,
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`LEFT JOIN`), ...table.toTokens()],
+      table,
+    ) as any;
+  }
+
+  leftJoinLateral<JoinTable extends FromItemOrTable>(
+    table: JoinTable,
+  ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
+    return this.newSelectQuery(
+      [...this.tokens, new StringToken(`LEFT JOIN LATERAL`), ...table.toTokens()],
       table,
     ) as any;
   }

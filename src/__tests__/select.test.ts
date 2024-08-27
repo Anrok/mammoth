@@ -566,6 +566,17 @@ describe(`select`, () => {
     `);
   });
 
+  it(`should select join lateral`, () => {
+    const query = db.select(db.foo.id).from(db.foo).joinLateral(db.bar).on(db.foo.id.eq(db.bar.fooId));
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [],
+        "text": "SELECT foo.id FROM foo JOIN LATERAL bar ON (foo.id = bar.foo_id)",
+      }
+    `);
+  });
+
   it(`should select inner join`, () => {
     const query = db
       .select(db.foo.id)
@@ -577,6 +588,21 @@ describe(`select`, () => {
       {
         "parameters": [],
         "text": "SELECT foo.id FROM foo INNER JOIN bar ON (foo.id = bar.foo_id)",
+      }
+    `);
+  });
+
+  it(`should select inner join lateral`, () => {
+    const query = db
+      .select(db.foo.id)
+      .from(db.foo)
+      .innerJoinLateral(db.bar)
+      .on(db.foo.id.eq(db.bar.fooId));
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [],
+        "text": "SELECT foo.id FROM foo INNER JOIN LATERAL bar ON (foo.id = bar.foo_id)",
       }
     `);
   });
@@ -596,6 +622,21 @@ describe(`select`, () => {
     `);
   });
 
+  it(`should select left outer join lateral`, () => {
+    const query = db
+      .select(db.foo.id)
+      .from(db.foo)
+      .leftOuterJoinLateral(db.bar)
+      .on(db.foo.id.eq(db.bar.fooId));
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [],
+        "text": "SELECT foo.id FROM foo LEFT OUTER JOIN LATERAL bar ON (foo.id = bar.foo_id)",
+      }
+    `);
+  });
+
   it(`should select left join`, () => {
     const query = db.select(db.foo.id).from(db.foo).leftJoin(db.bar).on(db.foo.id.eq(db.bar.fooId));
 
@@ -603,6 +644,17 @@ describe(`select`, () => {
       {
         "parameters": [],
         "text": "SELECT foo.id FROM foo LEFT JOIN bar ON (foo.id = bar.foo_id)",
+      }
+    `);
+  });
+
+  it(`should select left join lateral`, () => {
+    const query = db.select(db.foo.id).from(db.foo).leftJoinLateral(db.bar).on(db.foo.id.eq(db.bar.fooId));
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [],
+        "text": "SELECT foo.id FROM foo LEFT JOIN LATERAL bar ON (foo.id = bar.foo_id)",
       }
     `);
   });
