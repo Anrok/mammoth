@@ -567,7 +567,11 @@ describe(`select`, () => {
   });
 
   it(`should select join lateral`, () => {
-    const query = db.select(db.foo.id).from(db.foo).joinLateral(db.bar).on(db.foo.id.eq(db.bar.fooId));
+    const query = db
+      .select(db.foo.id)
+      .from(db.foo)
+      .joinLateral(db.bar)
+      .on(db.foo.id.eq(db.bar.fooId));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       {
@@ -649,7 +653,11 @@ describe(`select`, () => {
   });
 
   it(`should select left join lateral`, () => {
-    const query = db.select(db.foo.id).from(db.foo).leftJoinLateral(db.bar).on(db.foo.id.eq(db.bar.fooId));
+    const query = db
+      .select(db.foo.id)
+      .from(db.foo)
+      .leftJoinLateral(db.bar)
+      .on(db.foo.id.eq(db.bar.fooId));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       {
