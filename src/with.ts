@@ -445,6 +445,31 @@ export interface WithFn {
   ): Q;
 }
 
+export const makeFromItem = <Q extends Query<any>>(name: string, query: Q): FromItem<Q> => {
+  const fromItem = {
+    ...query.getReturningKeys().reduce((fromItem, key) => {
+      fromItem[key] = new Expression(
+        [new StringToken(`${wrapQuotes(name)}.${wrapQuotes(key)}`)],
+        key,
+      );
+      return fromItem;
+    }, {} as any),
+
+    getName() {
+      return name;
+    },
+
+    getOriginalName() {
+      return undefined;
+    },
+    toTokens() {
+      return [new TableToken(this)];
+    },
+  };
+
+  return fromItem;
+};
+
 export const makeWith =
   (queryExecutor: QueryExecutorFn): WithFn =>
   (...args: any[]) => {
@@ -456,31 +481,6 @@ export const makeWith =
       }
 
       return withFn(queries);
-    };
-
-    const createFromItem = (name: string, query: Query<any>) => {
-      const fromItem = {
-        ...query.getReturningKeys().reduce((fromItem, key) => {
-          fromItem[key] = new Expression(
-            [new StringToken(`${wrapQuotes(name)}.${wrapQuotes(key)}`)],
-            key,
-          );
-          return fromItem;
-        }, {} as any),
-
-        getName() {
-          return name;
-        },
-
-        getOriginalName() {
-          return undefined;
-        },
-        toTokens() {
-          return [new TableToken(this)];
-        },
-      };
-
-      return fromItem;
     };
 
     const tokens: Token[] = [];
@@ -497,7 +497,7 @@ export const makeWith =
         ]),
       );
 
-      queries[name] = createFromItem(name, withQuery);
+      queries[name] = makeFromItem(name, withQuery);
     }
 
     const callback = args[args.length - 1];

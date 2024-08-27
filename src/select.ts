@@ -11,7 +11,7 @@ import { SelectFn, Selectable } from './SelectFn';
 
 import { Column } from './column';
 import { Expression } from './expression';
-import { FromItem } from './with';
+import { FromItem, makeFromItem } from './with';
 import { Query } from './query';
 import { QueryExecutorFn } from './types';
 import { ResultSet } from './result-set';
@@ -317,16 +317,14 @@ export class SelectQuery<
     return this.tokens;
   }
 
-  on(joinCondition: boolean | Expression<boolean, boolean, string>): SelectQuery<Columns, IncludesStar> {
+  on(
+    joinCondition: boolean | Expression<boolean, boolean, string>,
+  ): SelectQuery<Columns, IncludesStar> {
     const joinConditionToken = isTokenable(joinCondition)
       ? new GroupToken(joinCondition.toTokens())
       : new ParameterToken(joinCondition);
-  
-    return this.newSelectQuery([
-      ...this.tokens,
-      new StringToken(`ON`),
-      joinConditionToken,
-    ]) as any;
+
+    return this.newSelectQuery([...this.tokens, new StringToken(`ON`), joinConditionToken]) as any;
   }
 
   using(...columns: Column<any, any, any, any, any, any>[]): SelectQuery<Columns> {
@@ -440,6 +438,16 @@ export class SelectQuery<
 
   skipLocked(): SelectQuery<Columns> {
     return this.newSelectQuery([...this.tokens, new StringToken(`SKIP LOCKED`)]);
+  }
+
+  as(name: string): FromItem<SelectQuery<Columns>> {
+    const selectTokens = this.tokens;
+    return {
+      ...makeFromItem(name, this),
+      toTokens() {
+        return [new GroupToken(selectTokens), new StringToken(`AS`), new StringToken(name)];
+      },
+    };
   }
 }
 

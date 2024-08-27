@@ -582,11 +582,7 @@ describe(`select`, () => {
   });
 
   it(`should select join lateral on true`, () => {
-    const query = db
-      .select(db.foo.id)
-      .from(db.foo)
-      .joinLateral(db.bar)
-      .on(true);
+    const query = db.select(db.foo.id).from(db.foo).joinLateral(db.bar).on(true);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       {
@@ -594,6 +590,24 @@ describe(`select`, () => {
           true,
         ],
         "text": "SELECT foo.id FROM foo JOIN LATERAL bar ON $1",
+      }
+    `);
+  });
+
+  it(`should select join lateral with alias`, () => {
+    const barSub = db.select(db.bar.id).from(db.bar).as('barSub');
+    const query = db
+      .select(db.foo.id, barSub.id.as('barId'))
+      .from(db.foo)
+      .joinLateral(barSub)
+      .on(true);
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          true,
+        ],
+        "text": "SELECT foo.id, "barSub".id "barId" FROM foo JOIN LATERAL (SELECT bar.id FROM bar) AS barSub ON $1",
       }
     `);
   });
