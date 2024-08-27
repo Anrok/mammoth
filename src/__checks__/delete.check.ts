@@ -18,14 +18,14 @@ const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 
 
 describe('delete', () => {
   test('should delete and returning id', () => {
-    expect(toSnap(db.deleteFrom(db.foo).returning(`id`))).type.toEqual<{ id: string }>();
+    expect(toSnap(db.deleteFrom(db.foo).returning(`id`))).type.toBe<{ id: string }>();
   });
 
   test('should delete and await affected row count', async () => {
-    expect(await db.deleteFrom(db.foo)).type.toEqual<number>();
+    expect(await db.deleteFrom(db.foo)).type.toBeNumber();
   });
 
   test('should delete and await rows', async () => {
-    expect(await db.deleteFrom(db.foo).returning(`id`)).type.toEqual<{ id: string }[]>();
+    expect(await db.deleteFrom(db.foo).returning(`id`)).type.toBe<{ id: string }[]>();
   });
 });

@@ -220,7 +220,7 @@ describe('data-types', () => {
           )
           .from(db.foo),
       ),
-    ).type.toEqual<{
+    ).type.toBe<{
       int8: string | null;
       bigint: string | null;
       bigserial: string | null;

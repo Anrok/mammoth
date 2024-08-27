@@ -18,10 +18,10 @@ const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 
 
 describe('truncate', () => {
   test('should truncate', () => {
-    expect(toSnap(db.truncate(db.foo))).type.toEqual<never>();
+    expect(toSnap(db.truncate(db.foo))).type.toBeNever();
   });
 
   test('should truncate ans await affected row count', async () => {
-    expect(await db.truncate(db.foo)).type.toEqual<number>();
+    expect(await db.truncate(db.foo)).type.toBeNumber();
   });
 });
