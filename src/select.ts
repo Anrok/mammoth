@@ -4,6 +4,7 @@ import {
   ParameterToken,
   SeparatorToken,
   StringToken,
+  TableToken,
   Token,
   createQueryState,
 } from './tokens';
@@ -445,7 +446,7 @@ export class SelectQuery<
     return {
       ...makeFromItem(name, this),
       toTokens() {
-        return [new GroupToken(selectTokens), new StringToken(`AS`), new StringToken(name)];
+        return [new GroupToken(selectTokens), new StringToken(`AS`), new TableToken(this)];
       },
     };
   }

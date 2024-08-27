@@ -67,6 +67,20 @@ describe(`select`, () => {
     `);
   });
 
+  it(`should select star from foo lateral join bar with alias`, () => {
+    const barSub = db.select(db.bar.id.as('barId')).from(db.bar).as('barSub');
+    const query = db.select(star()).from(db.foo).joinLateral(barSub).on(true);
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          true,
+        ],
+        "text": "SELECT foo.id, foo.create_date "createDate", foo.name, foo.value, foo.enum_test "enumTest", "barSub"."barId" "barId" FROM foo JOIN LATERAL (SELECT bar.id "barId" FROM bar) AS "barSub" ON $1",
+      }
+    `);
+  });
+
   it(`should select star plus bar alias from foo`, () => {
     const query = db
       .select(star(), db.bar.id.as(`test`))
@@ -607,7 +621,7 @@ describe(`select`, () => {
         "parameters": [
           true,
         ],
-        "text": "SELECT foo.id, "barSub".id "barId" FROM foo JOIN LATERAL (SELECT bar.id FROM bar) AS barSub ON $1",
+        "text": "SELECT foo.id, "barSub".id "barId" FROM foo JOIN LATERAL (SELECT bar.id FROM bar) AS "barSub" ON $1",
       }
     `);
   });
