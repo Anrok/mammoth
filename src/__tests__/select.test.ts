@@ -581,6 +581,23 @@ describe(`select`, () => {
     `);
   });
 
+  it(`should select join lateral on true`, () => {
+    const query = db
+      .select(db.foo.id)
+      .from(db.foo)
+      .joinLateral(db.bar)
+      .on(true);
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          true,
+        ],
+        "text": "SELECT foo.id FROM foo JOIN LATERAL bar ON $1",
+      }
+    `);
+  });
+
   it(`should select inner join`, () => {
     const query = db
       .select(db.foo.id)

@@ -15,7 +15,7 @@ import { FromItem } from './with';
 import { Query } from './query';
 import { QueryExecutorFn } from './types';
 import { ResultSet } from './result-set';
-import { Star } from './sql-functions';
+import { isTokenable, Star } from './sql-functions';
 import { Table } from './TableType';
 import { TableDefinition } from './table';
 
@@ -317,11 +317,15 @@ export class SelectQuery<
     return this.tokens;
   }
 
-  on(joinCondition: Expression<boolean, boolean, string>): SelectQuery<Columns, IncludesStar> {
+  on(joinCondition: boolean | Expression<boolean, boolean, string>): SelectQuery<Columns, IncludesStar> {
+    const joinConditionToken = isTokenable(joinCondition)
+      ? new GroupToken(joinCondition.toTokens())
+      : new ParameterToken(joinCondition);
+  
     return this.newSelectQuery([
       ...this.tokens,
       new StringToken(`ON`),
-      new GroupToken(joinCondition.toTokens()),
+      joinConditionToken,
     ]) as any;
   }
 
