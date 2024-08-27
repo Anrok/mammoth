@@ -193,6 +193,20 @@ describe(`select`, () => {
     `);
   });
 
+  it(`should select barId from foo lateral join bar with alias`, () => {
+    const barSub = db.select(db.bar.id.as('barId')).from(db.bar).as('barSub');
+    const query = db.select(barSub.barId).from(db.foo).joinLateral(barSub).on(true);
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          true,
+        ],
+        "text": "SELECT "barSub"."barId" "barId" FROM foo JOIN LATERAL (SELECT bar.id "barId" FROM bar) AS "barSub" ON $1",
+      }
+    `);
+  });
+
   it(`should alias a table plus reference it in a condition `, () => {
     const baz = db.foo.as(`baz`);
     const query = db.select(baz.id).from(baz).where(baz.value.eq(1));
