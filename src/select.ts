@@ -4,6 +4,7 @@ import {
   ParameterToken,
   SeparatorToken,
   StringToken,
+  TableToken,
   Token,
   createQueryState,
 } from './tokens';
@@ -11,11 +12,11 @@ import { SelectFn, Selectable } from './SelectFn';
 
 import { Column } from './column';
 import { Expression } from './expression';
-import { FromItem } from './with';
+import { FromItem, makeFromItem } from './with';
 import { Query } from './query';
 import { QueryExecutorFn } from './types';
 import { ResultSet } from './result-set';
-import { Star } from './sql-functions';
+import { isTokenable, Star } from './sql-functions';
 import { Table } from './TableType';
 import { TableDefinition } from './table';
 
@@ -189,11 +190,27 @@ export class SelectQuery<
     ) as any;
   }
 
+  joinLateral<T extends FromItemOrTable>(table: T): Join<SelectQuery<Columns, IncludesStar>, T> {
+    return this.newSelectQuery(
+      [...this.tokens, new StringToken(`JOIN LATERAL`), ...table.toTokens()],
+      table,
+    ) as any;
+  }
+
   innerJoin<JoinTable extends FromItemOrTable>(
     table: JoinTable,
   ): Join<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`INNER JOIN`), ...table.toTokens()],
+      table,
+    ) as any;
+  }
+
+  innerJoinLateral<JoinTable extends FromItemOrTable>(
+    table: JoinTable,
+  ): Join<SelectQuery<Columns, IncludesStar>, JoinTable> {
+    return this.newSelectQuery(
+      [...this.tokens, new StringToken(`INNER JOIN LATERAL`), ...table.toTokens()],
       table,
     ) as any;
   }
@@ -207,11 +224,29 @@ export class SelectQuery<
     ) as any;
   }
 
+  leftOuterJoinLateral<JoinTable extends FromItemOrTable>(
+    table: JoinTable,
+  ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
+    return this.newSelectQuery(
+      [...this.tokens, new StringToken(`LEFT OUTER JOIN LATERAL`), ...table.toTokens()],
+      table,
+    ) as any;
+  }
+
   leftJoin<JoinTable extends FromItemOrTable>(
     table: JoinTable,
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`LEFT JOIN`), ...table.toTokens()],
+      table,
+    ) as any;
+  }
+
+  leftJoinLateral<JoinTable extends FromItemOrTable>(
+    table: JoinTable,
+  ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
+    return this.newSelectQuery(
+      [...this.tokens, new StringToken(`LEFT JOIN LATERAL`), ...table.toTokens()],
       table,
     ) as any;
   }
@@ -283,12 +318,14 @@ export class SelectQuery<
     return this.tokens;
   }
 
-  on(joinCondition: Expression<boolean, boolean, string>): SelectQuery<Columns, IncludesStar> {
-    return this.newSelectQuery([
-      ...this.tokens,
-      new StringToken(`ON`),
-      new GroupToken(joinCondition.toTokens()),
-    ]) as any;
+  on(
+    joinCondition: boolean | Expression<boolean, boolean, string>,
+  ): SelectQuery<Columns, IncludesStar> {
+    const joinConditionToken = isTokenable(joinCondition)
+      ? new GroupToken(joinCondition.toTokens())
+      : new ParameterToken(joinCondition);
+
+    return this.newSelectQuery([...this.tokens, new StringToken(`ON`), joinConditionToken]) as any;
   }
 
   using(...columns: Column<any, any, any, any, any, any>[]): SelectQuery<Columns> {
@@ -402,6 +439,16 @@ export class SelectQuery<
 
   skipLocked(): SelectQuery<Columns> {
     return this.newSelectQuery([...this.tokens, new StringToken(`SKIP LOCKED`)]);
+  }
+
+  as(name: string): FromItem<SelectQuery<Columns>> {
+    const selectTokens = this.tokens;
+    return {
+      ...makeFromItem(name, this),
+      toTokens() {
+        return [new GroupToken(selectTokens), new StringToken(`AS`), new TableToken(this)];
+      },
+    };
   }
 }
 

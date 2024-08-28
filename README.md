@@ -6,6 +6,7 @@ This fork is based on the 1.x version rather than newer 2.x version.  We made th
 - Changes nullable expressions to use the `null` data type, rather than `undefined`.
 - Fixes `with` query to return the value provided by constructed query.
 - Adds support for constant tables using `VALUES` lists.
+- Adds support for `LATERAL` joins.
 
 ---
 
