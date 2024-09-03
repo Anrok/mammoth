@@ -54,9 +54,7 @@ const db = defineDb({ foo, bar }, () => Promise.resolve({ rows: [], affectedCoun
 
 describe('select', () => {
   test('should return null and not null properties', () => {
-    expect(
-      toSnap(db.select(db.foo.id, db.foo.createDate, db.foo.value).from(db.foo)),
-    ).type.toBe<{
+    expect(toSnap(db.select(db.foo.id, db.foo.createDate, db.foo.value).from(db.foo))).type.toBe<{
       id: string;
       createDate: Date;
       value: number | null;
@@ -136,9 +134,7 @@ describe('select', () => {
   });
 
   test('should select aggregate subquery', () => {
-    expect(
-      toSnap(db.select(db.foo.id, db.select(count()).from(db.foo)).from(db.foo)),
-    ).type.toBe<{
+    expect(toSnap(db.select(db.foo.id, db.select(count()).from(db.foo)).from(db.foo))).type.toBe<{
       id: string;
       count: string;
     }>();
@@ -311,9 +307,7 @@ describe('select', () => {
   });
 
   test('should select raw expression', () => {
-    expect(
-      toSnap(db.select(db.foo.id, raw<number, false, `test`>`test`).from(db.foo)),
-    ).type.toBe<{
+    expect(toSnap(db.select(db.foo.id, raw<number, false, `test`>`test`).from(db.foo))).type.toBe<{
       id: string;
       test: number | null;
     }>();

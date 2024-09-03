@@ -19,9 +19,7 @@ const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 
 
 describe('update', () => {
   test('should update and returning id', () => {
-    expect(
-      toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }).returning(`id`)),
-    ).type.toBe<{
+    expect(toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }).returning(`id`))).type.toBe<{
       id: string;
     }>();
   });
