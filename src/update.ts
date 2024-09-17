@@ -345,7 +345,7 @@ export const makeUpdate =
             }
           : never,
       ): UpdateQuery<T, number> {
-        const keys = Object.keys(values);
+        const keys = Object.keys(values).filter((key) => (values as any)[key] !== undefined);
 
         return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
           new StringToken(`UPDATE`),
