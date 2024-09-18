@@ -124,7 +124,7 @@ describe(`update`, () => {
   });
 
   it(`should not update if value is undefined`, () => {
-    const query = db.update(db.bar).set({});
+    const query = db.update(db.bar).set({ name: undefined, with: `Test` });
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       {
