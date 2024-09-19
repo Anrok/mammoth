@@ -351,7 +351,7 @@ export const makeUpdate =
           if (value === undefined) continue;
 
           const column = (table as any)[key] as Column<any, any, any, any, any, any>;
-        
+
           valuesToken.push(
             new CollectionToken([
               new StringToken(wrapQuotes(column.getSnakeCaseName())),
@@ -365,10 +365,7 @@ export const makeUpdate =
           new StringToken(`UPDATE`),
           ...table.toTokens(),
           new StringToken(`SET`),
-          new SeparatorToken(
-            `,`,
-            valuesToken,
-          ),
+          new SeparatorToken(`,`, valuesToken),
         ]);
       },
     };
