@@ -345,7 +345,21 @@ export const makeUpdate =
             }
           : never,
       ): UpdateQuery<T, number> {
-        const keys = Object.keys(values).filter((key) => (values as any)[key] !== undefined);
+        const valuesToken = [];
+        for (const key of Object.keys(values)) {
+          const value = (values as any)[key];
+          if (value === undefined) continue;
+
+          const column = (table as any)[key] as Column<any, any, any, any, any, any>;
+        
+          valuesToken.push(
+            new CollectionToken([
+              new StringToken(wrapQuotes(column.getSnakeCaseName())),
+              new StringToken(`=`),
+              ...(isTokenable(value) ? value.toTokens() : [new ParameterToken(value)]),
+            ]),
+          );
+        }
 
         return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
           new StringToken(`UPDATE`),
@@ -353,16 +367,7 @@ export const makeUpdate =
           new StringToken(`SET`),
           new SeparatorToken(
             `,`,
-            keys.map((key) => {
-              const column = (table as any)[key] as Column<any, any, any, any, any, any>;
-              const value = (values as any)[key];
-
-              return new CollectionToken([
-                new StringToken(wrapQuotes(column.getSnakeCaseName())),
-                new StringToken(`=`),
-                ...(isTokenable(value) ? value.toTokens() : [new ParameterToken(value)]),
-              ]);
-            }),
+            valuesToken,
           ),
         ]);
       },
