@@ -7,7 +7,10 @@ export class ParameterToken extends Token {
     super();
 
     if (parameter === undefined) {
-      console.warn('parameter is undefined. This will likely have unintended consequences.', new Error().stack);
+      console.warn(
+        'parameter is undefined. This will likely have unintended consequences.',
+        new Error().stack,
+      );
     }
 
     this.parameter = parameter;
