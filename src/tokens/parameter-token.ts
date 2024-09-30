@@ -6,6 +6,13 @@ export class ParameterToken extends Token {
   constructor(parameter: any) {
     super();
 
+    if (parameter === undefined) {
+      console.warn(
+        'parameter is undefined. This will likely have unintended consequences.',
+        new Error().stack,
+      );
+    }
+
     this.parameter = parameter;
   }
 
