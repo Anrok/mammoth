@@ -10,6 +10,7 @@ import {
 
 import { wrapQuotes } from './naming';
 import { isTokenable } from './sql-functions';
+import assert from 'assert';
 
 export class Expression<DataType, IsNotNull extends boolean, Name extends string> {
   private _expressionBrand!: ['expression', DataType, IsNotNull, Name];
@@ -137,6 +138,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
         new GroupToken(array.toTokens()),
       ]);
     } else {
+      assert(array.length > 0, 'Array must have at least one element');
       return new DefaultExpression([
         ...this.tokens,
         new StringToken(`IN`),
