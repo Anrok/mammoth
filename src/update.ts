@@ -16,6 +16,7 @@ import { Table } from './TableType';
 import { wrapQuotes } from './naming';
 import { FromItem } from './with';
 import { isTokenable } from './sql-functions';
+import assert from 'assert';
 
 // https://www.postgresql.org/docs/12/sql-update.html
 export class UpdateQuery<
@@ -360,6 +361,8 @@ export const makeUpdate =
             ]),
           );
         }
+
+        assert(valuesToken.length > 0, `SET must be setting at least one value.`);
 
         return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
           new StringToken(`UPDATE`),
