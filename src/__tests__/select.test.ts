@@ -28,28 +28,40 @@ import { enumType } from '../data-types';
 
 describe(`select`, () => {
   const foo = defineTable({
-    id: uuid().primaryKey().default(`gen_random_uuid()`),
-    createDate: timestampWithTimeZone().notNull().default(`now()`),
-    name: text().notNull(),
-    value: integer(),
-    enumTest: enumType('my_enum_type', ['A', 'B', 'C'] as const),
+    columns: {
+      id: uuid().primaryKey().default(`gen_random_uuid()`),
+      createDate: timestampWithTimeZone().notNull().default(`now()`),
+      name: text().notNull(),
+      value: integer(),
+      enumTest: enumType('my_enum_type', ['A', 'B', 'C'] as const),
+    },
+    indexes: {},
   });
 
   const bar = defineTable({
-    id: uuid().primaryKey().default(`gen_random_uuid()`),
-    fooId: uuid().notNull().references(foo, `id`),
-    name: text(),
+    columns:{
+      id: uuid().primaryKey().default(`gen_random_uuid()`),
+      fooId: uuid().notNull().references(foo, `id`),
+      name: text(),
+    },
+    indexes: {},
   });
 
   const listItem = defineTable({
-    id: uuid().primaryKey().default(`gen_random_uuid()`),
-    name: text().notNull(),
-    isGreat: boolean().notNull(),
+    columns: {
+      id: uuid().primaryKey().default(`gen_random_uuid()`),
+      name: text().notNull(),
+      isGreat: boolean().notNull(),
+    },
+    indexes: {},
   });
 
   const user = defineTable({
-    id: uuid(),
-    with: text(),
+    columns: {
+      id: uuid(),
+      with: text(),
+    },
+    indexes: {},
   });
 
   const db = defineDb({ foo, bar, listItem, user }, () =>

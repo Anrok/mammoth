@@ -165,7 +165,7 @@ export class SelectQuery<
         ? [
             ...this.returningKeys,
             ...Object.keys(table).filter(
-              (name) => ![`as`, `getName`, `getOriginalName`, `toTokens`].includes(name),
+              (name) => ![`as`, `getName`, `getOriginalName`, `toTokens`, `getIndexes`].includes(name),
             ),
           ]
         : this.returningKeys;

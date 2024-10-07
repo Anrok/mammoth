@@ -35,4 +35,25 @@ export interface InternalTable<TableName, Columns> {
         : never;
     }
   >;
+
+  getIndexes(): {[index: string]: {
+    columns: Array<Columns[keyof Columns] extends Column<
+      infer Name,
+      string,
+      infer DataType,
+      infer IsNotNull,
+      infer HasDefault,
+      infer JoinType
+    > ? Column<Name, TableName, DataType, IsNotNull, HasDefault, JoinType> : never>,
+    isUniqueKey: boolean,
+    isPrimaryKey: boolean,
+    includes: Array<Columns[keyof Columns] extends Column<
+      infer Name,
+      string,
+      infer DataType,
+      infer IsNotNull,
+      infer HasDefault,
+      infer JoinType
+    > ? Column<Name, TableName, DataType, IsNotNull, HasDefault, JoinType> : never>,
+  }};
 }

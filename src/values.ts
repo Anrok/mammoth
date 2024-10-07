@@ -1,5 +1,5 @@
 import { Table } from './TableType';
-import { Column, ColumnDefinition } from './column';
+import { Column, ColumnDefinition, ColumnDefinitionsToColumns } from './column';
 import { toSnakeCase } from './naming';
 import { TableDefinition, TableRow } from './table';
 import {
@@ -10,21 +10,6 @@ import {
   StringToken,
   TableToken,
 } from './tokens';
-
-type ColumnDefinitionsToColumns<
-  TableNameT extends string,
-  ColumnDefinitionsT extends { [column: string]: ColumnDefinition<any, any, any> },
-> = {
-  [ColumnName in keyof ColumnDefinitionsT]: ColumnName extends string
-    ? ColumnDefinitionsT[ColumnName] extends ColumnDefinition<
-        infer DataType,
-        infer IsNotNull,
-        infer HasDefault
-      >
-      ? Column<ColumnName, TableNameT, DataType, IsNotNull, HasDefault, undefined>
-      : never
-    : never;
-};
 
 export function makeValues<
   TableName extends string,

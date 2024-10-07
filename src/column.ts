@@ -52,6 +52,21 @@ export interface ColumnDefinition<
   getDefinition(): ColumnDefinitionFormat;
 }
 
+export type ColumnDefinitionsToColumns<
+  TableNameT extends string,
+  ColumnDefinitionsT extends { [column: string]: ColumnDefinition<any, any, any> },
+> = {
+  [ColumnName in keyof ColumnDefinitionsT]: ColumnName extends string
+    ? ColumnDefinitionsT[ColumnName] extends ColumnDefinition<
+        infer DataType,
+        infer IsNotNull,
+        infer HasDefault
+      >
+      ? Column<ColumnName, TableNameT, DataType, IsNotNull, HasDefault, undefined>
+      : never
+    : never;
+};
+
 export const makeColumnDefinition = <
   DataType,
   IsNotNull extends boolean = false,

@@ -14,14 +14,33 @@ const foo = defineTable({
     name: text().notNull(),
     value: integer(),
   },
-  indexes: {},
+  indexes: {
+    fooPkey: {
+      columns: [`id`],
+      isUniqueKey: true,
+      isPrimaryKey: true,
+    },
+    fooCovering: {
+      columns: [`id`],
+      isUniqueKey: true,
+      isPrimaryKey: false,
+      includes: [`name`, `value`, `createDate`],
+    },
+    fooPkeyNonNull: {
+      columns: [`id`],
+      isUniqueKey: false,
+      isPrimaryKey: false,
+      where: (table) => table.value.isNotNull(),
+    }
+  },
 });
 
 const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 }));
+const indexes = db.foo.getIndexes();
 
 describe('delete', () => {
   test('should delete and returning id', () => {
-    expect(toSnap(db.deleteFrom(db.foo).returning(`id`))).type.toBe<{ id: string }>();
+    expect(indexes).type.toBe<{ id: string }>();
   });
 
   test('should delete and await affected row count', async () => {

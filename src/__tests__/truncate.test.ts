@@ -2,18 +2,27 @@ import { defineDb, defineTable, integer, text, timestampWithTimeZone, toSql, uui
 
 describe(`truncate`, () => {
   const foo = defineTable({
-    id: uuid().primaryKey().default(`gen_random_uuid()`),
-    createDate: timestampWithTimeZone().notNull().default(`now()`),
-    name: text().notNull(),
-    value: integer(),
+    columns: {
+      id: uuid().primaryKey().default(`gen_random_uuid()`),
+      createDate: timestampWithTimeZone().notNull().default(`now()`),
+      name: text().notNull(),
+      value: integer(),
+    },
+    indexes: {},
   });
 
   const bar = defineTable({
-    id: uuid().primaryKey().default(`gen_random_uuid()`),
+    columns: {
+      id: uuid().primaryKey().default(`gen_random_uuid()`),
+    },
+    indexes: {},
   });
 
   const baz = defineTable({
-    id: uuid().primaryKey().default(`gen_random_uuid()`),
+    columns: {
+      id: uuid().primaryKey().default(`gen_random_uuid()`),
+    },
+    indexes: {},
   });
 
   const db = defineDb(

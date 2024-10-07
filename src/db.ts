@@ -12,6 +12,7 @@ import { makeUpdate } from './update';
 import { makeWith } from './with';
 import { toSnakeCase } from './naming';
 import { makeValues } from './values';
+import { Index, IndexDefinition } from './table-index';
 
 const createTables = <TableDefinitions extends { [key: string]: TableDefinition<any> }>(
   tableDefinitions: TableDefinitions,
@@ -54,19 +55,21 @@ export const defineDb = <TableDefinitions extends { [key: string]: TableDefiniti
       name: string;
       originalDefinition: any;
       columns: (ColumnDefinitionFormat & { name: string })[];
+      indexes: IndexDefinition<string, boolean, boolean, any>[];
     }[] {
       const tableNames = Object.keys(tableDefinitions);
 
       return tableNames.map((tableName) => {
         const table = tableDefinitions[tableName];
-        const columnNames = Object.keys(table);
+        const columnNames = Object.keys(table.columns);
 
         return {
           name: tableName,
           columns: columnNames.map((columnName) => ({
             name: columnName,
-            ...(table as any)[columnName].getDefinition(),
+            ...(table as any).columns[columnName].getDefinition(),
           })),
+          indexes: Object.values(table.indexes) as any,
           originalDefinition: table,
         };
       });
