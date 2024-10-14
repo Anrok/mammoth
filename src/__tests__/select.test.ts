@@ -38,7 +38,7 @@ describe(`select`, () => {
   });
 
   const bar = defineTable({
-    columns:{
+    columns: {
       id: uuid().primaryKey().default(`gen_random_uuid()`),
       fooId: uuid().notNull().references(foo, `id`),
       name: text(),

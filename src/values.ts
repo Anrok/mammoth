@@ -39,7 +39,8 @@ export function makeValues<
             ? Column<K, TableName, DataType, IsNotNull, HasDefault, undefined>
             : never
           : never;
-      }, {}
+      },
+      {}
     >,
   );
 

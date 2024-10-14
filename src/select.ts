@@ -28,7 +28,8 @@ type ToJoinType<OldType, NewType extends JoinType> =
 
 // It's important to note that to make sure we infer the table name, we should pass object instead
 // of any as the second argument to the table.
-type GetTableName<T extends Table<any, any, any>> = T extends Table<infer A, object, object> ? A : never;
+type GetTableName<T extends Table<any, any, any>> =
+  T extends Table<infer A, object, object> ? A : never;
 
 type FromItemOrTable = FromItem<any> | Table<string, unknown, unknown>;
 
@@ -165,7 +166,8 @@ export class SelectQuery<
         ? [
             ...this.returningKeys,
             ...Object.keys(table).filter(
-              (name) => ![`as`, `getName`, `getOriginalName`, `toTokens`, `getIndexes`].includes(name),
+              (name) =>
+                ![`as`, `getName`, `getOriginalName`, `toTokens`, `getIndexes`].includes(name),
             ),
           ]
         : this.returningKeys;

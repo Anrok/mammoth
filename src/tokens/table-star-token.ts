@@ -16,7 +16,10 @@ export class TableStarToken extends Token {
         new SeparatorToken(
           ',',
           Object.keys(this.table)
-            .filter((name) => ![`as`, `getName`, `getOriginalName`, `toTokens`, `getIndexes`].includes(name))
+            .filter(
+              (name) =>
+                ![`as`, `getName`, `getOriginalName`, `toTokens`, `getIndexes`].includes(name),
+            )
             .map((columnName) => this.table[columnName])
             .map((column) => {
               return new CollectionToken(

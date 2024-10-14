@@ -3,7 +3,8 @@ import { DefaultExpression, Expression } from './expression';
 import { Index } from './table-index';
 import { Token } from './tokens';
 
-export type Table<TableName, Columns, Indexes> = Columns & InternalTable<TableName, Columns, Indexes>;
+export type Table<TableName, Columns, Indexes> = Columns &
+  InternalTable<TableName, Columns, Indexes>;
 
 export interface InternalTable<TableName, Columns, Indexes> {
   /** @internal */
@@ -48,5 +49,5 @@ export interface InternalTable<TableName, Columns, Indexes> {
     >
       ? Index<Name, TableName extends string ? TableName : never, IsPrimaryKey, IsUniqueKey>
       : never;
-  },
+  };
 }

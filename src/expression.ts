@@ -11,7 +11,13 @@ import {
 import { wrapQuotes } from './naming';
 import { isTokenable } from './sql-functions';
 import assert from 'assert';
-import { InlineValueTokenWithCast, InlineStringValueToken, InlineNumberValueToken, InlineBooleanValueToken, InlineJsonbValueToken } from './tokens/inline-value-token';
+import {
+  InlineValueTokenWithCast,
+  InlineStringValueToken,
+  InlineNumberValueToken,
+  InlineBooleanValueToken,
+  InlineJsonbValueToken,
+} from './tokens/inline-value-token';
 
 export class Expression<DataType, IsNotNull extends boolean, Name extends string> {
   private _expressionBrand!: ['expression', DataType, IsNotNull, Name];
@@ -140,7 +146,10 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   in<Q extends Query<any>>(
-    array: (DataType | InlineValue<DataType>)[] | Expression<DataType, IsNotNull, any> | SpecificQuery<DataType, Q>,
+    array:
+      | (DataType | InlineValue<DataType>)[]
+      | Expression<DataType, IsNotNull, any>
+      | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     if (array && ('toTokens' in array || array instanceof Query)) {
       return new DefaultExpression([
@@ -247,7 +256,10 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
     ]);
   }
 
-  between(a: DataType | InlineValue<DataType>, b: DataType | InlineValue<DataType>): DefaultExpression<boolean> {
+  between(
+    a: DataType | InlineValue<DataType>,
+    b: DataType | InlineValue<DataType>,
+  ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`BETWEEN`),
@@ -257,7 +269,10 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
     ]);
   }
 
-  betweenSymmetric(a: DataType | InlineValue<DataType>, b: DataType | InlineValue<DataType>): DefaultExpression<boolean> {
+  betweenSymmetric(
+    a: DataType | InlineValue<DataType>,
+    b: DataType | InlineValue<DataType>,
+  ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`BETWEEN SYMMETRIC`),
@@ -300,7 +315,11 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   eq<Q extends Query<any>>(
-    value: DataType | InlineValue<DataType> | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
+    value:
+      | DataType
+      | InlineValue<DataType>
+      | Expression<DataType, boolean, any>
+      | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
@@ -310,7 +329,11 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   ne<Q extends Query<any>>(
-    value: DataType | InlineValue<DataType> | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
+    value:
+      | DataType
+      | InlineValue<DataType>
+      | Expression<DataType, boolean, any>
+      | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
@@ -320,7 +343,11 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   gt<Q extends Query<any>>(
-    value: DataType | InlineValue<DataType> | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
+    value:
+      | DataType
+      | InlineValue<DataType>
+      | Expression<DataType, boolean, any>
+      | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
@@ -330,7 +357,11 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   gte<Q extends Query<any>>(
-    value: DataType | InlineValue<DataType> | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
+    value:
+      | DataType
+      | InlineValue<DataType>
+      | Expression<DataType, boolean, any>
+      | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
@@ -340,7 +371,11 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   lt<Q extends Query<any>>(
-    value: DataType | InlineValue<DataType> | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
+    value:
+      | DataType
+      | InlineValue<DataType>
+      | Expression<DataType, boolean, any>
+      | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
@@ -350,7 +385,11 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   lte<Q extends Query<any>>(
-    value: DataType | InlineValue<DataType> | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
+    value:
+      | DataType
+      | InlineValue<DataType>
+      | Expression<DataType, boolean, any>
+      | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
@@ -393,44 +432,52 @@ export class DefaultExpression<DataType, IsNotNull extends boolean = true> exten
 }
 
 function valueToInlineValueToken<T>(value: T, castType?: string): Token {
-    if (castType !== undefined) {
-        return new InlineValueTokenWithCast(value, castType);
-    } else if (Array.isArray(value)) {
-        return new GroupToken([
-            new SeparatorToken(
-                ',',
-                value.map((item) => valueToInlineValueToken(item)),
-            ),
-        ], '{', '}');
-    } if (typeof value === `string`) {
-        return new InlineStringValueToken(value);
-    } else if (typeof value === `number`) {
-        return new InlineNumberValueToken(value);
-    } else if (typeof value === `boolean`) {
-        return new InlineBooleanValueToken(value);
-    } else if (typeof value === `object` && value !== null) {
-        return new InlineJsonbValueToken(value);
-    }
-    throw new Error(`Unsupported value type`);
+  if (castType !== undefined) {
+    return new InlineValueTokenWithCast(value, castType);
+  } else if (Array.isArray(value)) {
+    return new GroupToken(
+      [
+        new SeparatorToken(
+          ',',
+          value.map((item) => valueToInlineValueToken(item)),
+        ),
+      ],
+      '{',
+      '}',
+    );
+  }
+  if (typeof value === `string`) {
+    return new InlineStringValueToken(value);
+  } else if (typeof value === `number`) {
+    return new InlineNumberValueToken(value);
+  } else if (typeof value === `boolean`) {
+    return new InlineBooleanValueToken(value);
+  } else if (typeof value === `object` && value !== null) {
+    return new InlineJsonbValueToken(value);
+  }
+  throw new Error(`Unsupported value type`);
 }
 
 export class InlineValue<T> extends Expression<T, false, 'value'> {
-    constructor(private value: T, private castType?: string) {
-        const tokens: Token[] = [];
-        tokens.push(valueToInlineValueToken(value, castType));
+  constructor(
+    private value: T,
+    private castType?: string,
+  ) {
+    const tokens: Token[] = [];
+    tokens.push(valueToInlineValueToken(value, castType));
 
-        super(tokens, 'value');
-    }
+    super(tokens, 'value');
+  }
 
-    getValue() {
-        return this.value;
-    }
+  getValue() {
+    return this.value;
+  }
 
-    getCastType() {
-        return this.castType;
-    }
+  getCastType() {
+    return this.castType;
+  }
 }
 
 export function inlineValue<T>(value: T, castType?: string): InlineValue<T> {
-    return new InlineValue(value, castType);
+  return new InlineValue(value, castType);
 }

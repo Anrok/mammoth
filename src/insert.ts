@@ -402,9 +402,9 @@ export class InsertQuery<
     ]);
   }
 
-  onConflict<ColumnNames extends T extends Table<any, infer Columns, any> ? (keyof Columns)[] : never>(
-    ...columnNames: ColumnNames
-  ) {
+  onConflict<
+    ColumnNames extends T extends Table<any, infer Columns, any> ? (keyof Columns)[] : never,
+  >(...columnNames: ColumnNames) {
     const self = this;
     return {
       doNothing() {

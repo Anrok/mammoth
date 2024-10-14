@@ -13,7 +13,9 @@ export class AllStarToken extends Token {
   reduce(state: State, numberOfParameters: number, tables: Table<any, any, any>[]) {
     const tokens = tables.flatMap((table) => {
       return Object.keys(table)
-        .filter((name) => ![`as`, `getName`, `getOriginalName`, `toTokens`, `getIndexes`].includes(name))
+        .filter(
+          (name) => ![`as`, `getName`, `getOriginalName`, `toTokens`, `getIndexes`].includes(name),
+        )
         .map((columnName) => table[columnName])
         .map((column) => {
           return new CollectionToken(

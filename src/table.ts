@@ -21,14 +21,18 @@ export type TableRow<T> =
       }
     : never;
 
-export class TableDefinition<Columns extends {[K: string]: ColumnDefinition<any, any, any>}, Indexes> {
+export class TableDefinition<
+  Columns extends { [K: string]: ColumnDefinition<any, any, any> },
+  Indexes,
+> {
   private _tableDefinitionBrand: any;
   columns: Columns;
   defineIndexes: (columns: ColumnDefinitionsToColumns<any, Columns>) => Indexes;
 
   constructor(
     columns: Columns,
-    defineIndexes: (columns: ColumnDefinitionsToColumns<any, Columns>) => Indexes = () => ({} as Indexes)
+    defineIndexes: (columns: ColumnDefinitionsToColumns<any, Columns>) => Indexes = () =>
+      ({}) as Indexes,
   ) {
     this.columns = columns;
     this.defineIndexes = defineIndexes;
@@ -37,17 +41,16 @@ export class TableDefinition<Columns extends {[K: string]: ColumnDefinition<any,
 
 export const makeTable = <
   TableName extends string,
-  ColumnDefinitions extends {[column: string]: ColumnDefinition<any, any, any> },
-  IndexDefinitions extends {[index: string]: IndexDefinition<
-    boolean,
-    boolean
-  >},
+  ColumnDefinitions extends { [column: string]: ColumnDefinition<any, any, any> },
+  IndexDefinitions extends { [index: string]: IndexDefinition<boolean, boolean> },
 >(
   tableName: TableName,
   originalTableName: string | undefined,
   tableDefinition: {
-    columns: ColumnDefinitions,
-    defineIndexes?: (columns: ColumnDefinitionsToColumns<TableName, ColumnDefinitions>) => IndexDefinitions,
+    columns: ColumnDefinitions;
+    defineIndexes?: (
+      columns: ColumnDefinitionsToColumns<TableName, ColumnDefinitions>,
+    ) => IndexDefinitions;
   },
 ) => {
   const columnNames = Object.keys(
@@ -72,7 +75,8 @@ export const makeTable = <
     {} as ColumnDefinitionsToColumns<TableName, ColumnDefinitions>,
   );
 
-  const indexDefinitions = tableDefinition.defineIndexes?.(columnsForIndexes) ?? {} as IndexDefinitions;
+  const indexDefinitions =
+    tableDefinition.defineIndexes?.(columnsForIndexes) ?? ({} as IndexDefinitions);
 
   const indexNames = Object.keys(
     indexDefinitions as unknown as object,
@@ -80,15 +84,18 @@ export const makeTable = <
 
   const indexes = indexNames.reduce(
     (map, indexName) => {
-      const {
-        expressions,
-        include,
-        where,
+      const { expressions, include, where, type, isPrimaryKey, isUniqueKey } =
+        indexDefinitions[indexName].getDefinition();
+      const index = new Index(
+        indexName as string,
+        tableName,
         type,
         isPrimaryKey,
         isUniqueKey,
-      } = indexDefinitions[indexName].getDefinition();
-      const index = new Index(indexName as string, tableName, type, isPrimaryKey, isUniqueKey, expressions, include, where) as any;
+        expressions,
+        include,
+        where,
+      ) as any;
       map[indexName] = index;
       return map;
     },
@@ -111,7 +118,7 @@ export const makeTable = <
     },
     getIndexes() {
       return indexes;
-    }
+    },
   };
   return table;
 };
@@ -121,11 +128,9 @@ export const defineTable = <
   Columns extends { [column: string]: ColumnDefinition<any, boolean, boolean> },
   IndexNames extends string,
   Indexes extends { [Index in IndexNames]: IndexDefinition<boolean, boolean> },
->(
-  tableDefinition: {
-    columns: Columns,
-    defineIndexes?(columns: ColumnDefinitionsToColumns<TableName, Columns>): Indexes,
-  },
-): TableDefinition<Columns, Indexes> => {
+>(tableDefinition: {
+  columns: Columns;
+  defineIndexes?(columns: ColumnDefinitionsToColumns<TableName, Columns>): Indexes;
+}): TableDefinition<Columns, Indexes> => {
   return tableDefinition as any;
 };

@@ -20,7 +20,7 @@ const toSnap = <T extends Query<any>>(query: T): ResultSet<T> => {
 };
 
 const foo = defineTable({
-  columns:{
+  columns: {
     id: uuid().primaryKey().default(`gen_random_uuid()`),
     createDate: timestampWithTimeZone().notNull().default(`now()`),
     name: text().notNull(),

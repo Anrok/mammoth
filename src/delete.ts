@@ -84,7 +84,9 @@ export class DeleteQuery<
       .catch(onRejected);
   }
 
-  using(...fromItems: Array<FromItem<any> | Table<string, unknown, unknown>>): DeleteQuery<T, Returning> {
+  using(
+    ...fromItems: Array<FromItem<any> | Table<string, unknown, unknown>>
+  ): DeleteQuery<T, Returning> {
     return this.newQueryWithTokens([
       ...this.tokens,
       new StringToken(`USING`),
@@ -115,7 +117,10 @@ export class DeleteQuery<
 
   returning<C1 extends keyof (T extends Table<string, infer Columns, unknown> ? Columns : never)>(
     column1: C1,
-  ): DeleteQuery<T, GetReturning<T extends Table<string, infer Columns, unknown> ? Columns : never, C1>>;
+  ): DeleteQuery<
+    T,
+    GetReturning<T extends Table<string, infer Columns, unknown> ? Columns : never, C1>
+  >;
   returning<C1 extends keyof TableColumns, C2 extends keyof TableColumns>(
     column1: C1,
     column2: C2,

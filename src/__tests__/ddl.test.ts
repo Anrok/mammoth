@@ -4,13 +4,13 @@ import { enumType } from '../data-types';
 
 describe(`ddl`, () => {
   const foo = defineTable({
-    columns:{
+    columns: {
       id: uuid().primaryKey().default(`gen_random_uuid()`),
       createDate: timestampWithTimeZone().notNull().default(`now()`),
       name: text().notNull(),
       value: integer(),
       enumTest: enumType('my_enum_type', ['A', 'B', 'C']),
-    }
+    },
   });
 
   const db = defineDb(

@@ -181,28 +181,24 @@ export class Column<
     private readonly originalColumnName: string | undefined,
     private readonly isColumnForIndexExpression: boolean = false,
   ) {
-    const tokens = isColumnForIndexExpression ? [new StringToken(toSnakeCase(columnName))] :
-      originalColumnName
+    const tokens = isColumnForIndexExpression
+      ? [new StringToken(toSnakeCase(columnName))]
+      : originalColumnName
         ? [
-          new StringToken(
-            `${wrapQuotes(tableName as unknown as string)}.${wrapQuotes(
-              toSnakeCase(originalColumnName),
-            )}`,
-          ),
-        ]
-      : [
-          new StringToken(
-            `${wrapQuotes(tableName as unknown as string)}.${wrapQuotes(
-              toSnakeCase(columnName),
-            )}`,
-          ),
-        ];
-    super(
-      tokens,
-      columnName as any,
-      false,
-      isColumnForIndexExpression
-    );
+            new StringToken(
+              `${wrapQuotes(tableName as unknown as string)}.${wrapQuotes(
+                toSnakeCase(originalColumnName),
+              )}`,
+            ),
+          ]
+        : [
+            new StringToken(
+              `${wrapQuotes(tableName as unknown as string)}.${wrapQuotes(
+                toSnakeCase(columnName),
+              )}`,
+            ),
+          ];
+    super(tokens, columnName as any, false, isColumnForIndexExpression);
   }
 
   as<AliasName extends string>(

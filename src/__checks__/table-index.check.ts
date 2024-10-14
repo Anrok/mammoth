@@ -33,7 +33,7 @@ describe('defineIndexes', () => {
       'fooGin',
       'fooCovering',
       'fooNonNull',
-      'fooExpression'
+      'fooExpression',
     ]);
   });
 
