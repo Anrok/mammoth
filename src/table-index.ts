@@ -50,11 +50,6 @@ export class Index<
   private _indexBrand: any;
 
   /** @internal */
-  getSnakeCaseName() {
-    return wrapQuotes(toSnakeCase(this.indexName));
-  }
-
-  /** @internal */
   getName() {
     return this.indexName;
   }

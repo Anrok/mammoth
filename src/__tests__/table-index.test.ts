@@ -47,7 +47,7 @@ describe('defineIndexes', () => {
   test('should generate correct tokens for an index with an expression as part of the compound index', () => {
     expect(toSql(indexes.fooExpression).text).toEqual('CREATE INDEX foo_expression ON public.foo USING gin (id, name, (value > 25)) WHERE (name = \'foo\')');
   });
-    test('should generate correct tokens for an index with an enum in the where clause', () => {
-        expect(toSql(indexes.fooWhereEnum).text).toEqual('CREATE INDEX foo_where_enum ON public.foo USING btree (id) WHERE (status = \'open\'::open_status)');
-    });
+  test('should generate correct tokens for an index with an enum in the where clause', () => {
+    expect(toSql(indexes.fooWhereEnum).text).toEqual('CREATE INDEX foo_where_enum ON public.foo USING btree (id) WHERE (status = \'open\'::open_status)');
+  });
 });
