@@ -75,7 +75,7 @@ export const defineDb = <TableDefinitions extends { [key: string]: TableDefiniti
         // Recompute columns to determine index definitions. A little inefficient, but this function is
         // only intended to be used for debugging and testing purposes.
         const columns = columnNames.reduce((map, columnName) => {
-          const column = new Column(columnName as string, tableName, undefined) as any;
+          const column = new Column(columnName as string, tableName, undefined, true) as any;
           map[columnName] = column;
           return map;
         }, {} as any);
