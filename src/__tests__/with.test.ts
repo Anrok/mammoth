@@ -9,7 +9,7 @@ describe(`with`, () => {
       quantity: integer().notNull(),
       amount: integer().notNull(),
     },
-    indexes: {}
+    defineIndexes: () => ({})
   });
 
   const db = defineDb(

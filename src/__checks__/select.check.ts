@@ -33,7 +33,6 @@ const foo = defineTable({
     name: text().notNull(),
     value: integer(),
   },
-  indexes: {},
 });
 
 const bar = defineTable({
@@ -44,7 +43,6 @@ const bar = defineTable({
     value: integer(),
     fooId: uuid().references(foo, 'id'),
   },
-  indexes: {},
 });
 
 test('should output all columns and the data type', () => {

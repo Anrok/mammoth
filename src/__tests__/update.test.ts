@@ -8,7 +8,6 @@ describe(`update`, () => {
       name: text().notNull(),
       value: integer(),
     },
-    indexes: {},
   });
 
   const bar = defineTable({
@@ -18,7 +17,6 @@ describe(`update`, () => {
       name: text(),
       with: text(),
     },
-    indexes: {},
   });
 
   const db = defineDb({ foo, bar }, () => Promise.resolve({ rows: [], affectedCount: 0 }));

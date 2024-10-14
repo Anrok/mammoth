@@ -1,9 +1,11 @@
 import { Column } from './column';
+import { DefaultExpression, Expression } from './expression';
+import { Index } from './table-index';
 import { Token } from './tokens';
 
-export type Table<TableName, Columns> = Columns & InternalTable<TableName, Columns>;
+export type Table<TableName, Columns, Indexes> = Columns & InternalTable<TableName, Columns, Indexes>;
 
-export interface InternalTable<TableName, Columns> {
+export interface InternalTable<TableName, Columns, Indexes> {
   /** @internal */
   _tableBrand: any;
 
@@ -33,27 +35,18 @@ export interface InternalTable<TableName, Columns> {
       >
         ? Column<Name, T, DataType, IsNotNull, HasDefault, JoinType>
         : never;
-    }
+    },
+    Indexes
   >;
 
-  getIndexes(): {[index: string]: {
-    columns: Array<Columns[keyof Columns] extends Column<
+  getIndexes(): {
+    [K in keyof Indexes]: Indexes[K] extends Index<
       infer Name,
-      string,
-      infer DataType,
-      infer IsNotNull,
-      infer HasDefault,
-      infer JoinType
-    > ? Column<Name, TableName, DataType, IsNotNull, HasDefault, JoinType> : never>,
-    isUniqueKey: boolean,
-    isPrimaryKey: boolean,
-    includes: Array<Columns[keyof Columns] extends Column<
-      infer Name,
-      string,
-      infer DataType,
-      infer IsNotNull,
-      infer HasDefault,
-      infer JoinType
-    > ? Column<Name, TableName, DataType, IsNotNull, HasDefault, JoinType> : never>,
-  }};
+      TableName extends string ? TableName : never,
+      infer IsPrimaryKey,
+      infer IsUniqueKey
+    >
+      ? Index<Name, TableName extends string ? TableName : never, IsPrimaryKey, IsUniqueKey>
+      : never;
+  },
 }

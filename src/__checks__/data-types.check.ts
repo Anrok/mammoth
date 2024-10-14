@@ -145,7 +145,6 @@ const foo = defineTable({
     array: array(text()),
     array2d: array2d(text()),
   },
-  indexes: {},
 });
 
 const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 }));

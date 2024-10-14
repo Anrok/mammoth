@@ -8,7 +8,6 @@ describe(`execute`, () => {
       name: text().notNull(),
       value: integer(),
     },
-    indexes: {},
   });
 
   const db = defineDb({ foo }, () =>

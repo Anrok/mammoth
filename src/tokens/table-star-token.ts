@@ -6,7 +6,7 @@ import { SeparatorToken } from './separator-token';
 import type { Table } from '../TableType';
 
 export class TableStarToken extends Token {
-  constructor(private readonly table: Table<any, any>) {
+  constructor(private readonly table: Table<any, any, any>) {
     super();
   }
 

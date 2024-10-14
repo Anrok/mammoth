@@ -28,9 +28,9 @@ type ToJoinType<OldType, NewType extends JoinType> =
 
 // It's important to note that to make sure we infer the table name, we should pass object instead
 // of any as the second argument to the table.
-type GetTableName<T extends Table<any, any>> = T extends Table<infer A, object> ? A : never;
+type GetTableName<T extends Table<any, any, any>> = T extends Table<infer A, object, object> ? A : never;
 
-type FromItemOrTable = FromItem<any> | Table<string, unknown>;
+type FromItemOrTable = FromItem<any> | Table<string, unknown, unknown>;
 
 type AddLeftJoin<Columns, JoinTable> = {
   [K in keyof Columns]: Columns[K] extends Column<
@@ -90,7 +90,7 @@ type Join<Query extends SelectQuery<any, boolean>, JoinTable extends FromItemOrT
     : never;
 
 type GetColumns<From extends FromItemOrTable> =
-  From extends Table<any, infer Columns>
+  From extends Table<any, infer Columns, any>
     ? Columns
     : From extends FromItem<infer Q>
       ? Q extends Query<infer Returning>
@@ -159,7 +159,7 @@ export class SelectQuery<
       .catch(onRejected) as any;
   }
 
-  private newSelectQuery(tokens: Token[], table?: Table<any, any>): SelectQuery<Columns> {
+  private newSelectQuery(tokens: Token[], table?: Table<any, any, any>): SelectQuery<Columns> {
     const returningKeys =
       this.includesStar && table
         ? [
@@ -176,7 +176,7 @@ export class SelectQuery<
   // [ FROM from_item [, ...] ]
   from<T extends FromItemOrTable>(
     fromItem: T,
-  ): T extends TableDefinition<any> ? never : Join<SelectQuery<Columns, IncludesStar>, T> {
+  ): T extends TableDefinition<any, any> ? never : Join<SelectQuery<Columns, IncludesStar>, T> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`FROM`), ...fromItem.toTokens()],
       fromItem,
@@ -425,7 +425,7 @@ export class SelectQuery<
     ]);
   }
 
-  of(table: Table<any, any>): SelectQuery<Columns> {
+  of(table: Table<any, any, any>): SelectQuery<Columns> {
     return this.newSelectQuery([
       ...this.tokens,
       new StringToken(`OF`),

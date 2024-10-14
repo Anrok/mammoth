@@ -10,7 +10,6 @@ describe(`valuesList`, () => {
       amount: integer().notNull(),
       createDate: timestamp().notNull(),
     },
-    indexes: {},
   });
 
   const db = defineDb(

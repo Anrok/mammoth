@@ -10,8 +10,7 @@ describe(`ddl`, () => {
       name: text().notNull(),
       value: integer(),
       enumTest: enumType('my_enum_type', ['A', 'B', 'C']),
-    },
-    indexes: {},
+    }
   });
 
   const db = defineDb(
@@ -153,7 +152,6 @@ describe(`ddl`, () => {
                 "unique": [Function],
               },
             },
-            "indexes": [],
           },
         },
       ]

@@ -35,7 +35,6 @@ describe(`select`, () => {
       value: integer(),
       enumTest: enumType('my_enum_type', ['A', 'B', 'C'] as const),
     },
-    indexes: {},
   });
 
   const bar = defineTable({
@@ -44,7 +43,6 @@ describe(`select`, () => {
       fooId: uuid().notNull().references(foo, `id`),
       name: text(),
     },
-    indexes: {},
   });
 
   const listItem = defineTable({
@@ -53,7 +51,6 @@ describe(`select`, () => {
       name: text().notNull(),
       isGreat: boolean().notNull(),
     },
-    indexes: {},
   });
 
   const user = defineTable({
@@ -61,7 +58,6 @@ describe(`select`, () => {
       id: uuid(),
       with: text(),
     },
-    indexes: {},
   });
 
   const db = defineDb({ foo, bar, listItem, user }, () =>

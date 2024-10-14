@@ -11,6 +11,7 @@ import {
 import { wrapQuotes } from './naming';
 import { isTokenable } from './sql-functions';
 import assert from 'assert';
+import { InlineValueTokenWithCast, InlineStringValueToken, InlineNumberValueToken, InlineBooleanValueToken, InlineJsonbValueToken } from './tokens/inline-value-token';
 
 export class Expression<DataType, IsNotNull extends boolean, Name extends string> {
   private _expressionBrand!: ['expression', DataType, IsNotNull, Name];
@@ -31,6 +32,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
     private readonly tokens: Token[],
     private readonly name: Name,
     private readonly nameIsAlias = false,
+    private readonly shouldInlineParameters = false,
   ) {}
 
   private getDataTypeTokens(value: DataType | Expression<DataType, boolean, any> | Query<any>) {
@@ -42,7 +44,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
       return value.toTokens();
     }
 
-    return [new ParameterToken(value)];
+    return [this.makeTokenForValue(value)];
   }
 
   private toGroup(expression: Expression<any, any, any> | Query<any>) {
@@ -54,6 +56,15 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
     }
 
     return new CollectionToken(newTokens);
+  }
+
+  private makeTokenForValue(parameter: DataType | InlineValue<DataType>): Token {
+    const value = parameter instanceof InlineValue ? parameter.getValue() : parameter;
+    if (this.shouldInlineParameters) {
+      const castType = parameter instanceof InlineValue ? parameter.getCastType() : undefined;
+      return valueToInlineValueToken(value, castType);
+    }
+    return new ParameterToken(value);
   }
 
   // TODO: only include
@@ -129,7 +140,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   in<Q extends Query<any>>(
-    array: DataType[] | Expression<DataType, IsNotNull, any> | SpecificQuery<DataType, Q>,
+    array: (DataType | InlineValue<DataType>)[] | Expression<DataType, IsNotNull, any> | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     if (array && ('toTokens' in array || array instanceof Query)) {
       return new DefaultExpression([
@@ -145,7 +156,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
         new GroupToken([
           new SeparatorToken(
             ',',
-            array.map((item) => new ParameterToken(item)),
+            array.map((item) => this.makeTokenForValue(item)),
           ),
         ]),
       ]);
@@ -153,7 +164,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   notIn(
-    array: DataType[] | Expression<DataType, IsNotNull, any> | Query<any>,
+    array: (DataType | InlineValue<DataType>)[] | Expression<DataType, IsNotNull, any> | Query<any>,
   ): DefaultExpression<boolean> {
     if (array && ('toTokens' in array || array instanceof Query)) {
       return new DefaultExpression([
@@ -169,7 +180,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
         new GroupToken([
           new SeparatorToken(
             ',',
-            array.map((item) => new ParameterToken(item)),
+            array.map((item) => this.makeTokenForValue(item)),
           ),
         ]),
       ]);
@@ -177,7 +188,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   plus(
-    value: DataType | Expression<DataType, IsNotNull, any>,
+    value: DataType | InlineValue<DataType> | Expression<DataType, IsNotNull, any>,
   ): DefaultExpression<DataType, IsNotNull> {
     return new DefaultExpression([
       ...this.tokens,
@@ -187,7 +198,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   minus(
-    value: DataType | Expression<DataType, IsNotNull, any>,
+    value: DataType | InlineValue<DataType> | Expression<DataType, IsNotNull, any>,
   ): DefaultExpression<DataType, IsNotNull> {
     return new DefaultExpression([
       ...this.tokens,
@@ -197,7 +208,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   multiply(
-    value: DataType | Expression<DataType, IsNotNull, any>,
+    value: DataType | InlineValue<DataType> | Expression<DataType, IsNotNull, any>,
   ): DefaultExpression<DataType, IsNotNull> {
     return new DefaultExpression([
       ...this.tokens,
@@ -207,7 +218,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   divide(
-    value: DataType | Expression<DataType, IsNotNull, any>,
+    value: DataType | InlineValue<DataType> | Expression<DataType, IsNotNull, any>,
   ): DefaultExpression<DataType, IsNotNull> {
     return new DefaultExpression([
       ...this.tokens,
@@ -217,7 +228,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   modulo(
-    value: DataType | Expression<DataType, IsNotNull, any>,
+    value: DataType | InlineValue<DataType> | Expression<DataType, IsNotNull, any>,
   ): DefaultExpression<DataType, IsNotNull> {
     return new DefaultExpression([
       ...this.tokens,
@@ -227,7 +238,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   concat(
-    value: DataType | Expression<DataType, IsNotNull, any>,
+    value: DataType | InlineValue<DataType> | Expression<DataType, IsNotNull, any>,
   ): DefaultExpression<DataType, IsNotNull> {
     return new DefaultExpression([
       ...this.tokens,
@@ -236,60 +247,60 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
     ]);
   }
 
-  between(a: DataType, b: DataType): DefaultExpression<boolean> {
+  between(a: DataType | InlineValue<DataType>, b: DataType | InlineValue<DataType>): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`BETWEEN`),
-      new ParameterToken(a),
+      this.makeTokenForValue(a),
       new StringToken(`AND`),
-      new ParameterToken(b),
+      this.makeTokenForValue(b),
     ]);
   }
 
-  betweenSymmetric(a: DataType, b: DataType): DefaultExpression<boolean> {
+  betweenSymmetric(a: DataType | InlineValue<DataType>, b: DataType | InlineValue<DataType>): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`BETWEEN SYMMETRIC`),
-      new ParameterToken(a),
+      this.makeTokenForValue(a),
       new StringToken(`AND`),
-      new ParameterToken(b),
+      this.makeTokenForValue(b),
     ]);
   }
 
-  isDistinctFrom(a: DataType): DefaultExpression<boolean> {
+  isDistinctFrom(a: DataType | InlineValue<DataType>): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`IS DISTINCT FROM`),
-      new ParameterToken(a),
+      this.makeTokenForValue(a),
     ]);
   }
 
-  isNotDistinctFrom(a: DataType): DefaultExpression<boolean> {
+  isNotDistinctFrom(a: DataType | InlineValue<DataType>): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`IS NOT DISTINCT FROM`),
-      new ParameterToken(a),
+      this.makeTokenForValue(a),
     ]);
   }
 
-  like(value: DataType): DefaultExpression<boolean> {
+  like(value: DataType | InlineValue<DataType>): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`LIKE`),
-      new ParameterToken(value),
+      this.makeTokenForValue(value),
     ]);
   }
 
-  ilike(value: DataType): DefaultExpression<boolean> {
+  ilike(value: DataType | InlineValue<DataType>): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`ILIKE`),
-      new ParameterToken(value),
+      this.makeTokenForValue(value),
     ]);
   }
 
   eq<Q extends Query<any>>(
-    value: DataType | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
+    value: DataType | InlineValue<DataType> | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
@@ -299,7 +310,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   ne<Q extends Query<any>>(
-    value: DataType | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
+    value: DataType | InlineValue<DataType> | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
@@ -309,7 +320,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   gt<Q extends Query<any>>(
-    value: DataType | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
+    value: DataType | InlineValue<DataType> | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
@@ -319,7 +330,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   gte<Q extends Query<any>>(
-    value: DataType | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
+    value: DataType | InlineValue<DataType> | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
@@ -329,7 +340,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   lt<Q extends Query<any>>(
-    value: DataType | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
+    value: DataType | InlineValue<DataType> | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
@@ -339,7 +350,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   lte<Q extends Query<any>>(
-    value: DataType | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
+    value: DataType | InlineValue<DataType> | Expression<DataType, boolean, any> | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     return new DefaultExpression([
       ...this.tokens,
@@ -379,4 +390,47 @@ export class DefaultExpression<DataType, IsNotNull extends boolean = true> exten
   constructor(tokens: Token[]) {
     super(tokens, '?column?');
   }
+}
+
+function valueToInlineValueToken<T>(value: T, castType?: string): Token {
+    if (castType !== undefined) {
+        return new InlineValueTokenWithCast(value, castType);
+    } else if (Array.isArray(value)) {
+        return new GroupToken([
+            new SeparatorToken(
+                ',',
+                value.map((item) => valueToInlineValueToken(item)),
+            ),
+        ], '{', '}');
+    } if (typeof value === `string`) {
+        return new InlineStringValueToken(value);
+    } else if (typeof value === `number`) {
+        return new InlineNumberValueToken(value);
+    } else if (typeof value === `boolean`) {
+        return new InlineBooleanValueToken(value);
+    } else if (typeof value === `object` && value !== null) {
+        return new InlineJsonbValueToken(value);
+    }
+    throw new Error(`Unsupported value type`);
+}
+
+export class InlineValue<T> extends Expression<T, false, 'value'> {
+    constructor(private value: T, private castType?: string) {
+        const tokens: Token[] = [];
+        tokens.push(valueToInlineValueToken(value, castType));
+
+        super(tokens, 'value');
+    }
+
+    getValue() {
+        return this.value;
+    }
+
+    getCastType() {
+        return this.castType;
+    }
+}
+
+export function inlineValue<T>(value: T, castType?: string): InlineValue<T> {
+    return new InlineValue(value, castType);
 }

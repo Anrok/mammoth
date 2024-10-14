@@ -19,9 +19,9 @@ import { FromItem } from './with';
 
 export const makeDeleteFrom =
   (queryExecutor: QueryExecutorFn) =>
-  <T extends Table<string, unknown>>(
+  <T extends Table<string, unknown, unknown>>(
     table: T,
-  ): T extends TableDefinition<any> ? never : DeleteQuery<T> => {
+  ): T extends TableDefinition<any, any> ? never : DeleteQuery<T> => {
     return new DeleteQuery<T>(queryExecutor, [], table, 'AFFECTED_COUNT', [
       new StringToken(`DELETE FROM`),
       ...table.toTokens(),
@@ -30,9 +30,9 @@ export const makeDeleteFrom =
 
 // https://www.postgresql.org/docs/12/sql-delete.html
 export class DeleteQuery<
-  T extends Table<any, any>,
+  T extends Table<any, any, any>,
   Returning = number,
-  TableColumns = T extends Table<any, infer Columns> ? Columns : never,
+  TableColumns = T extends Table<any, infer Columns, any> ? Columns : never,
 > extends Query<Returning> {
   private _deleteQueryBrand: any;
 
@@ -84,7 +84,7 @@ export class DeleteQuery<
       .catch(onRejected);
   }
 
-  using(...fromItems: Array<FromItem<any> | Table<string, unknown>>): DeleteQuery<T, Returning> {
+  using(...fromItems: Array<FromItem<any> | Table<string, unknown, unknown>>): DeleteQuery<T, Returning> {
     return this.newQueryWithTokens([
       ...this.tokens,
       new StringToken(`USING`),
@@ -113,9 +113,9 @@ export class DeleteQuery<
     ]);
   }
 
-  returning<C1 extends keyof (T extends Table<string, infer Columns> ? Columns : never)>(
+  returning<C1 extends keyof (T extends Table<string, infer Columns, unknown> ? Columns : never)>(
     column1: C1,
-  ): DeleteQuery<T, GetReturning<T extends Table<string, infer Columns> ? Columns : never, C1>>;
+  ): DeleteQuery<T, GetReturning<T extends Table<string, infer Columns, unknown> ? Columns : never, C1>>;
   returning<C1 extends keyof TableColumns, C2 extends keyof TableColumns>(
     column1: C1,
     column2: C2,

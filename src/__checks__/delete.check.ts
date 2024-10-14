@@ -14,7 +14,6 @@ const foo = defineTable({
     name: text().notNull(),
     value: integer(),
   },
-  indexes: {},
 });
 
 const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 }));

@@ -8,21 +8,18 @@ describe(`truncate`, () => {
       name: text().notNull(),
       value: integer(),
     },
-    indexes: {},
   });
 
   const bar = defineTable({
     columns: {
       id: uuid().primaryKey().default(`gen_random_uuid()`),
     },
-    indexes: {},
   });
 
   const baz = defineTable({
     columns: {
       id: uuid().primaryKey().default(`gen_random_uuid()`),
     },
-    indexes: {},
   });
 
   const db = defineDb(

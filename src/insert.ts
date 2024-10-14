@@ -24,9 +24,9 @@ import { isTokenable } from './sql-functions';
 
 // https://www.postgresql.org/docs/12/sql-insert.html
 export class InsertQuery<
-  T extends Table<any, any>,
+  T extends Table<any, any, any>,
   Returning = number,
-  TableColumns = T extends Table<any, infer Columns> ? Columns : never,
+  TableColumns = T extends Table<any, infer Columns, any> ? Columns : never,
 > extends Query<Returning> {
   private _insertQueryBrand: any;
 
@@ -325,7 +325,7 @@ export class InsertQuery<
       },
 
       doUpdateSet(
-        values: T extends Table<any, infer Columns>
+        values: T extends Table<any, infer Columns, any>
           ? {
               [K in keyof Columns]?: Columns[K] extends Column<
                 any,
@@ -388,7 +388,7 @@ export class InsertQuery<
   }
 
   private getConflictTargetToken<
-    ColumnNames extends T extends Table<any, infer Columns> ? (keyof Columns)[] : never,
+    ColumnNames extends T extends Table<any, infer Columns, any> ? (keyof Columns)[] : never,
   >(columnNames: ColumnNames): Token {
     if (columnNames.length === 0) return new EmptyToken();
     return new GroupToken([
@@ -402,7 +402,7 @@ export class InsertQuery<
     ]);
   }
 
-  onConflict<ColumnNames extends T extends Table<any, infer Columns> ? (keyof Columns)[] : never>(
+  onConflict<ColumnNames extends T extends Table<any, infer Columns, any> ? (keyof Columns)[] : never>(
     ...columnNames: ColumnNames
   ) {
     const self = this;
@@ -423,7 +423,7 @@ export class InsertQuery<
       },
 
       doUpdateSet(
-        values: T extends Table<any, infer Columns>
+        values: T extends Table<any, infer Columns, any>
           ? {
               [K in keyof Columns]?: Columns[K] extends Column<
                 any,
@@ -492,8 +492,8 @@ export class InsertQuery<
 }
 
 export interface InsertIntoResult<
-  T extends Table<any, any>,
-  Row = T extends Table<any, infer Columns>
+  T extends Table<any, any, any>,
+  Row = T extends Table<any, infer Columns, any>
     ? {
         [K in keyof PickByValue<
           {
@@ -551,15 +551,15 @@ export interface InsertIntoResult<
 > {
   select: SelectFn;
 
-  deleteFrom<DeleteTable extends Table<any, any>>(
+  deleteFrom<DeleteTable extends Table<any, any, any>>(
     deleteTable: DeleteTable,
   ): DeleteQuery<DeleteTable, number>;
 
-  update<UpdateTable extends Table<any, any>>(
+  update<UpdateTable extends Table<any, any, any>>(
     updateTable: UpdateTable,
   ): {
     set(
-      values: UpdateTable extends Table<any, infer Columns>
+      values: UpdateTable extends Table<any, infer Columns, any>
         ? {
             [K in keyof Columns]?: Columns[K] extends Column<
               any,
@@ -584,14 +584,14 @@ export interface InsertIntoResult<
 
 export const makeInsertInto =
   (queryExecutor: QueryExecutorFn) =>
-  <T extends Table<any, any>>(
+  <T extends Table<any, any, any>>(
     table: T,
-    columnNames?: T extends Table<any, infer Columns> ? (keyof Columns)[] : never,
-  ): T extends TableDefinition<any> ? never : InsertIntoResult<T> => {
+    columnNames?: T extends Table<any, infer Columns, any> ? (keyof Columns)[] : never,
+  ): T extends TableDefinition<any, any> ? never : InsertIntoResult<T> => {
     return {
       select: makeSelect(queryExecutor, [
         new StringToken(`INSERT INTO`),
-        new StringToken((table as Table<any, any>).getName()),
+        new StringToken((table as Table<any, any, any>).getName()),
         new GroupToken([
           new SeparatorToken(
             `,`,
@@ -604,7 +604,7 @@ export const makeInsertInto =
         ]),
       ]),
 
-      deleteFrom<DeleteTable extends Table<any, any>>(deleteTable: DeleteTable) {
+      deleteFrom<DeleteTable extends Table<any, any, any>>(deleteTable: DeleteTable) {
         return new DeleteQuery<DeleteTable, number>(
           queryExecutor,
           [],
@@ -612,7 +612,7 @@ export const makeInsertInto =
           'AFFECTED_COUNT',
           [
             new StringToken(`INSERT INTO`),
-            new StringToken((table as Table<any, any>).getName()),
+            new StringToken((table as Table<any, any, any>).getName()),
             new GroupToken([
               new SeparatorToken(
                 `,`,
@@ -624,15 +624,15 @@ export const makeInsertInto =
               ),
             ]),
             new StringToken(`DELETE FROM`),
-            new StringToken((deleteTable as Table<any, any>).getName()),
+            new StringToken((deleteTable as Table<any, any, any>).getName()),
           ],
         );
       },
 
-      update<UpdateTable extends Table<any, any>>(updateTable: UpdateTable) {
+      update<UpdateTable extends Table<any, any, any>>(updateTable: UpdateTable) {
         return {
           set(
-            values: UpdateTable extends Table<any, infer Columns>
+            values: UpdateTable extends Table<any, infer Columns, any>
               ? {
                   [K in keyof Columns]?: Columns[K] extends Column<
                     any,
@@ -653,7 +653,7 @@ export const makeInsertInto =
 
             return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
               new StringToken(`INSERT INTO`),
-              new StringToken((table as Table<any, any>).getName()),
+              new StringToken((table as Table<any, any, any>).getName()),
               new GroupToken([
                 new SeparatorToken(
                   `,`,
@@ -672,7 +672,7 @@ export const makeInsertInto =
                 ),
               ]),
               new StringToken(`UPDATE`),
-              new StringToken((updateTable as Table<any, any>).getName()),
+              new StringToken((updateTable as Table<any, any, any>).getName()),
               new StringToken(`SET`),
               new SeparatorToken(
                 `,`,
@@ -695,7 +695,7 @@ export const makeInsertInto =
       defaultValues() {
         return new InsertQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
           new StringToken(`INSERT INTO`),
-          new StringToken((table as Table<any, any>).getName()),
+          new StringToken((table as Table<any, any, any>).getName()),
           new StringToken(`DEFAULT VALUES`),
         ]);
       },
@@ -710,7 +710,7 @@ export const makeInsertInto =
 
         return new InsertQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
           new StringToken(`INSERT INTO`),
-          new StringToken((table as Table<any, any>).getName()),
+          new StringToken((table as Table<any, any, any>).getName()),
           new GroupToken([
             new SeparatorToken(
               `,`,

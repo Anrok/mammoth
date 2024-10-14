@@ -26,7 +26,7 @@ const foo = defineTable({
     name: text().notNull(),
     value: integer(),
   },
-  indexes: {},
+  defineIndexes: () => ({}),
 });
 
 const serialTest = defineTable({
@@ -34,7 +34,7 @@ const serialTest = defineTable({
     id: serial().primaryKey(),
     value: integer(),
   },
-  indexes: {},
+  defineIndexes: () => ({}),
 });
 
 const db = defineDb({ foo, serialTest }, () => Promise.resolve({ rows: [], affectedCount: 0 }));
@@ -88,7 +88,8 @@ describe('insert', () => {
           {
             id: Column<'id', 'serialTest', number, true, true, undefined>;
             value: Column<'value', 'serialTest', number, false, false, undefined>;
-          }
+          },
+          {}
         >,
         number,
         {
@@ -109,7 +110,8 @@ describe('insert', () => {
           {
             id: Column<'id', 'serialTest', number, true, true, undefined>;
             value: Column<'value', 'serialTest', number, false, false, undefined>;
-          }
+          },
+          {}
         >,
         number,
         {
@@ -130,7 +132,8 @@ describe('insert', () => {
           {
             id: Column<'id', 'serialTest', number, true, true, undefined>;
             value: Column<'value', 'serialTest', number, false, false, undefined>;
-          }
+          },
+          {}
         >,
         number,
         {
@@ -161,7 +164,8 @@ describe('insert', () => {
             createDate: Column<'createDate', 'foo', Date, true, true, undefined>;
             name: Column<'name', 'foo', string, true, false, undefined>;
             value: Column<'value', 'foo', number, false, false, undefined>;
-          }
+          },
+          {}
         >,
         number,
         {

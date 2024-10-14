@@ -10,7 +10,7 @@ export class AllStarToken extends Token {
     super();
   }
 
-  reduce(state: State, numberOfParameters: number, tables: Table<any, any>[]) {
+  reduce(state: State, numberOfParameters: number, tables: Table<any, any, any>[]) {
     const tokens = tables.flatMap((table) => {
       return Object.keys(table)
         .filter((name) => ![`as`, `getName`, `getOriginalName`, `toTokens`, `getIndexes`].includes(name))
