@@ -63,7 +63,6 @@ export class Index<
   /** @internal */
   toTokens(): Token[] {
     const snakeCaseIndexName = toSnakeCase(this.indexName as unknown as string);
-    // TODO: Change impl from being token-based to string-based
     const tokens: Token[] = [
       this.isUniqueKey ? new StringToken('CREATE UNIQUE INDEX') : new StringToken('CREATE INDEX'),
       new StringToken(snakeCaseIndexName),
