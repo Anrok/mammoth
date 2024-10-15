@@ -2,14 +2,12 @@ import { defineDb, defineTable, integer, text, timestamp, toSql } from '..';
 
 describe(`valuesList`, () => {
   const orderLog = defineTable({
-    columns: {
-      id: integer().notNull().primaryKey(),
-      region: text().notNull(),
-      product: text().notNull(),
-      quantity: integer().notNull(),
-      amount: integer().notNull(),
-      createDate: timestamp().notNull(),
-    },
+    id: integer().notNull().primaryKey(),
+    region: text().notNull(),
+    product: text().notNull(),
+    quantity: integer().notNull(),
+    amount: integer().notNull(),
+    createDate: timestamp().notNull(),
   });
 
   const db = defineDb(

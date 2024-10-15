@@ -2,12 +2,10 @@ import { defineDb, defineTable, integer, text, timestampWithTimeZone, raw, toSql
 
 describe(`insert`, () => {
   const foo = defineTable({
-    columns: {
-      id: uuid().primaryKey().default(`gen_random_uuid()`),
-      createDate: timestampWithTimeZone().notNull().default(`now()`),
-      name: text().notNull(),
-      value: integer(),
-    },
+    id: uuid().primaryKey().default(`gen_random_uuid()`),
+    createDate: timestampWithTimeZone().notNull().default(`now()`),
+    name: text().notNull(),
+    value: integer(),
   });
 
   const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 }));

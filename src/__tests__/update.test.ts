@@ -2,21 +2,17 @@ import { defineDb, defineTable, integer, text, timestampWithTimeZone, toSql, uui
 
 describe(`update`, () => {
   const foo = defineTable({
-    columns: {
-      id: uuid().primaryKey().default(`gen_random_uuid()`),
-      createDate: timestampWithTimeZone().notNull().default(`now()`),
-      name: text().notNull(),
-      value: integer(),
-    },
+    id: uuid().primaryKey().default(`gen_random_uuid()`),
+    createDate: timestampWithTimeZone().notNull().default(`now()`),
+    name: text().notNull(),
+    value: integer(),
   });
 
   const bar = defineTable({
-    columns: {
-      id: uuid().primaryKey().default(`gen_random_uuid()`),
-      fooId: uuid().notNull().references(foo, `id`),
-      name: text(),
-      with: text(),
-    },
+    id: uuid().primaryKey().default(`gen_random_uuid()`),
+    fooId: uuid().notNull().references(foo, `id`),
+    name: text(),
+    with: text(),
   });
 
   const db = defineDb({ foo, bar }, () => Promise.resolve({ rows: [], affectedCount: 0 }));

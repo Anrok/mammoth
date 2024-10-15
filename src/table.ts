@@ -48,7 +48,7 @@ export const makeTable = <
   originalTableName: string | undefined,
   tableDefinition: {
     columns: ColumnDefinitions;
-    defineIndexes?: (
+    defineIndexes: (
       columns: ColumnDefinitionsToColumns<TableName, ColumnDefinitions>,
     ) => IndexDefinitions;
   },
@@ -75,8 +75,7 @@ export const makeTable = <
     {} as ColumnDefinitionsToColumns<TableName, ColumnDefinitions>,
   );
 
-  const indexDefinitions =
-    tableDefinition.defineIndexes?.(columnsForIndexes) ?? ({} as IndexDefinitions);
+  const indexDefinitions = tableDefinition.defineIndexes(columnsForIndexes);
 
   const indexNames = Object.keys(
     indexDefinitions as unknown as object,
@@ -126,11 +125,11 @@ export const makeTable = <
 export const defineTable = <
   TableName extends string,
   Columns extends { [column: string]: ColumnDefinition<any, boolean, boolean> },
-  IndexNames extends string,
-  Indexes extends { [Index in IndexNames]: IndexDefinition<boolean, boolean> },
->(tableDefinition: {
-  columns: Columns;
-  defineIndexes?(columns: ColumnDefinitionsToColumns<TableName, Columns>): Indexes;
-}): TableDefinition<Columns, Indexes> => {
-  return tableDefinition as any;
+  Indexes extends { [index: string]: IndexDefinition<boolean, boolean> } = {},
+>(
+  columns: Columns,
+  defineIndexes: (columns: ColumnDefinitionsToColumns<TableName, Columns>) => Indexes = () =>
+    ({}) as Indexes,
+): TableDefinition<Columns, Indexes> => {
+  return { columns, defineIndexes } as any;
 };

@@ -27,22 +27,18 @@ const toTableRow = <T>(table: T): TableRow<T> => {
 };
 
 const foo = defineTable({
-  columns: {
-    id: uuid().primaryKey().default(`gen_random_uuid()`),
-    createDate: timestampWithTimeZone().notNull().default(`now()`),
-    name: text().notNull(),
-    value: integer(),
-  },
+  id: uuid().primaryKey().default(`gen_random_uuid()`),
+  createDate: timestampWithTimeZone().notNull().default(`now()`),
+  name: text().notNull(),
+  value: integer(),
 });
 
 const bar = defineTable({
-  columns: {
-    id: uuid().primaryKey().default(`gen_random_uuid()`),
-    startDate: timestampWithTimeZone().notNull().default(`now()`),
-    endDate: timestampWithTimeZone().notNull().default(`now()`),
-    value: integer(),
-    fooId: uuid().references(foo, 'id'),
-  },
+  id: uuid().primaryKey().default(`gen_random_uuid()`),
+  startDate: timestampWithTimeZone().notNull().default(`now()`),
+  endDate: timestampWithTimeZone().notNull().default(`now()`),
+  value: integer(),
+  fooId: uuid().references(foo, 'id'),
 });
 
 test('should output all columns and the data type', () => {

@@ -4,24 +4,18 @@ import { toSql } from '../sql-functions';
 
 describe(`delete`, () => {
   const foo = defineTable({
-    columns: {
-      id: uuid().primaryKey().default(`gen_random_uuid()`),
-      createDate: timestampWithTimeZone().notNull().default(`now()`),
-      name: text().notNull(),
-      value: integer(),
-    },
+    id: uuid().primaryKey().default(`gen_random_uuid()`),
+    createDate: timestampWithTimeZone().notNull().default(`now()`),
+    name: text().notNull(),
+    value: integer(),
   });
 
   const bar = defineTable({
-    columns: {
-      id: uuid().primaryKey().default(`gen_random_uuid()`),
-    },
+    id: uuid().primaryKey().default(`gen_random_uuid()`),
   });
 
   const baz = defineTable({
-    columns: {
-      id: uuid().primaryKey().default(`gen_random_uuid()`),
-    },
+    id: uuid().primaryKey().default(`gen_random_uuid()`),
   });
 
   const db = defineDb(

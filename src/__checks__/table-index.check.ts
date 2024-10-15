@@ -3,14 +3,14 @@ import { expect, describe, test } from 'tstyche';
 import { btree, gin, gist } from '../table-index-types';
 import { Index } from '../table-index';
 
-const foo = defineTable({
-  columns: {
+const foo = defineTable(
+  {
     id: uuid().primaryKey().default(`gen_random_uuid()`),
     createDate: timestampWithTimeZone().notNull().default(`now()`),
     name: text().notNull(),
     value: integer(),
   },
-  defineIndexes: (foo) => ({
+  (foo) => ({
     fooPkey: btree(foo.id).primaryKey(),
     fooCompound: btree(foo.id, foo.name).unique(),
     fooGist: gist(foo.id, foo.createDate),
@@ -19,7 +19,7 @@ const foo = defineTable({
     fooNonNull: btree(foo.id).where(foo.value.isNotNull()),
     fooExpression: gin(foo.id, foo.name, foo.value.gt(25)).where(foo.name.eq('foo')),
   }),
-});
+);
 
 const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 }));
 const indexes = db.foo.getIndexes();

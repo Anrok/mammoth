@@ -20,21 +20,15 @@ const toSnap = <T extends Query<any>>(query: T): ResultSet<T> => {
 };
 
 const foo = defineTable({
-  columns: {
-    id: uuid().primaryKey().default(`gen_random_uuid()`),
-    createDate: timestampWithTimeZone().notNull().default(`now()`),
-    name: text().notNull(),
-    value: integer(),
-  },
-  defineIndexes: () => ({}),
+  id: uuid().primaryKey().default(`gen_random_uuid()`),
+  createDate: timestampWithTimeZone().notNull().default(`now()`),
+  name: text().notNull(),
+  value: integer(),
 });
 
 const serialTest = defineTable({
-  columns: {
-    id: serial().primaryKey(),
-    value: integer(),
-  },
-  defineIndexes: () => ({}),
+  id: serial().primaryKey(),
+  value: integer(),
 });
 
 const db = defineDb({ foo, serialTest }, () => Promise.resolve({ rows: [], affectedCount: 0 }));

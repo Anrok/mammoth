@@ -2,13 +2,11 @@ import { defineDb, defineTable, integer, star, sum, text, toSql, uuid } from '..
 
 describe(`with`, () => {
   const orderLog = defineTable({
-    columns: {
-      id: uuid().primaryKey().default(`gen_random_uuid()`),
-      region: text().notNull(),
-      product: text().notNull(),
-      quantity: integer().notNull(),
-      amount: integer().notNull(),
-    },
+    id: uuid().primaryKey().default(`gen_random_uuid()`),
+    region: text().notNull(),
+    product: text().notNull(),
+    quantity: integer().notNull(),
+    amount: integer().notNull(),
   });
 
   const db = defineDb(

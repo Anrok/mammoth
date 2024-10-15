@@ -11,15 +11,15 @@ import {
 import { inlineValue } from '../expression';
 import { btree, gin, gist } from '../table-index-types';
 
-const foo = defineTable({
-  columns: {
+const foo = defineTable(
+  {
     id: uuid().primaryKey().default(`gen_random_uuid()`),
     createDate: timestampWithTimeZone().notNull().default(`now()`),
     name: text().notNull(),
     value: integer(),
     status: enumType<'open' | 'closed'>('open_status', ['open', 'closed']),
   },
-  defineIndexes: (foo) => ({
+  (foo) => ({
     fooPkey: btree(foo.id).primaryKey(),
     fooCompound: btree(foo.id, foo.name).unique(),
     fooGist: gist(foo.id, foo.createDate),
@@ -29,7 +29,7 @@ const foo = defineTable({
     fooExpression: gin(foo.id, foo.name, foo.value.gt(25)).where(foo.name.eq('foo')),
     fooWhereEnum: btree(foo.id).where(foo.status.eq(inlineValue('open', 'open_status'))),
   }),
-});
+);
 
 const db = defineDb({ foo }, () => Promise.resolve({ rows: [], affectedCount: 0 }));
 const indexes = db.foo.getIndexes();
