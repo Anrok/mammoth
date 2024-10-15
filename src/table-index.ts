@@ -6,7 +6,7 @@ import { GroupToken, SeparatorToken, StringToken, Token } from './tokens';
 export type IndexDefinitionsToIndexes<
   IndexDefinitionsT extends { [column: string]: IndexDefinition },
 > = {
-  [IndexName in keyof IndexDefinitionsT]: Index
+  [IndexName in keyof IndexDefinitionsT]: Index;
 };
 
 export interface IndexDefinitionFormat {
@@ -23,9 +23,7 @@ export interface IndexDefinition {
   where(condition: DefaultExpression<boolean>): IndexDefinition;
   primaryKey(): IndexDefinition;
   unique(): IndexDefinition;
-  include(
-    ...columns: Column<string, string, any, boolean, boolean, any>[]
-  ): IndexDefinition;
+  include(...columns: Column<string, string, any, boolean, boolean, any>[]): IndexDefinition;
 }
 
 export class Index {

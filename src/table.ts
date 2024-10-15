@@ -79,25 +79,22 @@ export const makeTable = <
     indexDefinitions as unknown as object,
   ) as (keyof IndexDefinitions)[];
 
-  const indexes = indexNames.reduce(
-    (map, indexName) => {
-      const { expressions, include, where, type, isPrimaryKey, isUniqueKey } =
-        indexDefinitions[indexName].getDefinition();
-      const index = new Index(
-        indexName as string,
-        tableName,
-        type,
-        isPrimaryKey,
-        isUniqueKey,
-        expressions,
-        include,
-        where,
-      ) as any;
-      map[indexName] = index;
-      return map;
-    },
-    {} as IndexDefinitionsToIndexes<IndexDefinitions>,
-  );
+  const indexes = indexNames.reduce((map, indexName) => {
+    const { expressions, include, where, type, isPrimaryKey, isUniqueKey } =
+      indexDefinitions[indexName].getDefinition();
+    const index = new Index(
+      indexName as string,
+      tableName,
+      type,
+      isPrimaryKey,
+      isUniqueKey,
+      expressions,
+      include,
+      where,
+    ) as any;
+    map[indexName] = index;
+    return map;
+  }, {} as IndexDefinitionsToIndexes<IndexDefinitions>);
 
   const table = {
     ...columns,
