@@ -37,8 +37,8 @@ const createTables = <TableDefinitions extends { [key: string]: TableDefinition<
         },
         {
           [K in keyof IndexDefinitions]: K extends string
-            ? IndexDefinitions[K] extends IndexDefinition<infer IsPrimaryKey, infer IsUniqueKey>
-              ? Index<K, TableName extends string ? TableName : never, IsPrimaryKey, IsUniqueKey>
+            ? IndexDefinitions[K] extends IndexDefinition
+              ? Index
               : never
             : never;
         }
@@ -64,7 +64,7 @@ export const defineDb = <TableDefinitions extends { [key: string]: TableDefiniti
       name: string;
       originalDefinition: any;
       columns: (ColumnDefinitionFormat & { name: string })[];
-      indexes: IndexDefinition<boolean, boolean>[];
+      indexes: IndexDefinition[];
     }[] {
       const tableNames = Object.keys(tableDefinitions);
 

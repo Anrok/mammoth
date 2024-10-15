@@ -1,9 +1,7 @@
-import exp from 'constants';
 import { Column, ColumnDefinition, ColumnDefinitionsToColumns } from './column';
 import { Index, IndexDefinition, IndexDefinitionsToIndexes } from './table-index';
 
-import { Table } from './TableType';
-import { StringToken, TableToken } from './tokens';
+import { TableToken } from './tokens';
 import { DbNull } from './types';
 
 export type TableRow<T> =
@@ -42,7 +40,7 @@ export class TableDefinition<
 export const makeTable = <
   TableName extends string,
   ColumnDefinitions extends { [column: string]: ColumnDefinition<any, any, any> },
-  IndexDefinitions extends { [index: string]: IndexDefinition<boolean, boolean> },
+  IndexDefinitions extends { [index: string]: IndexDefinition },
 >(
   tableName: TableName,
   originalTableName: string | undefined,
@@ -98,7 +96,7 @@ export const makeTable = <
       map[indexName] = index;
       return map;
     },
-    {} as IndexDefinitionsToIndexes<TableName, IndexDefinitions>,
+    {} as IndexDefinitionsToIndexes<IndexDefinitions>,
   );
 
   const table = {
@@ -125,7 +123,7 @@ export const makeTable = <
 export const defineTable = <
   TableName extends string,
   Columns extends { [column: string]: ColumnDefinition<any, boolean, boolean> },
-  Indexes extends { [index: string]: IndexDefinition<boolean, boolean> } = {},
+  Indexes extends { [index: string]: IndexDefinition } = {},
 >(
   columns: Columns,
   defineIndexes: (columns: ColumnDefinitionsToColumns<TableName, Columns>) => Indexes = () =>

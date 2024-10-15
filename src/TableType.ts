@@ -40,14 +40,5 @@ export interface InternalTable<TableName, Columns, Indexes> {
     Indexes
   >;
 
-  getIndexes(): {
-    [K in keyof Indexes]: Indexes[K] extends Index<
-      infer Name,
-      TableName extends string ? TableName : never,
-      infer IsPrimaryKey,
-      infer IsUniqueKey
-    >
-      ? Index<Name, TableName extends string ? TableName : never, IsPrimaryKey, IsUniqueKey>
-      : never;
-  };
+  getIndexes(): Indexes;
 }

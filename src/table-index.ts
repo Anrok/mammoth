@@ -4,14 +4,9 @@ import { toSnakeCase, wrapQuotes } from './naming';
 import { GroupToken, SeparatorToken, StringToken, Token } from './tokens';
 
 export type IndexDefinitionsToIndexes<
-  TableNameT extends string,
-  IndexDefinitionsT extends { [column: string]: IndexDefinition<boolean, boolean> },
+  IndexDefinitionsT extends { [column: string]: IndexDefinition },
 > = {
-  [IndexName in keyof IndexDefinitionsT]: IndexName extends string
-    ? IndexDefinitionsT[IndexName] extends IndexDefinition<infer IsPrimaryKey, infer IsUniqueKey>
-      ? Index<IndexName, TableNameT, IsPrimaryKey, IsUniqueKey>
-      : never
-    : never;
+  [IndexName in keyof IndexDefinitionsT]: Index
 };
 
 export interface IndexDefinitionFormat {
@@ -23,25 +18,17 @@ export interface IndexDefinitionFormat {
   where: DefaultExpression<boolean> | null;
 }
 
-export interface IndexDefinition<
-  IsPrimaryKey extends boolean = false,
-  IsUniqueKey extends boolean = false,
-> {
+export interface IndexDefinition {
   getDefinition(): IndexDefinitionFormat;
-  where(condition: DefaultExpression<boolean>): IndexDefinition<IsPrimaryKey, IsUniqueKey>;
-  primaryKey(): IndexDefinition<true, true>;
-  unique(): IndexDefinition<IsPrimaryKey, true>;
+  where(condition: DefaultExpression<boolean>): IndexDefinition;
+  primaryKey(): IndexDefinition;
+  unique(): IndexDefinition;
   include(
     ...columns: Column<string, string, any, boolean, boolean, any>[]
-  ): IndexDefinition<IsPrimaryKey, IsUniqueKey>;
+  ): IndexDefinition;
 }
 
-export class Index<
-  Name extends string,
-  TableName extends string,
-  IsPrimaryKey extends boolean,
-  IsUnique extends boolean,
-> {
+export class Index {
   private _indexBrand: any;
 
   /** @internal */
@@ -50,13 +37,13 @@ export class Index<
   }
 
   constructor(
-    private readonly indexName: Name,
-    private readonly tableName: TableName,
+    private readonly indexName: string,
+    private readonly tableName: string,
     private readonly indexType: string,
-    private readonly isPrimaryKey: IsPrimaryKey,
-    private readonly isUniqueKey: IsUnique,
+    private readonly isPrimaryKey: boolean,
+    private readonly isUniqueKey: boolean,
     private readonly expressions: Expression<any, boolean, string>[],
-    private readonly include: Column<string, TableName, any, boolean, boolean, any>[],
+    private readonly include: Column<string, string, any, boolean, boolean, any>[],
     private readonly where: DefaultExpression<boolean> | null,
   ) {}
 
