@@ -19,15 +19,15 @@ const foo = defineTable(
     value: integer(),
     status: enumType<'open' | 'closed'>('open_status', ['open', 'closed']),
   },
-  (foo) => ({
-    fooPkey: btree(foo.id).primaryKey(),
-    fooCompound: btree(foo.id, foo.name).unique(),
-    fooGist: gist(foo.id, foo.createDate),
-    fooGin: gin(foo.name, foo.value),
-    fooCovering: btree(foo.id).unique().include(foo.name, foo.value, foo.createDate),
-    fooNonNull: btree(foo.id).where(foo.value.isNotNull()),
-    fooExpression: gin(foo.id, foo.name, foo.value.gt(25)).where(foo.name.eq('foo')),
-    fooWhereEnum: btree(foo.id).where(foo.status.eq(inlineValue('open', 'open_status'))),
+  (t) => ({
+    fooPkey: btree(t.id).primaryKey(),
+    fooCompound: btree(t.id, t.name).unique(),
+    fooGist: gist(t.id, t.createDate),
+    fooGin: gin(t.name, t.value),
+    fooCovering: btree(t.id).unique().include(t.name, t.value, t.createDate),
+    fooNonNull: btree(t.id).where(t.value.isNotNull()),
+    fooExpression: gin(t.id, t.name, t.value.gt(25)).where(t.name.eq('foo')),
+    fooWhereEnum: btree(t.id).where(t.status.eq(inlineValue('open', 'open_status'))),
   }),
 );
 
