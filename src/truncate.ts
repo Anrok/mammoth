@@ -7,19 +7,19 @@ import { TableDefinition } from './table';
 
 export const makeTruncate =
   (queryExecutor: QueryExecutorFn) =>
-  <T extends Table<any, any>>(
+  <T extends Table<any, any, any>>(
     table: T,
-  ): T extends TableDefinition<any> ? never : TruncateQuery<T> => {
+  ): T extends TableDefinition<any, any> ? never : TruncateQuery<T> => {
     return new TruncateQuery<T>(queryExecutor, table, 'AFFECTED_COUNT', [
       new StringToken(`TRUNCATE`),
-      new StringToken((table as Table<any, any>).getName()),
+      new StringToken((table as Table<any, any, any>).getName()),
     ]) as any;
   };
 
 export class TruncateQuery<
-  T extends Table<any, any>,
+  T extends Table<any, any, any>,
   Returning = number,
-  TableColumns = T extends Table<any, infer Columns> ? Columns : never,
+  TableColumns = T extends Table<any, infer Columns, any> ? Columns : never,
 > extends Query<Returning> {
   /** @internal */
   newQueryWithTokens(tokens: Array<Token>): TruncateQuery<T, Returning, TableColumns> {
@@ -46,19 +46,19 @@ export class TruncateQuery<
       .catch(onRejected) as any;
   }
 
-  restartIdentity<T extends Table<any, any>>() {
+  restartIdentity<T extends Table<any, any, any>>() {
     return this.newQueryWithTokens([...this.tokens, new StringToken(`RESTART IDENTITY`)]) as any;
   }
 
-  continueIdentity<T extends Table<any, any>>() {
+  continueIdentity<T extends Table<any, any, any>>() {
     return this.newQueryWithTokens([...this.tokens, new StringToken(`CONTINUE IDENTITY`)]) as any;
   }
 
-  cascade<T extends Table<any, any>>() {
+  cascade<T extends Table<any, any, any>>() {
     return this.newQueryWithTokens([...this.tokens, new StringToken('CASCADE')]);
   }
 
-  restrict<T extends Table<any, any>>() {
+  restrict<T extends Table<any, any, any>>() {
     return this.newQueryWithTokens([...this.tokens, new StringToken('RESTRICT')]);
   }
 

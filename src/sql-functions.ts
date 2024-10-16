@@ -27,7 +27,7 @@ export const isTokenable = (value: any): value is Tokenable =>
 export class Star {
   private _starBrand: any;
 
-  constructor(private readonly table?: Table<any, any>) {}
+  constructor(private readonly table?: Table<any, any, any>) {}
 
   toTokens() {
     if (this.table) {
@@ -59,10 +59,10 @@ export function raw<DataType, IsNotNull extends boolean = false, Name extends st
 }
 
 export function star(): Star;
-export function star<T extends Table<any, any>>(
+export function star<T extends Table<any, any, any>>(
   table: T,
-): T extends Table<any, infer Columns> ? ColumnSet<Columns> : never;
-export function star(table?: Table<any, any>) {
+): T extends Table<any, infer Columns, any> ? ColumnSet<Columns> : never;
+export function star(table?: Table<any, any, any>) {
   if (table) {
     return new Star(table) as any;
   }

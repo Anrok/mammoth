@@ -1,11 +1,11 @@
-import { Column, ColumnDefinition } from './column';
+import { Column, ColumnDefinition, ColumnDefinitionsToColumns } from './column';
+import { Index, IndexDefinition, IndexDefinitionsToIndexes } from './table-index';
 
-import { Table } from './TableType';
 import { TableToken } from './tokens';
 import { DbNull } from './types';
 
 export type TableRow<T> =
-  T extends TableDefinition<infer Columns>
+  T extends TableDefinition<infer Columns, any>
     ? {
         [K in keyof Columns]: Columns[K] extends ColumnDefinition<
           infer DataType,
@@ -19,21 +19,41 @@ export type TableRow<T> =
       }
     : never;
 
-export class TableDefinition<Columns> {
+export class TableDefinition<
+  Columns extends { [K: string]: ColumnDefinition<any, any, any> },
+  Indexes,
+> {
   private _tableDefinitionBrand: any;
+  columns: Columns;
+  defineIndexes: (columns: ColumnDefinitionsToColumns<any, Columns>) => Indexes;
+
+  constructor(
+    columns: Columns,
+    defineIndexes: (columns: ColumnDefinitionsToColumns<any, Columns>) => Indexes = () =>
+      ({}) as Indexes,
+  ) {
+    this.columns = columns;
+    this.defineIndexes = defineIndexes;
+  }
 }
 
 export const makeTable = <
   TableName extends string,
-  TableDefinition extends { [column: string]: ColumnDefinition<any, any, any> },
+  ColumnDefinitions extends { [column: string]: ColumnDefinition<any, any, any> },
+  IndexDefinitions extends { [index: string]: IndexDefinition },
 >(
   tableName: TableName,
   originalTableName: string | undefined,
-  tableDefinition: TableDefinition,
+  tableDefinition: {
+    columns: ColumnDefinitions;
+    defineIndexes: (
+      columns: ColumnDefinitionsToColumns<TableName, ColumnDefinitions>,
+    ) => IndexDefinitions;
+  },
 ) => {
   const columnNames = Object.keys(
-    tableDefinition as unknown as object,
-  ) as (keyof TableDefinition)[];
+    tableDefinition['columns'] as unknown as object,
+  ) as (keyof ColumnDefinitions)[];
 
   const columns = columnNames.reduce(
     (map, columnName) => {
@@ -41,26 +61,45 @@ export const makeTable = <
       map[columnName] = column;
       return map;
     },
-    {} as Table<
-      TableName,
-      {
-        [K in keyof TableDefinition]: K extends string
-          ? TableDefinition[K] extends ColumnDefinition<
-              infer DataType,
-              infer IsNotNull,
-              infer HasDefault
-            >
-            ? Column<K, TableName, DataType, IsNotNull, HasDefault, undefined>
-            : never
-          : never;
-      }
-    >,
+    {} as ColumnDefinitionsToColumns<TableName, ColumnDefinitions>,
   );
+
+  const columnsForIndexes = columnNames.reduce(
+    (map, columnName) => {
+      const column = new Column(columnName as string, tableName, undefined, true) as any;
+      map[columnName] = column;
+      return map;
+    },
+    {} as ColumnDefinitionsToColumns<TableName, ColumnDefinitions>,
+  );
+
+  const indexDefinitions = tableDefinition.defineIndexes(columnsForIndexes);
+
+  const indexNames = Object.keys(
+    indexDefinitions as unknown as object,
+  ) as (keyof IndexDefinitions)[];
+
+  const indexes = indexNames.reduce((map, indexName) => {
+    const { expressions, include, where, type, isPrimaryKey, isUniqueKey } =
+      indexDefinitions[indexName].getDefinition();
+    const index = new Index(
+      indexName as string,
+      tableName,
+      type,
+      isPrimaryKey,
+      isUniqueKey,
+      expressions,
+      include,
+      where,
+    ) as any;
+    map[indexName] = index;
+    return map;
+  }, {} as IndexDefinitionsToIndexes<IndexDefinitions>);
 
   const table = {
     ...columns,
     as<T extends string>(alias: T) {
-      return makeTable(alias, tableName, tableDefinition) as any;
+      return makeTable(alias, tableName, tableDefinition as any) as any;
     },
     getName() {
       return tableName;
@@ -71,14 +110,21 @@ export const makeTable = <
     toTokens() {
       return [new TableToken(this)];
     },
+    getIndexes() {
+      return indexes;
+    },
   };
   return table;
 };
 
 export const defineTable = <
+  TableName extends string,
   Columns extends { [column: string]: ColumnDefinition<any, boolean, boolean> },
+  Indexes extends { [index: string]: IndexDefinition } = {},
 >(
-  tableDefinition: Columns,
-): TableDefinition<Columns> => {
-  return tableDefinition as any;
+  columns: Columns,
+  defineIndexes: (columns: ColumnDefinitionsToColumns<TableName, Columns>) => Indexes = () =>
+    ({}) as Indexes,
+): TableDefinition<Columns, Indexes> => {
+  return { columns, defineIndexes } as any;
 };

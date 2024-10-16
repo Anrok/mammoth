@@ -1,5 +1,5 @@
 import { Table } from './TableType';
-import { Column, ColumnDefinition } from './column';
+import { Column, ColumnDefinition, ColumnDefinitionsToColumns } from './column';
 import { toSnakeCase } from './naming';
 import { TableDefinition, TableRow } from './table';
 import {
@@ -11,30 +11,15 @@ import {
   TableToken,
 } from './tokens';
 
-type ColumnDefinitionsToColumns<
-  TableNameT extends string,
-  ColumnDefinitionsT extends { [column: string]: ColumnDefinition<any, any, any> },
-> = {
-  [ColumnName in keyof ColumnDefinitionsT]: ColumnName extends string
-    ? ColumnDefinitionsT[ColumnName] extends ColumnDefinition<
-        infer DataType,
-        infer IsNotNull,
-        infer HasDefault
-      >
-      ? Column<ColumnName, TableNameT, DataType, IsNotNull, HasDefault, undefined>
-      : never
-    : never;
-};
-
 export function makeValues<
   TableName extends string,
-  TableDefinitionT extends { [column: string]: ColumnDefinition<any, any, any> },
+  ColumnDefinitionsT extends { [column: string]: ColumnDefinition<any, any, any> },
 >(
   tableName: TableName,
-  definition: TableDefinitionT,
-  values: Array<TableRow<TableDefinition<TableDefinitionT>>>,
-): Table<TableName, ColumnDefinitionsToColumns<TableName, TableDefinitionT>> {
-  const columnNames = Object.keys(definition as unknown as object) as (keyof TableDefinitionT)[];
+  definition: ColumnDefinitionsT,
+  values: Array<TableRow<TableDefinition<ColumnDefinitionsT, any>>>,
+): Table<TableName, ColumnDefinitionsToColumns<TableName, ColumnDefinitionsT>, {}> {
+  const columnNames = Object.keys(definition as unknown as object) as (keyof ColumnDefinitionsT)[];
 
   const columns = columnNames.reduce(
     (map, columnName) => {
@@ -45,8 +30,8 @@ export function makeValues<
     {} as Table<
       TableName,
       {
-        [K in keyof TableDefinitionT]: K extends string
-          ? TableDefinitionT[K] extends ColumnDefinition<
+        [K in keyof ColumnDefinitionsT]: K extends string
+          ? ColumnDefinitionsT[K] extends ColumnDefinition<
               infer DataType,
               infer IsNotNull,
               infer HasDefault
@@ -54,7 +39,8 @@ export function makeValues<
             ? Column<K, TableName, DataType, IsNotNull, HasDefault, undefined>
             : never
           : never;
-      }
+      },
+      {}
     >,
   );
 

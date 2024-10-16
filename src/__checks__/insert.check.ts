@@ -82,7 +82,8 @@ describe('insert', () => {
           {
             id: Column<'id', 'serialTest', number, true, true, undefined>;
             value: Column<'value', 'serialTest', number, false, false, undefined>;
-          }
+          },
+          {}
         >,
         number,
         {
@@ -103,7 +104,8 @@ describe('insert', () => {
           {
             id: Column<'id', 'serialTest', number, true, true, undefined>;
             value: Column<'value', 'serialTest', number, false, false, undefined>;
-          }
+          },
+          {}
         >,
         number,
         {
@@ -124,7 +126,8 @@ describe('insert', () => {
           {
             id: Column<'id', 'serialTest', number, true, true, undefined>;
             value: Column<'value', 'serialTest', number, false, false, undefined>;
-          }
+          },
+          {}
         >,
         number,
         {
@@ -155,7 +158,8 @@ describe('insert', () => {
             createDate: Column<'createDate', 'foo', Date, true, true, undefined>;
             name: Column<'name', 'foo', string, true, false, undefined>;
             value: Column<'value', 'foo', number, false, false, undefined>;
-          }
+          },
+          {}
         >,
         number,
         {

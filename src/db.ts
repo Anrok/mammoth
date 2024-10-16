@@ -12,12 +12,14 @@ import { makeUpdate } from './update';
 import { makeWith } from './with';
 import { toSnakeCase } from './naming';
 import { makeValues } from './values';
+import { Index, IndexDefinition } from './table-index';
 
-const createTables = <TableDefinitions extends { [key: string]: TableDefinition<any> }>(
+const createTables = <TableDefinitions extends { [key: string]: TableDefinition<any, any> }>(
   tableDefinitions: TableDefinitions,
 ): {
   [TableName in keyof TableDefinitions]: TableDefinitions[TableName] extends TableDefinition<
-    infer ColumnDefinitions
+    infer ColumnDefinitions,
+    infer IndexDefinitions
   >
     ? Table<
         TableName,
@@ -29,6 +31,13 @@ const createTables = <TableDefinitions extends { [key: string]: TableDefinition<
                 infer HasDefault
               >
               ? Column<K, TableName, DataType, IsNotNull, HasDefault, undefined>
+              : never
+            : never;
+        },
+        {
+          [K in keyof IndexDefinitions]: K extends string
+            ? IndexDefinitions[K] extends IndexDefinition
+              ? Index
               : never
             : never;
         }
@@ -44,7 +53,7 @@ const createTables = <TableDefinitions extends { [key: string]: TableDefinition<
   }, {} as any);
 };
 
-export const defineDb = <TableDefinitions extends { [key: string]: TableDefinition<any> }>(
+export const defineDb = <TableDefinitions extends { [key: string]: TableDefinition<any, any> }>(
   tableDefinitions: TableDefinitions,
   queryExecutor: QueryExecutorFn,
 ) => {
@@ -54,19 +63,32 @@ export const defineDb = <TableDefinitions extends { [key: string]: TableDefiniti
       name: string;
       originalDefinition: any;
       columns: (ColumnDefinitionFormat & { name: string })[];
+      indexes: IndexDefinition[];
     }[] {
       const tableNames = Object.keys(tableDefinitions);
 
       return tableNames.map((tableName) => {
-        const table = tableDefinitions[tableName];
-        const columnNames = Object.keys(table);
+        const table = tableDefinitions[tableName] as TableDefinition<any, any>;
+        const columnNames = Object.keys(table.columns);
+
+        // Recompute columns to determine index definitions. A little inefficient, but this function is
+        // only intended to be used for debugging and testing purposes.
+        const columns = columnNames.reduce((map, columnName) => {
+          const column = new Column(columnName as string, tableName, undefined, true) as any;
+          map[columnName] = column;
+          return map;
+        }, {} as any);
+        const indexDefinitions =
+          table.defineIndexes !== undefined ? table.defineIndexes(columns) : {};
+        const indexNames = Object.keys(indexDefinitions);
 
         return {
           name: tableName,
           columns: columnNames.map((columnName) => ({
             name: columnName,
-            ...(table as any)[columnName].getDefinition(),
+            ...table.columns[columnName].getDefinition(),
           })),
+          indexes: indexNames.map((indexName) => indexDefinitions[indexName].getDefinition()),
           originalDefinition: table,
         };
       });

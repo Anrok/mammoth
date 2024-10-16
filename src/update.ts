@@ -20,9 +20,9 @@ import assert from 'assert';
 
 // https://www.postgresql.org/docs/12/sql-update.html
 export class UpdateQuery<
-  T extends Table<any, any>,
+  T extends Table<any, any, any>,
   Returning = number,
-  TableColumns = T extends Table<any, infer Columns> ? Columns : never,
+  TableColumns = T extends Table<any, infer Columns, any> ? Columns : never,
 > extends Query<Returning> {
   private _updateQueryBrand: any;
 
@@ -90,7 +90,7 @@ export class UpdateQuery<
     ]);
   }
 
-  from(fromItem: FromItem<any> | Table<string, unknown>): UpdateQuery<T, Returning> {
+  from(fromItem: FromItem<any> | Table<string, unknown, unknown>): UpdateQuery<T, Returning> {
     return this.newQueryWithTokens([
       ...this.tokens,
       new StringToken(`FROM`),
@@ -326,10 +326,10 @@ export class UpdateQuery<
 
 export const makeUpdate =
   (queryExecutor: QueryExecutorFn) =>
-  <T extends Table<string, unknown>>(table: T) => {
+  <T extends Table<string, unknown, unknown>>(table: T) => {
     return {
       set(
-        values: T extends Table<any, infer Columns>
+        values: T extends Table<any, infer Columns, any>
           ? {
               [K in keyof Columns]?: Columns[K] extends Column<
                 any,

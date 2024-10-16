@@ -1,4 +1,4 @@
-import { GroupToken, ParameterToken, SeparatorToken, StringToken, Token } from './tokens';
+import { StringToken, Token } from './tokens';
 import { toSnakeCase, wrapQuotes } from './naming';
 
 import { Expression } from './expression';
@@ -36,8 +36,8 @@ export interface ColumnDefinition<
   check(expression: string): ColumnDefinition<DataType, IsNotNull, HasDefault>;
   unique(): ColumnDefinition<DataType, IsNotNull, HasDefault>;
   references<
-    T extends TableDefinition<any>,
-    ColumnName extends T extends TableDefinition<infer Columns>
+    T extends TableDefinition<any, any>,
+    ColumnName extends T extends TableDefinition<infer Columns, any>
       ? keyof Columns extends string
         ? keyof Columns
         : never
@@ -51,6 +51,21 @@ export interface ColumnDefinition<
   /** @internal */
   getDefinition(): ColumnDefinitionFormat;
 }
+
+export type ColumnDefinitionsToColumns<
+  TableNameT extends string,
+  ColumnDefinitionsT extends { [column: string]: ColumnDefinition<any, any, any> },
+> = {
+  [ColumnName in keyof ColumnDefinitionsT]: ColumnName extends string
+    ? ColumnDefinitionsT[ColumnName] extends ColumnDefinition<
+        infer DataType,
+        infer IsNotNull,
+        infer HasDefault
+      >
+      ? Column<ColumnName, TableNameT, DataType, IsNotNull, HasDefault, undefined>
+      : never
+    : never;
+};
 
 export const makeColumnDefinition = <
   DataType,
@@ -164,9 +179,11 @@ export class Column<
     private readonly columnName: Name,
     private readonly tableName: TableName,
     private readonly originalColumnName: string | undefined,
+    private readonly isColumnForIndexExpression: boolean = false,
   ) {
-    super(
-      originalColumnName
+    const tokens = isColumnForIndexExpression
+      ? [new StringToken(toSnakeCase(columnName))]
+      : originalColumnName
         ? [
             new StringToken(
               `${wrapQuotes(tableName as unknown as string)}.${wrapQuotes(
@@ -180,9 +197,8 @@ export class Column<
                 toSnakeCase(columnName),
               )}`,
             ),
-          ],
-      columnName as any,
-    );
+          ];
+    super(tokens, columnName as any, false, isColumnForIndexExpression);
   }
 
   as<AliasName extends string>(
@@ -193,6 +209,9 @@ export class Column<
 
   /** @internal */
   toTokens(includeAlias?: boolean): Token[] {
+    if (this.isColumnForIndexExpression) {
+      return [new StringToken(toSnakeCase(this.columnName as unknown as string))];
+    }
     const snakeCaseColumnName = toSnakeCase(this.columnName as unknown as string);
     const toStringTokens = (tableName: TableName, columnName: string, alias?: string) => {
       const initialToken = new StringToken(

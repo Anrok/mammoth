@@ -15,7 +15,7 @@ export class SeparatorToken extends Token {
     this.tokens = tokens;
   }
 
-  reduce(state: State, numberOfParameters: number, tables: Table<any, any>[]) {
+  reduce(state: State, numberOfParameters: number, tables: Table<any, any, any>[]) {
     const length = this.tokens.length;
     let parameterIndex = numberOfParameters;
     this.tokens.forEach((token, index) => {

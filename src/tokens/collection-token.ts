@@ -11,7 +11,7 @@ export class CollectionToken extends Token {
     this.tokens = tokens;
   }
 
-  reduce(state: State, numberOfParameters: number, tables: Table<any, any>[]) {
+  reduce(state: State, numberOfParameters: number, tables: Table<any, any, any>[]) {
     const tokensState = createQueryState(this.tokens, numberOfParameters, tables);
     state.parameters.push(...tokensState.parameters);
     state.text.push(...tokensState.text);

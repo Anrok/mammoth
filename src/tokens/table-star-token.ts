@@ -6,7 +6,7 @@ import { SeparatorToken } from './separator-token';
 import type { Table } from '../TableType';
 
 export class TableStarToken extends Token {
-  constructor(private readonly table: Table<any, any>) {
+  constructor(private readonly table: Table<any, any, any>) {
     super();
   }
 
@@ -16,7 +16,10 @@ export class TableStarToken extends Token {
         new SeparatorToken(
           ',',
           Object.keys(this.table)
-            .filter((name) => ![`as`, `getName`, `getOriginalName`, `toTokens`].includes(name))
+            .filter(
+              (name) =>
+                ![`as`, `getName`, `getOriginalName`, `toTokens`, `getIndexes`].includes(name),
+            )
             .map((columnName) => this.table[columnName])
             .map((column) => {
               return new CollectionToken(

@@ -1,9 +1,10 @@
 import { Column } from './column';
 import { Token } from './tokens';
 
-export type Table<TableName, Columns> = Columns & InternalTable<TableName, Columns>;
+export type Table<TableName, Columns, Indexes> = Columns &
+  InternalTable<TableName, Columns, Indexes>;
 
-export interface InternalTable<TableName, Columns> {
+export interface InternalTable<TableName, Columns, Indexes> {
   /** @internal */
   _tableBrand: any;
 
@@ -33,6 +34,9 @@ export interface InternalTable<TableName, Columns> {
       >
         ? Column<Name, T, DataType, IsNotNull, HasDefault, JoinType>
         : never;
-    }
+    },
+    Indexes
   >;
+
+  getIndexes(): Indexes;
 }

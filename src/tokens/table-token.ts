@@ -4,7 +4,7 @@ import { Table } from '../TableType';
 import { wrapQuotes } from '../naming';
 
 export class TableToken extends Token {
-  constructor(private readonly table: Table<any, any>) {
+  constructor(private readonly table: Table<any, any, any>) {
     super();
   }
 
