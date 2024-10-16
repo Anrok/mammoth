@@ -1,6 +1,6 @@
-import { Column, ColumnDefinition, ColumnDefinitionsToColumns } from './column';
+import { Column } from './column';
 import { DefaultExpression, Expression } from './expression';
-import { toSnakeCase, wrapQuotes } from './naming';
+import { toSnakeCase } from './naming';
 import { GroupToken, SeparatorToken, StringToken, Token } from './tokens';
 
 export type IndexDefinitionsToIndexes<

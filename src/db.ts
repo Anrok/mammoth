@@ -13,7 +13,6 @@ import { makeWith } from './with';
 import { toSnakeCase } from './naming';
 import { makeValues } from './values';
 import { Index, IndexDefinition } from './table-index';
-import { StringToken } from './tokens';
 
 const createTables = <TableDefinitions extends { [key: string]: TableDefinition<any, any> }>(
   tableDefinitions: TableDefinitions,

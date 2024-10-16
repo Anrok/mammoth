@@ -1,6 +1,4 @@
 import { Column } from './column';
-import { DefaultExpression, Expression } from './expression';
-import { Index } from './table-index';
 import { Token } from './tokens';
 
 export type Table<TableName, Columns, Indexes> = Columns &
