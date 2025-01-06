@@ -1047,13 +1047,37 @@ describe(`select`, () => {
     `);
   });
 
-  it(`should quote name in alias as extended reserved keyword`, () => {
-    const query = db.select(db.foo.id.as(`name`)).from(db.foo);
+  it(`should quote name in alias as extended reserved keyword, but not a table name`, () => {
+    const query = db.select(db.foo.id.as(`name`)).from(db.foo.as(`name`));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       {
         "parameters": [],
-        "text": "SELECT foo.id "name" FROM foo",
+        "text": "SELECT foo.id "name" FROM foo name",
+      }
+    `);
+  });
+
+  it(`should quote name in alias as extended reserved keyword (more complicated expression)`, () => {
+    const query = db.select(db.foo.id.concat('suffix').as(`name`)).from(db.foo);
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          "suffix",
+        ],
+        "text": "SELECT (foo.id || $1) "name" FROM foo",
+      }
+    `);
+  });
+
+  it(`should quote non-snake-case name`, () => {
+    const query = db.select(db.foo.id.as(`1234`), db.foo.id.as(`?column?`)).from(db.foo.as(`1234`));
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [],
+        "text": "SELECT foo.id \"1234\", foo.id \"?column?\" FROM foo \"1234\"",
       }
     `);
   });

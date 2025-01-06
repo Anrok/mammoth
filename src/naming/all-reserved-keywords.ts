@@ -1,3 +1,5 @@
+// All keywords listed in https://www.postgresql.org/docs/12/sql-keywords-appendix.html
+// Includes reserved, non-reserved, and others.
 export const allReservedKeywords = new Set([
   'a',
   'abort',
