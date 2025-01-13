@@ -355,7 +355,7 @@ export const makeUpdate =
 
           valuesToken.push(
             new CollectionToken([
-              new StringToken(wrapQuotes(column.getSnakeCaseName())),
+              new StringToken(column.getSnakeCaseName()),
               new StringToken(`=`),
               ...(isTokenable(value) ? value.toTokens() : [new ParameterToken(value)]),
             ]),
