@@ -7,6 +7,7 @@ This fork is based on the 1.x version rather than newer 2.x version.  We made th
 - Fixes `with` query to return the value provided by constructed query.
 - Adds support for constant tables using `VALUES` lists.
 - Adds support for `LATERAL` joins.
+- Fix identifier quoting. Old code wasn't quoting identifiers in all cases: https://github.com/Ff00ff/mammoth/issues/576
 
 ---
 
