@@ -160,7 +160,13 @@ export class Column<
     return this.columnName;
   }
 
+  /** @internal */
+  getDefinition() {
+    return this.definition;
+  }
+
   constructor(
+    private readonly definition: ColumnDefinition<DataType, IsNotNull, HasDefault>,
     private readonly columnName: Name,
     private readonly tableName: TableName,
     private readonly originalColumnName: string | undefined,
@@ -188,7 +194,7 @@ export class Column<
   as<AliasName extends string>(
     alias: AliasName,
   ): Column<AliasName, TableName, DataType, IsNotNull, HasDefault, JoinType> {
-    return new Column(alias, this.tableName, this.columnName as unknown as string);
+    return new Column(this.definition, alias, this.tableName, this.columnName as unknown as string);
   }
 
   /** @internal */

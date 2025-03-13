@@ -31,14 +31,16 @@ export function makeValues<
   TableDefinitionT extends { [column: string]: ColumnDefinition<any, any, any> },
 >(
   tableName: TableName,
-  definition: TableDefinitionT,
+  tableDefinition: TableDefinitionT,
   values: Array<TableRow<TableDefinition<TableDefinitionT>>>,
 ): Table<TableName, ColumnDefinitionsToColumns<TableName, TableDefinitionT>> {
-  const columnNames = Object.keys(definition as unknown as object) as (keyof TableDefinitionT)[];
+  const columnEntries = Object.entries(
+    tableDefinition as unknown as object,
+  ) as [(keyof TableDefinitionT), ColumnDefinition<any, any, any>][];
 
-  const columns = columnNames.reduce(
-    (map, columnName) => {
-      const column = new Column(columnName as string, tableName, undefined) as any;
+  const columns = columnEntries.reduce(
+    (map, [columnName, columnDefinition]) => {
+      const column = new Column(columnDefinition, columnName as string, tableName, undefined) as any;
       map[columnName] = column;
       return map;
     },
@@ -61,7 +63,7 @@ export function makeValues<
   const table = {
     ...columns,
     as<T extends string>(alias: T) {
-      return makeValues(alias, definition, values) as any;
+      return makeValues(alias, tableDefinition, values) as any;
     },
     getName() {
       return tableName;
@@ -80,8 +82,8 @@ export function makeValues<
                 new GroupToken([
                   new SeparatorToken(
                     ',',
-                    columnNames.map((key) => {
-                      const columnValueToken = new ParameterToken((value as any)[key] as any);
+                    columnEntries.map(([columnName, columnDefinition]) => {
+                      const columnValueToken = new ParameterToken((value as any)[columnName] as any);
 
                       if (index === 0) {
                         // Cast on the first row only to ensure correct types in the list.
@@ -89,7 +91,7 @@ export function makeValues<
                           columnValueToken,
                           new StringToken('::'),
                           new StringToken(
-                            (definition[key] as any).getDefinition().dataType as string,
+                            columnDefinition.getDefinition().dataType,
                           ),
                         ]);
                       }
@@ -106,7 +108,7 @@ export function makeValues<
         new GroupToken([
           new SeparatorToken(
             ',',
-            columnNames.map((key) => new StringToken(`"${toSnakeCase(key as string)}"`)),
+            columnEntries.map(([columnName]) => new StringToken(`"${toSnakeCase(columnName as string)}"`)),
           ),
         ]),
       ];

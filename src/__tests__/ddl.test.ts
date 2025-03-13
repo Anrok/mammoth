@@ -18,6 +18,24 @@ describe(`ddl`, () => {
     () => Promise.resolve({ rows: [], affectedCount: 0 }),
   );
 
+  it('should retrieve column definition info from column', () => {
+    const column = db.foo.id;
+    expect(column.getDefinition().getDefinition()).toMatchInlineSnapshot(`
+      {
+        "checkExpression": undefined,
+        "dataType": "uuid",
+        "defaultExpression": "gen_random_uuid()",
+        "enumValues": undefined,
+        "isNotNull": false,
+        "isPrimaryKey": true,
+        "isUnique": false,
+        "referencesColumn": undefined,
+        "referencesSelf": false,
+        "referencesTable": undefined,
+      }
+    `);
+  })
+
   it(`should retrieve column definition info`, () => {
     const tableDefinitions = db.getTableDefinitions();
 
