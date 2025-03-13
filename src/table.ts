@@ -31,13 +31,19 @@ export const makeTable = <
   originalTableName: string | undefined,
   tableDefinition: TableDefinition,
 ) => {
-  const columnEntries = Object.entries(
-    tableDefinition as unknown as object,
-  ) as [(keyof TableDefinition), ColumnDefinition<any, any, any>][];
+  const columnEntries = Object.entries(tableDefinition as unknown as object) as [
+    keyof TableDefinition,
+    ColumnDefinition<any, any, any>,
+  ][];
 
   const columns = columnEntries.reduce(
     (map, [columnName, columnDefinition]) => {
-      const column = new Column(columnDefinition, columnName as string, tableName, undefined) as any;
+      const column = new Column(
+        columnDefinition,
+        columnName as string,
+        tableName,
+        undefined,
+      ) as any;
       map[columnName] = column;
       return map;
     },

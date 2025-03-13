@@ -34,13 +34,19 @@ export function makeValues<
   tableDefinition: TableDefinitionT,
   values: Array<TableRow<TableDefinition<TableDefinitionT>>>,
 ): Table<TableName, ColumnDefinitionsToColumns<TableName, TableDefinitionT>> {
-  const columnEntries = Object.entries(
-    tableDefinition as unknown as object,
-  ) as [(keyof TableDefinitionT), ColumnDefinition<any, any, any>][];
+  const columnEntries = Object.entries(tableDefinition as unknown as object) as [
+    keyof TableDefinitionT,
+    ColumnDefinition<any, any, any>,
+  ][];
 
   const columns = columnEntries.reduce(
     (map, [columnName, columnDefinition]) => {
-      const column = new Column(columnDefinition, columnName as string, tableName, undefined) as any;
+      const column = new Column(
+        columnDefinition,
+        columnName as string,
+        tableName,
+        undefined,
+      ) as any;
       map[columnName] = column;
       return map;
     },
@@ -83,16 +89,16 @@ export function makeValues<
                   new SeparatorToken(
                     ',',
                     columnEntries.map(([columnName, columnDefinition]) => {
-                      const columnValueToken = new ParameterToken((value as any)[columnName] as any);
+                      const columnValueToken = new ParameterToken(
+                        (value as any)[columnName] as any,
+                      );
 
                       if (index === 0) {
                         // Cast on the first row only to ensure correct types in the list.
                         return new CollectionToken([
                           columnValueToken,
                           new StringToken('::'),
-                          new StringToken(
-                            columnDefinition.getDefinition().dataType,
-                          ),
+                          new StringToken(columnDefinition.getDefinition().dataType),
                         ]);
                       }
 
@@ -108,7 +114,9 @@ export function makeValues<
         new GroupToken([
           new SeparatorToken(
             ',',
-            columnEntries.map(([columnName]) => new StringToken(`"${toSnakeCase(columnName as string)}"`)),
+            columnEntries.map(
+              ([columnName]) => new StringToken(`"${toSnakeCase(columnName as string)}"`),
+            ),
           ),
         ]),
       ];

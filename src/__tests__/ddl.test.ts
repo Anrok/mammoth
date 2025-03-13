@@ -34,7 +34,7 @@ describe(`ddl`, () => {
         "referencesTable": undefined,
       }
     `);
-  })
+  });
 
   it(`should retrieve column definition info`, () => {
     const tableDefinitions = db.getTableDefinitions();
