@@ -72,6 +72,7 @@ export const defineDb = <TableDefinitions extends { [key: string]: TableDefiniti
       });
     },
     select: makeSelect(queryExecutor),
+    selectDistinct: makeSelect(queryExecutor, [], true),
     insertInto: makeInsertInto(queryExecutor),
     deleteFrom: makeDeleteFrom(queryExecutor),
     update: makeUpdate(queryExecutor),

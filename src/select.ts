@@ -453,7 +453,7 @@ export class SelectQuery<
 }
 
 export const makeSelect =
-  (queryExecutor: QueryExecutorFn, initialTokens?: Token[]): SelectFn =>
+  (queryExecutor: QueryExecutorFn, initialTokens?: Token[], distinct?: boolean): SelectFn =>
   <T extends Selectable>(...columns: T[]) => {
     const includesStar = !!columns.find((column) => column instanceof Star);
 
@@ -473,7 +473,7 @@ export const makeSelect =
 
     return new SelectQuery(queryExecutor, returningKeys, includesStar, [
       ...(initialTokens || []),
-      new StringToken(`SELECT`),
+      new StringToken(distinct === true ? `SELECT DISTINCT` : 'SELECT'),
       new SeparatorToken(
         `,`,
         columns.map((column) => {
