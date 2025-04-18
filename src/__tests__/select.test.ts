@@ -136,6 +136,17 @@ describe(`select`, () => {
     `);
   });
 
+  it(`should select distinct foo`, () => {
+    const query = db.selectDistinct(db.foo.id).from(db.foo);
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [],
+        "text": "SELECT DISTINCT foo.id FROM foo",
+      }
+    `);
+  });
+
   it(`should select camel case table`, () => {
     const query = db.select(db.listItem.id).from(db.listItem);
 
