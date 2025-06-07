@@ -39,7 +39,24 @@ export class UpdateQuery<
       this.table,
       this.resultType,
       tokens,
+      this.comment,
     );
+  }
+
+  /** @internal */
+  newQueryWithComment(comment: string): UpdateQuery<T, Returning, TableColumns> {
+    return new UpdateQuery(
+      this.queryExecutor,
+      this.returningKeys,
+      this.table,
+      this.resultType,
+      this.tokens,
+      comment,
+    );
+  }
+  
+  getComment() {
+    return this.comment;
   }
 
   constructor(
@@ -48,6 +65,7 @@ export class UpdateQuery<
     private readonly table: T,
     private readonly resultType: ResultType,
     private readonly tokens: Token[],
+    private readonly comment: string,
   ) {
     super();
   }
@@ -63,7 +81,7 @@ export class UpdateQuery<
   ): Promise<Result1 | Result2> {
     const queryState = createQueryState(this.tokens);
 
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
+    return this.queryExecutor(this.comment + '\n' + queryState.text.join(` `), queryState.parameters)
       .then((result) =>
         onFulfilled
           ? onFulfilled(
@@ -72,6 +90,10 @@ export class UpdateQuery<
           : (result as any),
       )
       .catch(onRejected);
+  }
+
+  addComment(comment: string) {
+    return this.newQueryWithComment(comment);
   }
 
   where(condition: Expression<boolean, boolean, string>): UpdateQuery<T, Returning> {
