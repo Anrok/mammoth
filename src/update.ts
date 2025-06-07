@@ -75,10 +75,7 @@ export class UpdateQuery<
   }
 
   addComment(comment: string) {
-    return this.newQueryWithTokens([
-      new StringToken(comment),
-      ...this.tokens,
-    ]);
+    return this.newQueryWithTokens([new StringToken(comment), ...this.tokens]);
   }
 
   where(condition: Expression<boolean, boolean, string>): UpdateQuery<T, Returning> {
