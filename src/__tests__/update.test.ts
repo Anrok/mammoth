@@ -135,4 +135,17 @@ describe(`update`, () => {
       }
     `);
   });
+
+  it(`should support adding comment`, () => {
+    const query = db.update(db.bar).set({ name: `Test` }).comment(`/*This is a comment*/`);
+    
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          "Test",
+        ],
+        "text": "/*This is a comment*/UPDATE bar SET "name" = $1",
+      }
+    `);
+  });
 });

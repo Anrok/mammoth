@@ -687,7 +687,7 @@ export const makeInsertInto =
                   ]);
                 }),
               ),
-            ]);
+            ], '');
           },
         };
       },
