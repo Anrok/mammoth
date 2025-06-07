@@ -144,7 +144,7 @@ describe(`update`, () => {
         "parameters": [
           "Test",
         ],
-        "text": "/*This is a comment*/ UPDATE bar SET "name" = $1",
+        "text": "/*This is a comment*/ UPDATE bar SET name = $1",
       }
     `);
   });
