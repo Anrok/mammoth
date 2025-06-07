@@ -10,6 +10,7 @@ This fork is based on the 1.x version rather than newer 2.x version.  We made th
 - Fix identifier quoting. Old code wasn't quoting identifiers in all cases: https://github.com/Ff00ff/mammoth/issues/576
 - `Column` objects now contain a reference to their `ColumnDefinition`.
 - Adds support for `SELECT DISTINCT`.
+- Adds support for comment in update query.
 
 ---
 
