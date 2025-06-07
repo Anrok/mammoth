@@ -137,7 +137,7 @@ describe(`update`, () => {
   });
 
   it(`should support adding comment`, () => {
-    const query = db.update(db.bar).set({ name: `Test` }).comment(`/*This is a comment*/`);
+    const query = db.update(db.bar).set({ name: `Test` }).addComment(`/*This is a comment*/`);
     
     expect(toSql(query)).toMatchInlineSnapshot(`
       {
