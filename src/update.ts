@@ -337,7 +337,7 @@ export class UpdateQuery<
           }
         }),
       ),
-    ]) as any;
+    ], '') as any;
   }
 
   /** @internal */
@@ -391,7 +391,7 @@ export const makeUpdate =
           ...table.toTokens(),
           new StringToken(`SET`),
           new SeparatorToken(`,`, valuesToken),
-        ]);
+        ], '');
       },
     };
   };
