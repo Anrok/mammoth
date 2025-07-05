@@ -144,7 +144,7 @@ describe(`update`, () => {
         "parameters": [
           "Test",
         ],
-        "text": "/* This is a comment */\n UPDATE bar SET name = $1",
+        "text": "/* This is a comment */ UPDATE bar SET name = $1",
       }
     `);
   });
@@ -157,7 +157,7 @@ describe(`update`, () => {
         "parameters": [
           "Test",
         ],
-        "text": "/*+ IndexScan(bar bar_idx)*/\n UPDATE bar SET name = $1",
+        "text": "/*+ IndexScan(bar bar_idx)*/ UPDATE bar SET name = $1",
       }
     `);
   });

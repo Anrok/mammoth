@@ -79,7 +79,7 @@ export class UpdateQuery<
   ): Promise<Result1 | Result2> {
     const queryState = createQueryState(this.tokens);
 
-    return this.queryExecutor(`${this.comment}${queryState.text.join(` `)}`, queryState.parameters)
+    return this.queryExecutor(`${this.comment} ${queryState.text.join(` `)}`, queryState.parameters)
       .then((result) =>
         onFulfilled
           ? onFulfilled(
@@ -93,7 +93,7 @@ export class UpdateQuery<
   withComment(comment: string, removeSpace?: boolean) {
     const match = endCommentRe.exec(comment); 
     if (match !== null) throw new Error('Found "*/" in comment contents.');
-    const commentString = (removeSpace) ? `/*${comment}*/\n` : `/* ${comment} */\n`
+    const commentString = (removeSpace) ? `/*${comment}*/` : `/* ${comment} */`
 
     return this.newQueryWithComment(commentString);
   }
