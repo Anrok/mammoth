@@ -91,9 +91,9 @@ export class UpdateQuery<
   }
 
   withComment(comment: string, removeSpace?: boolean) {
-    const match = endCommentRe.exec(comment); 
+    const match = endCommentRe.exec(comment);
     if (match !== null) throw new Error('Found "*/" in comment contents.');
-    const commentString = (removeSpace) ? `/*${comment}*/` : `/* ${comment} */`
+    const commentString = removeSpace ? `/*${comment}*/` : `/* ${comment} */`;
 
     return this.newQueryWithComment(commentString);
   }

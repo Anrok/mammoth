@@ -150,7 +150,10 @@ describe(`update`, () => {
   });
 
   it(`should support adding comment without space`, () => {
-    const query = db.update(db.bar).set({ name: `Test` }).withComment(`+ IndexScan(bar bar_idx)`, true);
+    const query = db
+      .update(db.bar)
+      .set({ name: `Test` })
+      .withComment(`+ IndexScan(bar bar_idx)`, true);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       {
