@@ -18,6 +18,8 @@ import { FromItem } from './with';
 import { isTokenable } from './sql-functions';
 import assert from 'assert';
 
+const endCommentRe = /\*\//;
+
 // https://www.postgresql.org/docs/12/sql-update.html
 export class UpdateQuery<
   T extends Table<any, any>,
@@ -89,7 +91,8 @@ export class UpdateQuery<
   }
 
   withComment(comment: string, removeSpace?: boolean) {
-    assert(!comment.includes('*'))
+    const match = endCommentRe.exec(comment); 
+    if (match !== null) throw new Error('Found "*/" in comment contents.');
     const commentString = (removeSpace) ? `/*${comment}*/\n` : `/* ${comment} */\n`
 
     return this.newQueryWithComment(commentString);
