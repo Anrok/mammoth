@@ -137,15 +137,29 @@ describe(`update`, () => {
   });
 
   it(`should support adding comment`, () => {
-    const query = db.update(db.bar).set({ name: `Test` }).addComment(`/*This is a comment*/`);
+    const query = db.update(db.bar).set({ name: `Test` }).withComment(`This is a comment`);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       {
         "parameters": [
           "Test",
         ],
-        "text": "/*This is a comment*/ UPDATE bar SET name = $1",
+        "text": "/* This is a comment */\n UPDATE bar SET name = $1",
       }
     `);
   });
+
+  it(`should support adding comment without space`, () => {
+    const query = db.update(db.bar).set({ name: `Test` }).withComment(`+ IndexScan(bar bar_idx)`, true);
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          "Test",
+        ],
+        "text": "/*+ IndexScan(bar bar_idx)*/\n UPDATE bar SET name = $1",
+      }
+    `);
+  });
+
 });

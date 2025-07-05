@@ -651,7 +651,7 @@ export const makeInsertInto =
           ): UpdateQuery<T, number> {
             const keys = Object.keys(values);
 
-            return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
+            return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', '', [
               new StringToken(`INSERT INTO`),
               new StringToken((table as Table<any, any>).getName()),
               new GroupToken([

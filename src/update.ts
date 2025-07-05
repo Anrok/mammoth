@@ -38,7 +38,20 @@ export class UpdateQuery<
       this.returningKeys,
       this.table,
       this.resultType,
+      this.comment,
       tokens,
+    );
+  }
+
+  /** @internal */
+  newQueryWithComment(comment: string): UpdateQuery<T, Returning, TableColumns> {
+    return new UpdateQuery(
+      this.queryExecutor,
+      this.returningKeys,
+      this.table,
+      this.resultType,
+      comment,
+      this.tokens,
     );
   }
 
@@ -47,6 +60,7 @@ export class UpdateQuery<
     private readonly returningKeys: string[],
     private readonly table: T,
     private readonly resultType: ResultType,
+    private readonly comment: string,
     private readonly tokens: Token[],
   ) {
     super();
@@ -63,7 +77,7 @@ export class UpdateQuery<
   ): Promise<Result1 | Result2> {
     const queryState = createQueryState(this.tokens);
 
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
+    return this.queryExecutor(`${this.comment}${queryState.text.join(` `)}`, queryState.parameters)
       .then((result) =>
         onFulfilled
           ? onFulfilled(
@@ -74,8 +88,11 @@ export class UpdateQuery<
       .catch(onRejected);
   }
 
-  addComment(comment: string) {
-    return this.newQueryWithTokens([new StringToken(comment), ...this.tokens]);
+  withComment(comment: string, removeSpace?: boolean) {
+    assert(!comment.includes('*'))
+    const commentString = (removeSpace) ? `/*${comment}*/\n` : `/* ${comment} */\n`
+
+    return this.newQueryWithComment(commentString);
   }
 
   where(condition: Expression<boolean, boolean, string>): UpdateQuery<T, Returning> {
@@ -304,7 +321,7 @@ export class UpdateQuery<
       GetReturning<TableColumns, C10>
   >;
   returning(...columnNames: any[]) {
-    return new UpdateQuery(this.queryExecutor, columnNames, this.table, 'ROWS', [
+    return new UpdateQuery(this.queryExecutor, columnNames, this.table, 'ROWS', '', [
       ...this.tokens,
       new StringToken(`RETURNING`),
       new SeparatorToken(
@@ -324,7 +341,8 @@ export class UpdateQuery<
 
   /** @internal */
   toTokens() {
-    return this.tokens;
+    if (this.comment.length == 0) return this.tokens;
+    return [new StringToken(this.comment), ...this.tokens];
   }
 }
 
@@ -368,7 +386,7 @@ export const makeUpdate =
 
         assert(valuesToken.length > 0, `SET must be setting at least one value.`);
 
-        return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
+        return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', '', [
           new StringToken(`UPDATE`),
           ...table.toTokens(),
           new StringToken(`SET`),
