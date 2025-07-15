@@ -192,9 +192,12 @@ export const or = (expression: Expression<boolean, boolean, string>) =>
 export const group = (expression: Expression<boolean, boolean, string>) =>
   new DefaultExpression<boolean>([new GroupToken(expression.toTokens())]);
 
-export const any = <T>(array: T[]) =>
+export const any = <T>(array: Array<T> | Expression<Array<T>, true, any>) =>
   new Expression<T, true, '?column?'>(
-    [new StringToken(`ANY`), new GroupToken([new ParameterToken(array)])],
+    [
+      new StringToken(`ANY`),
+      new GroupToken(isTokenable(array) ? array.toTokens() : [new ParameterToken(array)]),
+    ],
     '?column?',
   );
 
