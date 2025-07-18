@@ -1098,9 +1098,7 @@ describe(`select`, () => {
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       {
-        "parameters": [
-          "Test",
-        ],
+        "parameters": [],
         "text": "/* This is a comment */ SELECT foo.id FROM foo",
       }
     `);
