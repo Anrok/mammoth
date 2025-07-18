@@ -15,10 +15,8 @@ import { ResultSet } from './result-set';
 import { Table } from './TableType';
 import { wrapQuotes } from './naming';
 import { FromItem } from './with';
-import { isTokenable } from './sql-functions';
+import { isTokenable, getCommentString } from './sql-functions';
 import assert from 'assert';
-
-const endCommentRe = /\*\//;
 
 // https://www.postgresql.org/docs/12/sql-update.html
 export class UpdateQuery<
@@ -90,12 +88,8 @@ export class UpdateQuery<
       .catch(onRejected);
   }
 
-  withComment(comment: string, removeSpace?: boolean) {
-    const match = endCommentRe.exec(comment);
-    if (match !== null) throw new Error('Found "*/" in comment contents.');
-    const commentString = removeSpace ? `/*${comment}*/` : `/* ${comment} */`;
-
-    return this.newQueryWithComment(commentString);
+  withComment(comment: string, removeSpace?: boolean): UpdateQuery<T, Returning> {
+    return this.newQueryWithComment(getCommentString(comment, removeSpace));
   }
 
   where(condition: Expression<boolean, boolean, string>): UpdateQuery<T, Returning> {

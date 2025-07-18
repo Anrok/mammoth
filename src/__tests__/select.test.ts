@@ -1092,4 +1092,17 @@ describe(`select`, () => {
       }
     `);
   });
+
+  it(`should support adding comment`, () => {
+    const query = db.select(db.foo.id).from(db.foo).withComment(`This is a comment`);
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          "Test",
+        ],
+        "text": "/* This is a comment */ SELECT foo.id FROM foo",
+      }
+    `);
+  });
 });
