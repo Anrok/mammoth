@@ -77,7 +77,7 @@ export class UpdateQuery<
   ): Promise<Result1 | Result2> {
     const queryState = createQueryState(this.toTokens());
 
-    return this.queryExecutor(`${queryState.text.join(` `)}`, queryState.parameters)
+    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
       .then((result) =>
         onFulfilled
           ? onFulfilled(
