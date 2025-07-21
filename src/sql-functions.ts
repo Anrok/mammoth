@@ -252,8 +252,8 @@ export function toSql(query: Query<any> | Tokenable) {
 
 const endCommentRe = /\*\//;
 
-export function getCommentString(comment: string, removeSpace?: boolean): string {
-  const match = endCommentRe.exec(comment);
-  if (match !== null) throw new Error('Found "*/" in comment contents.');
-  return removeSpace ? `/*${comment}*/` : `/* ${comment} */`;
+export function getCommentString(comment: string): string {
+  const match = endCommentRe.test(comment);
+  if (match) throw new Error('Found "*/" in comment contents.');
+  return `/*${comment}*/`;
 }

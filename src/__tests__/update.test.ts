@@ -144,23 +144,7 @@ describe(`update`, () => {
         "parameters": [
           "Test",
         ],
-        "text": "/* This is a comment */ UPDATE bar SET name = $1",
-      }
-    `);
-  });
-
-  it(`should support adding comment without space`, () => {
-    const query = db
-      .update(db.bar)
-      .set({ name: `Test` })
-      .withComment(`+ IndexScan(bar bar_idx)`, true);
-
-    expect(toSql(query)).toMatchInlineSnapshot(`
-      {
-        "parameters": [
-          "Test",
-        ],
-        "text": "/*+ IndexScan(bar bar_idx)*/ UPDATE bar SET name = $1",
+        "text": "/*This is a comment*/ UPDATE bar SET name = $1",
       }
     `);
   });

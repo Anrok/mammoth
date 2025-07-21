@@ -492,8 +492,8 @@ export class SelectQuery<
     };
   }
 
-  withComment(comment: string, removeSpace?: boolean): SelectQuery<Columns> {
-    return this.newSelectQuery([...this.tokens], getCommentString(comment, removeSpace));
+  withComment(comment: string): SelectQuery<Columns> {
+    return this.newSelectQuery([...this.tokens], getCommentString(comment));
   }
 }
 

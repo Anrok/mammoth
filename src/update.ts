@@ -88,8 +88,8 @@ export class UpdateQuery<
       .catch(onRejected);
   }
 
-  withComment(comment: string, removeSpace?: boolean): UpdateQuery<T, Returning> {
-    return this.newQueryWithComment(getCommentString(comment, removeSpace));
+  withComment(comment: string): UpdateQuery<T, Returning> {
+    return this.newQueryWithComment(getCommentString(comment));
   }
 
   where(condition: Expression<boolean, boolean, string>): UpdateQuery<T, Returning> {
