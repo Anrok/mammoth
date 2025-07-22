@@ -425,8 +425,8 @@ export class SelectQuery<
     return this.newSelectQuery([
       ...this.tokens,
       new StringToken(`FETCH FIRST`),
-      new StringToken(`ROWS ONLY`),
       new ParameterToken(count),
+      new StringToken(`ROWS ONLY`),
     ]);
   }
 
