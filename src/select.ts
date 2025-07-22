@@ -405,8 +405,8 @@ export class SelectQuery<
       return this.newSelectQuery([...this.tokens, new StringToken(`LIMIT ALL`)]);
     } else {
       return this.newSelectQuery([
-        ...this.tokens, 
-        new StringToken(`LIMIT`), 
+        ...this.tokens,
+        new StringToken(`LIMIT`),
         new ParameterToken(limit),
       ]);
     }
@@ -415,27 +415,25 @@ export class SelectQuery<
   // [ OFFSET start [ ROW | ROWS ] ]
   offset(start: number): SelectQuery<Columns> {
     return this.newSelectQuery([
-      ...this.tokens, 
-      new StringToken(`OFFSET`), 
+      ...this.tokens,
+      new StringToken(`OFFSET`),
       new ParameterToken(start),
     ]);
   }
 
   fetch(count: number): SelectQuery<Columns> {
-    return this.newSelectQuery(
-      [
-        ...this.tokens,
-        new StringToken(`FETCH FIRST`),
-        new ParameterToken(count),
-        new StringToken(`ROWS ONLY`),
-      ],
-    );
+    return this.newSelectQuery([
+      ...this.tokens,
+      new StringToken(`FETCH FIRST`),
+      new StringToken(`ROWS ONLY`),
+      new ParameterToken(count),
+    ]);
   }
 
   of(table: Table<any, any>): SelectQuery<Columns> {
     return this.newSelectQuery([
-      ...this.tokens, 
-      new StringToken(`OF`), 
+      ...this.tokens,
+      new StringToken(`OF`),
       new StringToken(table.getName()),
     ]);
   }
