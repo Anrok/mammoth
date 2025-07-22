@@ -306,9 +306,7 @@ export class SelectQuery<
   }
 
   forNoKeyUpdate(): SelectQuery<Columns> {
-    return this.newSelectQuery(
-      [...this.tokens, new StringToken(`FOR NO KEY UPDATE`)],
-    );
+    return this.newSelectQuery([...this.tokens, new StringToken(`FOR NO KEY UPDATE`)]);
   }
 
   forShare(): SelectQuery<Columns> {
@@ -332,31 +330,25 @@ export class SelectQuery<
       ? new GroupToken(joinCondition.toTokens())
       : new ParameterToken(joinCondition);
 
-    return this.newSelectQuery(
-      [...this.tokens, new StringToken(`ON`), joinConditionToken],
-    ) as any;
+    return this.newSelectQuery([...this.tokens, new StringToken(`ON`), joinConditionToken]) as any;
   }
 
   using(...columns: Column<any, any, any, any, any, any>[]): SelectQuery<Columns> {
-    return this.newSelectQuery(
-      [
-        ...this.tokens,
-        new StringToken(`USING`),
-        new GroupToken([
-          new SeparatorToken(
-            ',',
-            columns.map((column) => new CollectionToken(column.toTokens())),
-          ),
-        ]),
-      ],
-    );
+    return this.newSelectQuery([
+      ...this.tokens,
+      new StringToken(`USING`),
+      new GroupToken([
+        new SeparatorToken(
+          ',',
+          columns.map((column) => new CollectionToken(column.toTokens())),
+        ),
+      ]),
+    ]);
   }
 
   // [ WHERE condition ]
   where(condition: Expression<boolean, boolean, string>): SelectQuery<Columns> {
-    return this.newSelectQuery(
-      [...this.tokens, new StringToken(`WHERE`), ...condition.toTokens()],
-    );
+    return this.newSelectQuery([...this.tokens, new StringToken(`WHERE`), ...condition.toTokens()]);
   }
 
   // [ GROUP BY grouping_element [, ...] ]
@@ -367,30 +359,26 @@ export class SelectQuery<
   // CUBE ( { expression | ( expression [, ...] ) } [, ...] )
   // GROUPING SETS ( grouping_element [, ...] )
   groupBy(...expressions: Expression<any, any, any>[]): SelectQuery<Columns> {
-    return this.newSelectQuery(
-      [
-        ...this.tokens,
-        new StringToken(`GROUP BY`),
-        new SeparatorToken(
-          ',',
-          expressions.map((expression) => new CollectionToken(expression.toTokens())),
-        ),
-      ],
-    );
+    return this.newSelectQuery([
+      ...this.tokens,
+      new StringToken(`GROUP BY`),
+      new SeparatorToken(
+        ',',
+        expressions.map((expression) => new CollectionToken(expression.toTokens())),
+      ),
+    ]);
   }
 
   // [ HAVING condition [, ...] ]
   having(...conditions: Expression<boolean, boolean, string>[]): SelectQuery<Columns> {
-    return this.newSelectQuery(
-      [
-        ...this.tokens,
-        new StringToken(`HAVING`),
-        new SeparatorToken(
-          `,`,
-          conditions.map((condition) => new CollectionToken(condition.toTokens())),
-        ),
-      ],
-    );
+    return this.newSelectQuery([
+      ...this.tokens,
+      new StringToken(`HAVING`),
+      new SeparatorToken(
+        `,`,
+        conditions.map((condition) => new CollectionToken(condition.toTokens())),
+      ),
+    ]);
   }
 
   // [ WINDOW window_name AS ( window_definition ) [, ...] ]
@@ -401,16 +389,14 @@ export class SelectQuery<
   // [ { UNION | INTERSECT | EXCEPT } [ ALL | DISTINCT ] select ]
   // [ ORDER BY expression [ ASC | DESC | USING operator ] [ NULLS { FIRST | LAST } ] [, ...] ]
   orderBy(...expressions: Expression<any, any, any>[]): SelectQuery<Columns> {
-    return this.newSelectQuery(
-      [
-        ...this.tokens,
-        new StringToken(`ORDER BY`),
-        new SeparatorToken(
-          ',',
-          expressions.map((expression) => new CollectionToken(expression.toTokens())),
-        ),
-      ],
-    );
+    return this.newSelectQuery([
+      ...this.tokens,
+      new StringToken(`ORDER BY`),
+      new SeparatorToken(
+        ',',
+        expressions.map((expression) => new CollectionToken(expression.toTokens())),
+      ),
+    ]);
   }
 
   // [ LIMIT { count | ALL } ]
@@ -418,17 +404,21 @@ export class SelectQuery<
     if (limit === `ALL`) {
       return this.newSelectQuery([...this.tokens, new StringToken(`LIMIT ALL`)]);
     } else {
-      return this.newSelectQuery(
-        [...this.tokens, new StringToken(`LIMIT`), new ParameterToken(limit)],
-      );
+      return this.newSelectQuery([
+        ...this.tokens, 
+        new StringToken(`LIMIT`), 
+        new ParameterToken(limit),
+      ]);
     }
   }
 
   // [ OFFSET start [ ROW | ROWS ] ]
   offset(start: number): SelectQuery<Columns> {
-    return this.newSelectQuery(
-      [...this.tokens, new StringToken(`OFFSET`), new ParameterToken(start)],
-    );
+    return this.newSelectQuery([
+      ...this.tokens, 
+      new StringToken(`OFFSET`), 
+      new ParameterToken(start),
+    ]);
   }
 
   fetch(count: number): SelectQuery<Columns> {
@@ -443,9 +433,11 @@ export class SelectQuery<
   }
 
   of(table: Table<any, any>): SelectQuery<Columns> {
-    return this.newSelectQuery(
-      [...this.tokens, new StringToken(`OF`), new StringToken(table.getName())],
-    );
+    return this.newSelectQuery([
+      ...this.tokens, 
+      new StringToken(`OF`), 
+      new StringToken(table.getName()),
+    ]);
   }
 
   nowait(): SelectQuery<Columns> {
