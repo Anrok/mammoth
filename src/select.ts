@@ -162,7 +162,7 @@ export class SelectQuery<
 
   private newSelectQuery(
     tokens: Token[],
-    {comment, table}: {comment?: string, table?: Table<any, any>} = {}
+    { comment, table }: { comment?: string; table?: Table<any, any> } = {},
   ): SelectQuery<Columns> {
     const returningKeys =
       this.includesStar && table
@@ -174,30 +174,34 @@ export class SelectQuery<
           ]
         : this.returningKeys;
 
-    return new SelectQuery(this.queryExecutor, returningKeys, this.includesStar, comment ?? this.comment, tokens);
+    return new SelectQuery(
+      this.queryExecutor,
+      returningKeys,
+      this.includesStar,
+      comment ?? this.comment,
+      tokens,
+    );
   }
 
   // [ FROM from_item [, ...] ]
   from<T extends FromItemOrTable>(
     fromItem: T,
   ): T extends TableDefinition<any> ? never : Join<SelectQuery<Columns, IncludesStar>, T> {
-    return this.newSelectQuery(
-      [...this.tokens, new StringToken(`FROM`), ...fromItem.toTokens()],
-      {table: fromItem},
-    ) as any;
+    return this.newSelectQuery([...this.tokens, new StringToken(`FROM`), ...fromItem.toTokens()], {
+      table: fromItem,
+    }) as any;
   }
 
   join<T extends FromItemOrTable>(table: T): Join<SelectQuery<Columns, IncludesStar>, T> {
-    return this.newSelectQuery(
-      [...this.tokens, new StringToken(`JOIN`), ...table.toTokens()],
-      {table},
-    ) as any;
+    return this.newSelectQuery([...this.tokens, new StringToken(`JOIN`), ...table.toTokens()], {
+      table,
+    }) as any;
   }
 
   joinLateral<T extends FromItemOrTable>(table: T): Join<SelectQuery<Columns, IncludesStar>, T> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`JOIN LATERAL`), ...table.toTokens()],
-      {table},
+      { table },
     ) as any;
   }
 
@@ -206,7 +210,7 @@ export class SelectQuery<
   ): Join<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`INNER JOIN`), ...table.toTokens()],
-      {table},
+      { table },
     ) as any;
   }
 
@@ -215,7 +219,7 @@ export class SelectQuery<
   ): Join<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`INNER JOIN LATERAL`), ...table.toTokens()],
-      {table},
+      { table },
     ) as any;
   }
 
@@ -224,7 +228,7 @@ export class SelectQuery<
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`LEFT OUTER JOIN`), ...table.toTokens()],
-      {table},
+      { table },
     ) as any;
   }
 
@@ -233,7 +237,7 @@ export class SelectQuery<
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`LEFT OUTER JOIN LATERAL`), ...table.toTokens()],
-      {table},
+      { table },
     ) as any;
   }
 
@@ -242,7 +246,7 @@ export class SelectQuery<
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`LEFT JOIN`), ...table.toTokens()],
-      {table},
+      { table },
     ) as any;
   }
 
@@ -251,7 +255,7 @@ export class SelectQuery<
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`LEFT JOIN LATERAL`), ...table.toTokens()],
-      {table},
+      { table },
     ) as any;
   }
 
@@ -260,7 +264,7 @@ export class SelectQuery<
   ): RightJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`RIGHT OUTER JOIN`), ...table.toTokens()],
-      {table},
+      { table },
     ) as any;
   }
 
@@ -269,7 +273,7 @@ export class SelectQuery<
   ): RightJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`RIGHT JOIN`), ...table.toTokens()],
-      {table},
+      { table },
     ) as any;
   }
 
@@ -278,7 +282,7 @@ export class SelectQuery<
   ): FullJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`FULL OUTER JOIN`), ...table.toTokens()],
-      {table},
+      { table },
     ) as any;
   }
 
@@ -287,7 +291,7 @@ export class SelectQuery<
   ): FullJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`FULL JOIN`), ...table.toTokens()],
-      {table},
+      { table },
     ) as any;
   }
 
@@ -297,7 +301,7 @@ export class SelectQuery<
   ): Join<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`CROSS JOIN`), ...table.toTokens()],
-      {table},
+      { table },
     ) as any;
   }
 
@@ -457,7 +461,7 @@ export class SelectQuery<
   }
 
   withComment(comment: string): SelectQuery<Columns> {
-    return this.newSelectQuery([...this.tokens], {comment: getCommentString(comment)});
+    return this.newSelectQuery([...this.tokens], { comment: getCommentString(comment) });
   }
 }
 
