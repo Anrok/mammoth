@@ -133,7 +133,7 @@ export class SelectQuery<
 
   /** @internal */
   newQueryWithTokens(tokens: Token[]): SelectQuery<Columns> {
-    return this.newSelectQuery(tokens, this.comment);
+    return this.newSelectQuery(tokens);
   }
 
   constructor(
@@ -162,8 +162,7 @@ export class SelectQuery<
 
   private newSelectQuery(
     tokens: Token[],
-    comment: string,
-    table?: Table<any, any>,
+    {comment, table}: {comment?: string, table?: Table<any, any>} = {}
   ): SelectQuery<Columns> {
     const returningKeys =
       this.includesStar && table
@@ -175,7 +174,7 @@ export class SelectQuery<
           ]
         : this.returningKeys;
 
-    return new SelectQuery(this.queryExecutor, returningKeys, this.includesStar, comment, tokens);
+    return new SelectQuery(this.queryExecutor, returningKeys, this.includesStar, comment ?? this.comment, tokens);
   }
 
   // [ FROM from_item [, ...] ]
@@ -184,24 +183,21 @@ export class SelectQuery<
   ): T extends TableDefinition<any> ? never : Join<SelectQuery<Columns, IncludesStar>, T> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`FROM`), ...fromItem.toTokens()],
-      this.comment,
-      fromItem,
+      {table: fromItem},
     ) as any;
   }
 
   join<T extends FromItemOrTable>(table: T): Join<SelectQuery<Columns, IncludesStar>, T> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`JOIN`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
   joinLateral<T extends FromItemOrTable>(table: T): Join<SelectQuery<Columns, IncludesStar>, T> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`JOIN LATERAL`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
@@ -210,8 +206,7 @@ export class SelectQuery<
   ): Join<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`INNER JOIN`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
@@ -220,8 +215,7 @@ export class SelectQuery<
   ): Join<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`INNER JOIN LATERAL`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
@@ -230,8 +224,7 @@ export class SelectQuery<
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`LEFT OUTER JOIN`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
@@ -240,8 +233,7 @@ export class SelectQuery<
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`LEFT OUTER JOIN LATERAL`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
@@ -250,8 +242,7 @@ export class SelectQuery<
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`LEFT JOIN`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
@@ -260,8 +251,7 @@ export class SelectQuery<
   ): LeftJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`LEFT JOIN LATERAL`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
@@ -270,8 +260,7 @@ export class SelectQuery<
   ): RightJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`RIGHT OUTER JOIN`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
@@ -280,8 +269,7 @@ export class SelectQuery<
   ): RightJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`RIGHT JOIN`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
@@ -290,8 +278,7 @@ export class SelectQuery<
   ): FullJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`FULL OUTER JOIN`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
@@ -300,8 +287,7 @@ export class SelectQuery<
   ): FullJoin<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`FULL JOIN`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
@@ -311,28 +297,26 @@ export class SelectQuery<
   ): Join<SelectQuery<Columns, IncludesStar>, JoinTable> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`CROSS JOIN`), ...table.toTokens()],
-      this.comment,
-      table,
+      {table},
     ) as any;
   }
 
   forUpdate(): SelectQuery<Columns> {
-    return this.newSelectQuery([...this.tokens, new StringToken(`FOR UPDATE`)], this.comment);
+    return this.newSelectQuery([...this.tokens, new StringToken(`FOR UPDATE`)]);
   }
 
   forNoKeyUpdate(): SelectQuery<Columns> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`FOR NO KEY UPDATE`)],
-      this.comment,
     );
   }
 
   forShare(): SelectQuery<Columns> {
-    return this.newSelectQuery([...this.tokens, new StringToken(`FOR SHARE`)], this.comment);
+    return this.newSelectQuery([...this.tokens, new StringToken(`FOR SHARE`)]);
   }
 
   forKeyShare(): SelectQuery<Columns> {
-    return this.newSelectQuery([...this.tokens, new StringToken(`FOR KEY SHARE`)], this.comment);
+    return this.newSelectQuery([...this.tokens, new StringToken(`FOR KEY SHARE`)]);
   }
 
   /** @internal */
@@ -350,7 +334,6 @@ export class SelectQuery<
 
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`ON`), joinConditionToken],
-      this.comment,
     ) as any;
   }
 
@@ -366,7 +349,6 @@ export class SelectQuery<
           ),
         ]),
       ],
-      this.comment,
     );
   }
 
@@ -374,7 +356,6 @@ export class SelectQuery<
   where(condition: Expression<boolean, boolean, string>): SelectQuery<Columns> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`WHERE`), ...condition.toTokens()],
-      this.comment,
     );
   }
 
@@ -392,10 +373,9 @@ export class SelectQuery<
         new StringToken(`GROUP BY`),
         new SeparatorToken(
           ',',
-          expressions.map((expression) => new CollectionToken(expression.toTokens()), this.comment),
+          expressions.map((expression) => new CollectionToken(expression.toTokens())),
         ),
       ],
-      this.comment,
     );
   }
 
@@ -407,10 +387,9 @@ export class SelectQuery<
         new StringToken(`HAVING`),
         new SeparatorToken(
           `,`,
-          conditions.map((condition) => new CollectionToken(condition.toTokens()), this.comment),
+          conditions.map((condition) => new CollectionToken(condition.toTokens())),
         ),
       ],
-      this.comment,
     );
   }
 
@@ -431,18 +410,16 @@ export class SelectQuery<
           expressions.map((expression) => new CollectionToken(expression.toTokens())),
         ),
       ],
-      this.comment,
     );
   }
 
   // [ LIMIT { count | ALL } ]
   limit(limit: number | 'ALL'): SelectQuery<Columns> {
     if (limit === `ALL`) {
-      return this.newSelectQuery([...this.tokens, new StringToken(`LIMIT ALL`)], this.comment);
+      return this.newSelectQuery([...this.tokens, new StringToken(`LIMIT ALL`)]);
     } else {
       return this.newSelectQuery(
         [...this.tokens, new StringToken(`LIMIT`), new ParameterToken(limit)],
-        this.comment,
       );
     }
   }
@@ -451,7 +428,6 @@ export class SelectQuery<
   offset(start: number): SelectQuery<Columns> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`OFFSET`), new ParameterToken(start)],
-      this.comment,
     );
   }
 
@@ -463,23 +439,21 @@ export class SelectQuery<
         new ParameterToken(count),
         new StringToken(`ROWS ONLY`),
       ],
-      this.comment,
     );
   }
 
   of(table: Table<any, any>): SelectQuery<Columns> {
     return this.newSelectQuery(
       [...this.tokens, new StringToken(`OF`), new StringToken(table.getName())],
-      this.comment,
     );
   }
 
   nowait(): SelectQuery<Columns> {
-    return this.newSelectQuery([...this.tokens, new StringToken(`NOWAIT`)], this.comment);
+    return this.newSelectQuery([...this.tokens, new StringToken(`NOWAIT`)]);
   }
 
   skipLocked(): SelectQuery<Columns> {
-    return this.newSelectQuery([...this.tokens, new StringToken(`SKIP LOCKED`)], this.comment);
+    return this.newSelectQuery([...this.tokens, new StringToken(`SKIP LOCKED`)]);
   }
 
   as(name: string): FromItem<SelectQuery<Columns>> {
@@ -493,7 +467,7 @@ export class SelectQuery<
   }
 
   withComment(comment: string): SelectQuery<Columns> {
-    return this.newSelectQuery([...this.tokens], getCommentString(comment));
+    return this.newSelectQuery([...this.tokens], {comment: getCommentString(comment)});
   }
 }
 
