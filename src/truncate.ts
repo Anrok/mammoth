@@ -6,11 +6,11 @@ import { Table } from './TableType';
 import { TableDefinition } from './table';
 
 export const makeTruncate =
-  (queryExecutor: QueryExecutorFn) =>
+  (queryExecutor: QueryExecutorFn, commentTokens: Token[]) =>
   <T extends Table<any, any>>(
     table: T,
   ): T extends TableDefinition<any> ? never : TruncateQuery<T> => {
-    return new TruncateQuery<T>(queryExecutor, table, 'AFFECTED_COUNT', [
+    return new TruncateQuery<T>(queryExecutor, commentTokens, table, 'AFFECTED_COUNT', [
       new StringToken(`TRUNCATE`),
       new StringToken((table as Table<any, any>).getName()),
     ]) as any;
@@ -23,16 +23,23 @@ export class TruncateQuery<
 > extends Query<Returning> {
   /** @internal */
   newQueryWithTokens(tokens: Array<Token>): TruncateQuery<T, Returning, TableColumns> {
-    return new TruncateQuery(this.queryExecutor, this.table, this.resultType, tokens);
+    return new TruncateQuery(
+      this.queryExecutor,
+      this.commentTokens,
+      this.table,
+      this.resultType,
+      tokens,
+    );
   }
 
   constructor(
-    private readonly queryExecutor: QueryExecutorFn,
+    queryExecutor: QueryExecutorFn,
+    commentTokens: Token[],
     private readonly table: T,
     private readonly resultType: ResultType,
     private readonly tokens: Token[],
   ) {
-    super();
+    super(queryExecutor, commentTokens);
   }
 
   then<Result1, Result2 = never>(
@@ -66,7 +73,7 @@ export class TruncateQuery<
     return [];
   }
 
-  toTokens(): Token[] {
+  toQueryTokens(): Token[] {
     return this.tokens;
   }
 }

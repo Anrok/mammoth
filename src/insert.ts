@@ -39,6 +39,7 @@ export class InsertQuery<
   newQueryWithTokens(tokens: Array<Token>): InsertQuery<T, Returning, TableColumns> {
     return new InsertQuery(
       this.queryExecutor,
+      this.commentTokens,
       this.returningKeys,
       this.table,
       this.resultType,
@@ -47,13 +48,14 @@ export class InsertQuery<
   }
 
   constructor(
-    private readonly queryExecutor: QueryExecutorFn,
+    queryExecutor: QueryExecutorFn,
+    commentTokens: Token[],
     private readonly returningKeys: string[],
     private readonly table: T,
     private readonly resultType: ResultType,
     private readonly tokens: Token[],
   ) {
-    super();
+    super(queryExecutor, commentTokens);
   }
 
   then<Result1, Result2 = never>(
@@ -280,22 +282,29 @@ export class InsertQuery<
       GetReturning<TableColumns, C10>
   >;
   returning(...columnNames: any[]) {
-    return new InsertQuery(this.queryExecutor, columnNames, this.table, 'ROWS', [
-      ...this.tokens,
-      new StringToken(`RETURNING`),
-      new SeparatorToken(
-        `,`,
-        columnNames.map((alias) => {
-          const column = (this.table as any)[alias] as Column<any, any, any, any, any, any>;
+    return new InsertQuery(
+      this.queryExecutor,
+      this.commentTokens,
+      columnNames,
+      this.table,
+      'ROWS',
+      [
+        ...this.tokens,
+        new StringToken(`RETURNING`),
+        new SeparatorToken(
+          `,`,
+          columnNames.map((alias) => {
+            const column = (this.table as any)[alias] as Column<any, any, any, any, any, any>;
 
-          if (alias !== column.getSnakeCaseName()) {
-            return new StringToken(`${column.getSnakeCaseName()} ${wrapQuotes(alias)}`);
-          } else {
-            return new StringToken(column.getSnakeCaseName());
-          }
-        }),
-      ),
-    ]) as any;
+            if (alias !== column.getSnakeCaseName()) {
+              return new StringToken(`${column.getSnakeCaseName()} ${wrapQuotes(alias)}`);
+            } else {
+              return new StringToken(column.getSnakeCaseName());
+            }
+          }),
+        ),
+      ],
+    ) as any;
   }
 
   where(expression: Expression<boolean, boolean, string>) {
@@ -312,6 +321,7 @@ export class InsertQuery<
       doNothing() {
         return new InsertQuery(
           self.queryExecutor,
+          self.commentTokens,
           self.returningKeys,
           self.table,
           self.resultType,
@@ -344,6 +354,7 @@ export class InsertQuery<
       ) {
         return new InsertQuery(
           self.queryExecutor,
+          self.commentTokens,
           self.returningKeys,
           self.table,
           self.resultType,
@@ -410,6 +421,7 @@ export class InsertQuery<
       doNothing() {
         return new InsertQuery(
           self.queryExecutor,
+          self.commentTokens,
           self.returningKeys,
           self.table,
           self.resultType,
@@ -442,6 +454,7 @@ export class InsertQuery<
       ) {
         return new InsertQuery(
           self.queryExecutor,
+          self.commentTokens,
           self.returningKeys,
           self.table,
           self.resultType,
@@ -486,7 +499,7 @@ export class InsertQuery<
   }
 
   /** @internal */
-  toTokens() {
+  toQueryTokens() {
     return this.tokens;
   }
 }
@@ -583,13 +596,13 @@ export interface InsertIntoResult<
 }
 
 export const makeInsertInto =
-  (queryExecutor: QueryExecutorFn) =>
+  (queryExecutor: QueryExecutorFn, commentTokens: Token[]) =>
   <T extends Table<any, any>>(
     table: T,
     columnNames?: T extends Table<any, infer Columns> ? (keyof Columns)[] : never,
   ): T extends TableDefinition<any> ? never : InsertIntoResult<T> => {
     return {
-      select: makeSelect(queryExecutor, [
+      select: makeSelect(queryExecutor, commentTokens, [
         new StringToken(`INSERT INTO`),
         new StringToken((table as Table<any, any>).getName()),
         new GroupToken([
@@ -607,6 +620,7 @@ export const makeInsertInto =
       deleteFrom<DeleteTable extends Table<any, any>>(deleteTable: DeleteTable) {
         return new DeleteQuery<DeleteTable, number>(
           queryExecutor,
+          commentTokens,
           [],
           deleteTable,
           'AFFECTED_COUNT',
@@ -651,7 +665,7 @@ export const makeInsertInto =
           ): UpdateQuery<T, number> {
             const keys = Object.keys(values);
 
-            return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
+            return new UpdateQuery(queryExecutor, commentTokens, [], table, 'AFFECTED_COUNT', [
               new StringToken(`INSERT INTO`),
               new StringToken((table as Table<any, any>).getName()),
               new GroupToken([
@@ -693,7 +707,7 @@ export const makeInsertInto =
       },
 
       defaultValues() {
-        return new InsertQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
+        return new InsertQuery(queryExecutor, commentTokens, [], table, 'AFFECTED_COUNT', [
           new StringToken(`INSERT INTO`),
           new StringToken((table as Table<any, any>).getName()),
           new StringToken(`DEFAULT VALUES`),
@@ -708,7 +722,7 @@ export const makeInsertInto =
         const list = Array.isArray(listOrItem) ? listOrItem : [listOrItem];
         const [firstItem] = list;
 
-        return new InsertQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
+        return new InsertQuery(queryExecutor, commentTokens, [], table, 'AFFECTED_COUNT', [
           new StringToken(`INSERT INTO`),
           new StringToken((table as Table<any, any>).getName()),
           new GroupToken([

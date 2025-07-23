@@ -1,17 +1,19 @@
 import {
   CollectionToken,
+  createQueryState,
   GroupToken,
   SeparatorToken,
   StringToken,
   TableToken,
   Token,
 } from './tokens';
-import { GetDataType, QueryExecutorFn } from './types';
+import { GetDataType, QueryExecutorFn, ResultType } from './types';
 
 import { Expression } from './expression';
 import { Query } from './query';
 import { CapturingResultSet } from './result-set';
 import { wrapQuotes } from './naming';
+import { Table } from './TableType';
 
 export type FromItem<Q> =
   Q extends Query<any>
@@ -471,7 +473,7 @@ export const makeFromItem = <Q extends Query<any>>(name: string, query: Q): From
 };
 
 export const makeWith =
-  (queryExecutor: QueryExecutorFn): WithFn =>
+  (): WithFn =>
   (...args: any[]) => {
     const queries: any = {};
 
@@ -507,6 +509,6 @@ export const makeWith =
     return query.newQueryWithTokens([
       new StringToken(`WITH`),
       new SeparatorToken(`,`, tokens),
-      ...query.toTokens(),
+      ...query.toQueryTokens(),
     ]);
   };
