@@ -18,11 +18,11 @@ import { wrapQuotes } from './naming';
 import { FromItem } from './with';
 
 export const makeDeleteFrom =
-  (queryExecutor: QueryExecutorFn) =>
+  (queryExecutor: QueryExecutorFn, commentTokens: Token[]) =>
   <T extends Table<string, unknown>>(
     table: T,
   ): T extends TableDefinition<any> ? never : DeleteQuery<T> => {
-    return new DeleteQuery<T>(queryExecutor, [], table, 'AFFECTED_COUNT', [
+    return new DeleteQuery<T>(queryExecutor, commentTokens, [], table, 'AFFECTED_COUNT', [
       new StringToken(`DELETE FROM`),
       ...table.toTokens(),
     ]) as any;
@@ -45,6 +45,7 @@ export class DeleteQuery<
   newQueryWithTokens(tokens: Array<Token>): DeleteQuery<T, Returning, TableColumns> {
     return new DeleteQuery(
       this.queryExecutor,
+      this.commentTokens,
       this.returningKeys,
       this.table,
       this.resultType,
@@ -53,13 +54,14 @@ export class DeleteQuery<
   }
 
   constructor(
-    private readonly queryExecutor: QueryExecutorFn,
+    queryExecutor: QueryExecutorFn,
+    commentTokens: Token[],
     private readonly returningKeys: string[],
     private readonly table: T,
     private readonly resultType: ResultType,
     private readonly tokens: Token[],
   ) {
-    super();
+    super(queryExecutor, commentTokens);
   }
 
   then<Result1, Result2 = never>(
@@ -315,26 +317,35 @@ export class DeleteQuery<
       GetReturning<TableColumns, C10>
   >;
   returning(...columnNames: any[]) {
-    return new DeleteQuery(this.queryExecutor, columnNames, this.table, 'ROWS', [
-      ...this.tokens,
-      new StringToken(`RETURNING`),
-      new SeparatorToken(
-        `,`,
-        columnNames.map((alias) => {
-          const column = (this.table as any)[alias] as Column<any, any, any, any, any, any>;
+    return new DeleteQuery(
+      this.queryExecutor,
+      this.commentTokens,
+      columnNames,
+      this.table,
+      'ROWS',
+      [
+        ...this.tokens,
+        new StringToken(`RETURNING`),
+        new SeparatorToken(
+          `,`,
+          columnNames.map((alias) => {
+            const column = (this.table as any)[alias] as Column<any, any, any, any, any, any>;
 
-          if (alias !== column.getSnakeCaseName()) {
-            return new StringToken(`${wrapQuotes(column.getSnakeCaseName())} ${wrapQuotes(alias)}`);
-          } else {
-            return new StringToken(wrapQuotes(column.getSnakeCaseName()));
-          }
-        }),
-      ),
-    ]) as any;
+            if (alias !== column.getSnakeCaseName()) {
+              return new StringToken(
+                `${wrapQuotes(column.getSnakeCaseName())} ${wrapQuotes(alias)}`,
+              );
+            } else {
+              return new StringToken(wrapQuotes(column.getSnakeCaseName()));
+            }
+          }),
+        ),
+      ],
+    ) as any;
   }
 
   /** @internal */
-  toTokens() {
+  toQueryTokens() {
     return this.tokens;
   }
 }

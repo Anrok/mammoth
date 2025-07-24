@@ -137,12 +137,13 @@ export class SelectQuery<
   }
 
   constructor(
-    private readonly queryExecutor: QueryExecutorFn,
+    queryExecutor: QueryExecutorFn,
+    commentTokens: Token[],
     private readonly returningKeys: string[],
     private readonly includesStar: boolean,
     private readonly tokens: Token[],
   ) {
-    super();
+    super(queryExecutor, commentTokens);
   }
 
   then<Result1, Result2 = never>(
@@ -170,7 +171,13 @@ export class SelectQuery<
           ]
         : this.returningKeys;
 
-    return new SelectQuery(this.queryExecutor, returningKeys, this.includesStar, tokens);
+    return new SelectQuery(
+      this.queryExecutor,
+      this.commentTokens,
+      returningKeys,
+      this.includesStar,
+      tokens,
+    );
   }
 
   // [ FROM from_item [, ...] ]
@@ -314,7 +321,7 @@ export class SelectQuery<
   }
 
   /** @internal */
-  toTokens() {
+  toQueryTokens() {
     return this.tokens;
   }
 
@@ -455,6 +462,7 @@ export class SelectQuery<
 export const makeSelect =
   (
     queryExecutor: QueryExecutorFn,
+    commentTokens: Token[],
     initialTokens?: Token[],
     { isDistinct = false }: { isDistinct?: boolean } = {},
   ): SelectFn =>
@@ -475,7 +483,7 @@ export const makeSelect =
         return (column as any).getName();
       });
 
-    return new SelectQuery(queryExecutor, returningKeys, includesStar, [
+    return new SelectQuery(queryExecutor, commentTokens, returningKeys, includesStar, [
       ...(initialTokens || []),
       new StringToken(isDistinct === true ? `SELECT DISTINCT` : 'SELECT'),
       new SeparatorToken(

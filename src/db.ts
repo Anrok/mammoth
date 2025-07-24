@@ -12,6 +12,7 @@ import { makeUpdate } from './update';
 import { makeWith } from './with';
 import { toSnakeCase } from './naming';
 import { makeValues } from './values';
+import { StringToken, Token } from './tokens';
 
 const createTables = <TableDefinitions extends { [key: string]: TableDefinition<any> }>(
   tableDefinitions: TableDefinitions,
@@ -44,6 +45,17 @@ const createTables = <TableDefinitions extends { [key: string]: TableDefinition<
   }, {} as any);
 };
 
+const makeQueryStartFunctions = (queryExecutor: QueryExecutorFn, commentTokens: Token[]) => {
+  return {
+    select: makeSelect(queryExecutor, commentTokens),
+    selectDistinct: makeSelect(queryExecutor, commentTokens, [], { isDistinct: true }),
+    insertInto: makeInsertInto(queryExecutor, commentTokens),
+    deleteFrom: makeDeleteFrom(queryExecutor, commentTokens),
+    update: makeUpdate(queryExecutor, commentTokens),
+    truncate: makeTruncate(queryExecutor, commentTokens),
+  };
+};
+
 export const defineDb = <TableDefinitions extends { [key: string]: TableDefinition<any> }>(
   tableDefinitions: TableDefinitions,
   queryExecutor: QueryExecutorFn,
@@ -71,13 +83,10 @@ export const defineDb = <TableDefinitions extends { [key: string]: TableDefiniti
         };
       });
     },
-    select: makeSelect(queryExecutor),
-    selectDistinct: makeSelect(queryExecutor, [], { isDistinct: true }),
-    insertInto: makeInsertInto(queryExecutor),
-    deleteFrom: makeDeleteFrom(queryExecutor),
-    update: makeUpdate(queryExecutor),
-    with: makeWith(queryExecutor),
-    truncate: makeTruncate(queryExecutor),
+    comment: (comment: string) =>
+      makeQueryStartFunctions(queryExecutor, [getCommentToken(comment)]),
+    ...makeQueryStartFunctions(queryExecutor, []),
+    with: makeWith(),
     values: makeValues,
     case: () => new CaseStatement<never>([]),
     ...sqlFunctions,
@@ -85,3 +94,10 @@ export const defineDb = <TableDefinitions extends { [key: string]: TableDefiniti
     ...createTables(tableDefinitions),
   };
 };
+
+const endCommentRe = /\*\//;
+
+export function getCommentToken(comment: string): Token {
+  if (endCommentRe.test(comment)) throw new Error('Found "*/" in comment contents.');
+  return new StringToken(`/*${comment}*/`);
+}

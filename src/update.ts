@@ -35,6 +35,7 @@ export class UpdateQuery<
   newQueryWithTokens(tokens: Array<Token>): UpdateQuery<T, Returning, TableColumns> {
     return new UpdateQuery(
       this.queryExecutor,
+      this.commentTokens,
       this.returningKeys,
       this.table,
       this.resultType,
@@ -43,13 +44,14 @@ export class UpdateQuery<
   }
 
   constructor(
-    private readonly queryExecutor: QueryExecutorFn,
+    queryExecutor: QueryExecutorFn,
+    commentTokens: Token[],
     private readonly returningKeys: string[],
     private readonly table: T,
     private readonly resultType: ResultType,
     private readonly tokens: Token[],
   ) {
-    super();
+    super(queryExecutor, commentTokens);
   }
 
   then<Result1, Result2 = never>(
@@ -300,32 +302,41 @@ export class UpdateQuery<
       GetReturning<TableColumns, C10>
   >;
   returning(...columnNames: any[]) {
-    return new UpdateQuery(this.queryExecutor, columnNames, this.table, 'ROWS', [
-      ...this.tokens,
-      new StringToken(`RETURNING`),
-      new SeparatorToken(
-        `,`,
-        columnNames.map((alias) => {
-          const column = (this.table as any)[alias] as Column<any, any, any, any, any, any>;
+    return new UpdateQuery(
+      this.queryExecutor,
+      this.commentTokens,
+      columnNames,
+      this.table,
+      'ROWS',
+      [
+        ...this.tokens,
+        new StringToken(`RETURNING`),
+        new SeparatorToken(
+          `,`,
+          columnNames.map((alias) => {
+            const column = (this.table as any)[alias] as Column<any, any, any, any, any, any>;
 
-          if (alias !== column.getSnakeCaseName()) {
-            return new StringToken(`${wrapQuotes(column.getSnakeCaseName())} ${wrapQuotes(alias)}`);
-          } else {
-            return new StringToken(wrapQuotes(column.getSnakeCaseName()));
-          }
-        }),
-      ),
-    ]) as any;
+            if (alias !== column.getSnakeCaseName()) {
+              return new StringToken(
+                `${wrapQuotes(column.getSnakeCaseName())} ${wrapQuotes(alias)}`,
+              );
+            } else {
+              return new StringToken(wrapQuotes(column.getSnakeCaseName()));
+            }
+          }),
+        ),
+      ],
+    ) as any;
   }
 
   /** @internal */
-  toTokens() {
+  toQueryTokens() {
     return this.tokens;
   }
 }
 
 export const makeUpdate =
-  (queryExecutor: QueryExecutorFn) =>
+  (queryExecutor: QueryExecutorFn, commentTokens: Token[]) =>
   <T extends Table<string, unknown>>(table: T) => {
     return {
       set(
@@ -364,7 +375,7 @@ export const makeUpdate =
 
         assert(valuesToken.length > 0, `SET must be setting at least one value.`);
 
-        return new UpdateQuery(queryExecutor, [], table, 'AFFECTED_COUNT', [
+        return new UpdateQuery(queryExecutor, commentTokens, [], table, 'AFFECTED_COUNT', [
           new StringToken(`UPDATE`),
           ...table.toTokens(),
           new StringToken(`SET`),
