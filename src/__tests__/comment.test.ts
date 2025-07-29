@@ -25,14 +25,17 @@ describe(`comment`, () => {
     return Promise.resolve({ rows: [], affectedCount: 0 });
   });
 
-  const checkQueryAsync = async (query: Query<any>, expected: {
-    text: string,
-    parameters: any[],
-  }) => {
+  const checkQueryAsync = async (
+    query: Query<any>,
+    expected: {
+      text: string;
+      parameters: any[];
+    },
+  ) => {
     expect(toSql(query)).toStrictEqual(expected);
     await query;
     expect(getLastQueryObj()).toStrictEqual(expected);
-  }
+  };
 
   const getLastQueryObj = () => {
     return {
@@ -47,7 +50,7 @@ describe(`comment`, () => {
       .select(db.bar.id)
       .from(db.bar)
       .where(db.bar.name.eq('Test'));
-    
+
     await checkQueryAsync(query, {
       parameters: ['Test'],
       text: '/*This is a comment*/ SELECT bar.id FROM bar WHERE bar.name = $1',
