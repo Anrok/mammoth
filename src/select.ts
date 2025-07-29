@@ -153,7 +153,7 @@ export class SelectQuery<
       | null,
     onRejected?: ((reason: any) => Result2 | PromiseLike<Result2>) | undefined | null,
   ): Promise<Result1 | Result2> {
-    const queryState = createQueryState(this.tokens);
+    const queryState = createQueryState(this.toTokens());
 
     return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
       .then((result) => (onFulfilled ? onFulfilled(result.rows as any) : result))
