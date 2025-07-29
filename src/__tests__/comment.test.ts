@@ -1,4 +1,5 @@
 import { defineDb, defineTable, integer, text, timestampWithTimeZone, toSql, uuid } from '..';
+import { Query } from '../query';
 
 describe(`comment`, () => {
   const foo = defineTable({
@@ -24,6 +25,15 @@ describe(`comment`, () => {
     return Promise.resolve({ rows: [], affectedCount: 0 });
   });
 
+  const checkQueryAsync = async (query: Query<any>, expected: {
+    text: string,
+    parameters: any[],
+  }) => {
+    expect(toSql(query)).toStrictEqual(expected);
+    await query;
+    expect(getLastQueryObj()).toStrictEqual(expected);
+  }
+
   const getLastQueryObj = () => {
     return {
       parameters: lastParameters,
@@ -32,29 +42,29 @@ describe(`comment`, () => {
   };
 
   it(`select`, async () => {
-    await db
+    const query = db
       .comment('This is a comment')
       .select(db.bar.id)
       .from(db.bar)
       .where(db.bar.name.eq('Test'));
-
-    expect(getLastQueryObj()).toStrictEqual({
+    
+    await checkQueryAsync(query, {
       parameters: ['Test'],
       text: '/*This is a comment*/ SELECT bar.id FROM bar WHERE bar.name = $1',
     });
   });
 
   it(`update`, async () => {
-    await db.comment('This is a comment').update(db.bar).set({ name: `Test` });
+    const query = db.comment('This is a comment').update(db.bar).set({ name: `Test` });
 
-    expect(getLastQueryObj()).toStrictEqual({
+    await checkQueryAsync(query, {
       parameters: ['Test'],
       text: '/*This is a comment*/ UPDATE bar SET name = $1',
     });
   });
 
   it(`insert`, async () => {
-    await db
+    const query = db
       .comment('This is a comment')
       .insertInto(db.foo)
       .values([
@@ -66,28 +76,28 @@ describe(`comment`, () => {
         },
       ]);
 
-    expect(getLastQueryObj()).toEqual({
+    await checkQueryAsync(query, {
       parameters: ['Test', 'Test 2'],
       text: '/*This is a comment*/ INSERT INTO foo (name) VALUES ($1), ($2)',
     });
   });
 
   it(`update`, async () => {
-    await db
+    const query = db
       .comment('This is a comment')
       .update(db.foo)
       .set({ name: `Test` })
       .from(db.bar)
       .where(db.bar.fooId.eq(db.foo.id).and(db.bar.name.isNotNull()));
 
-    expect(getLastQueryObj()).toStrictEqual({
+    await checkQueryAsync(query, {
       parameters: ['Test'],
       text: '/*This is a comment*/ UPDATE foo SET name = $1 FROM bar WHERE bar.foo_id = foo.id AND bar.name IS NOT NULL',
     });
   });
 
   it(`with`, async () => {
-    await db.with(
+    const query = db.with(
       'a',
       db.comment('A').select(db.bar.id).from(db.bar).where(db.bar.name.eq('TestA')),
       'b',
@@ -95,7 +105,7 @@ describe(`comment`, () => {
       ({ a, b }) => db.comment('C').select(a.id, b.name).from(a).join(b),
     );
 
-    expect(getLastQueryObj()).toStrictEqual({
+    await checkQueryAsync(query, {
       parameters: ['TestA', 'TestB'],
       text: [
         '/*C*/ WITH',
