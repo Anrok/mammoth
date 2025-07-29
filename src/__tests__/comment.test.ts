@@ -16,12 +16,10 @@ describe(`comment`, () => {
     with: text(),
   });
 
-  let lastQuery: string;
-  let lastParameters: any[];
+  let lastExecuteFnArgs: {text: string, parameters: Array<string>} | null = null;
 
   const db = defineDb({ foo, bar }, (query, parameters) => {
-    lastQuery = query;
-    lastParameters = parameters;
+    lastExecuteFnArgs = {text: query, parameters};
     return Promise.resolve({ rows: [], affectedCount: 0 });
   });
 
@@ -34,14 +32,7 @@ describe(`comment`, () => {
   ) => {
     expect(toSql(query)).toStrictEqual(expected);
     await query;
-    expect(getLastQueryObj()).toStrictEqual(expected);
-  };
-
-  const getLastQueryObj = () => {
-    return {
-      parameters: lastParameters,
-      text: lastQuery,
-    };
+    expect(lastExecuteFnArgs).toStrictEqual(expected);
   };
 
   it(`select`, async () => {
