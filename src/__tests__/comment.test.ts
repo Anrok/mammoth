@@ -16,10 +16,10 @@ describe(`comment`, () => {
     with: text(),
   });
 
-  let lastExecuteFnArgs: {text: string, parameters: Array<string>} | null = null;
+  let lastExecuteFnArgs: { text: string; parameters: Array<string> } | null = null;
 
   const db = defineDb({ foo, bar }, (query, parameters) => {
-    lastExecuteFnArgs = {text: query, parameters};
+    lastExecuteFnArgs = { text: query, parameters };
     return Promise.resolve({ rows: [], affectedCount: 0 });
   });
 
