@@ -73,7 +73,7 @@ export class DeleteQuery<
       | null,
     onRejected?: ((reason: any) => Result2 | PromiseLike<Result2>) | undefined | null,
   ): Promise<Result1 | Result2> {
-    const queryState = createQueryState(this.tokens);
+    const queryState = createQueryState(this.toTokens());
 
     return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
       .then((result) =>

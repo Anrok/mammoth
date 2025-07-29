@@ -46,7 +46,7 @@ export class TruncateQuery<
     onFulfilled?: ((value: number) => Result1 | PromiseLike<Result1>) | undefined | null,
     onRejected?: ((reason: any) => Result2 | PromiseLike<Result2>) | undefined | null,
   ): Promise<Result1 | Result2> {
-    const queryState = createQueryState(this.tokens);
+    const queryState = createQueryState(this.toTokens());
 
     return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
       .then((result) => onFulfilled?.(result.affectedCount))
