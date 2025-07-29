@@ -28,8 +28,8 @@ describe(`comment`, () => {
     return {
       parameters: lastParameters,
       text: lastQuery,
-    }
-  }
+    };
+  };
 
   it(`select`, async () => {
     await db
@@ -42,7 +42,6 @@ describe(`comment`, () => {
       parameters: ['Test'],
       text: '/*This is a comment*/ SELECT bar.id FROM bar WHERE bar.name = $1',
     });
-
   });
 
   it(`update`, async () => {
