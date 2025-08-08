@@ -335,10 +335,7 @@ describe(`select`, () => {
 
   it(`should select IN with array`, () => {
     const array = ['A', 'B', 'C'] as const; // Make sure you can pass read-only arrays.
-    const query = db
-      .select(db.foo.id)
-      .from(db.foo)
-      .where(db.foo.name.in(array));
+    const query = db.select(db.foo.id).from(db.foo).where(db.foo.name.in(array));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       {
@@ -368,10 +365,7 @@ describe(`select`, () => {
 
   it(`should select NOT IN with array`, () => {
     const array = ['A', 'B', 'C'] as const; // Make sure you can pass read-only arrays.
-    const query = db
-      .select(db.foo.id)
-      .from(db.foo)
-      .where(db.foo.name.notIn(array));
+    const query = db.select(db.foo.id).from(db.foo).where(db.foo.name.notIn(array));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       {

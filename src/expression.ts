@@ -129,7 +129,10 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
   }
 
   in<Q extends Query<any>>(
-    array: ReadonlyArray<DataType> | Expression<DataType, IsNotNull, any> | SpecificQuery<DataType, Q>,
+    array:
+      | ReadonlyArray<DataType>
+      | Expression<DataType, IsNotNull, any>
+      | SpecificQuery<DataType, Q>,
   ): DefaultExpression<boolean> {
     if (array && ('toTokens' in array || array instanceof Query)) {
       return new DefaultExpression([
