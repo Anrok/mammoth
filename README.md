@@ -11,6 +11,7 @@ This fork is based on the 1.x version rather than newer 2.x version.  We made th
 - `Column` objects now contain a reference to their `ColumnDefinition`.
 - Adds support for `SELECT DISTINCT`.
 - Adds support for adding comments to the front of queries.
+- Make .in(...) and .notIn(...) accept read-only arrays as well
 
 ---
 
