@@ -215,14 +215,7 @@ describe('select', () => {
   });
 
   test('should not use in with wrong data type', () => {
-    expect(
-      toSnap(
-        db
-          .select(db.foo.id)
-          .from(db.foo)
-          .where(db.foo.id.in(db.select(db.foo.createDate).from(db.foo))),
-      ),
-    ).type.toRaiseError();
+    expect(db.foo.id.in).type.not.toBeCallableWith(db.select(db.foo.createDate).from(db.foo));
   });
 
   test('with test as select from foo from test', async () => {

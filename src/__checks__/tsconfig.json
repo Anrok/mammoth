@@ -1,5 +1,8 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["./*.check.ts"],
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["."],
   "exclude": []
 }

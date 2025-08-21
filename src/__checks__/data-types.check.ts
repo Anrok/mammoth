@@ -75,8 +75,6 @@ const toSnap = <T extends Query<any>>(query: T): ResultSet<T> => {
   return undefined as any;
 };
 
-/** @dts-jest enable:test-type */
-
 const foo = defineTable({
   id: uuid().primaryKey().default(`gen_random_uuid()`),
   int8: int8(),

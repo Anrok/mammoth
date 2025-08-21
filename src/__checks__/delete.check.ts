@@ -22,7 +22,7 @@ describe('delete', () => {
   });
 
   test('should delete and await affected row count', async () => {
-    expect(await db.deleteFrom(db.foo)).type.toBeNumber();
+    expect(await db.deleteFrom(db.foo)).type.toBe<number>();
   });
 
   test('should delete and await rows', async () => {

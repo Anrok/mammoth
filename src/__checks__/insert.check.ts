@@ -35,37 +35,38 @@ const db = defineDb({ foo, serialTest }, () => Promise.resolve({ rows: [], affec
 
 describe('insert', () => {
   test('should insert and returning count', () => {
-    expect(toSnap(db.insertInto(db.foo).values({ name: `Test` }))).type.toBeNumber();
+    expect(toSnap(db.insertInto(db.foo).values({ name: `Test` }))).type.toBe<number>();
   });
 
   test('should insert multiple rows and returning count', () => {
     expect(
       toSnap(db.insertInto(db.foo).values([{ name: `Test` }, { name: `Test 2` }])),
-    ).type.toBeNumber();
+    ).type.toBe<number>();
   });
 
   test('should insert default column', () => {
     expect(
       toSnap(db.insertInto(db.foo).values({ name: `Test`, createDate: new Date() })),
-    ).type.toBeNumber();
+    ).type.toBe<number>();
   });
 
   test('should not insert unknown column', () => {
-    expect(toSnap(db.insertInto(db.foo).values({ name: `Test`, asd: `Test` }))).type.toRaiseError();
+    expect(db.insertInto(db.foo).values).type.not.toBeCallableWith({ name: `Test`, asd: `Test` });
   });
 
   test('should not insert invalid type in known column', () => {
-    expect(toSnap(db.insertInto(db.foo).values({ name: 123 }))).type.toRaiseError();
+    expect(db.insertInto(db.foo).values).type.not.toBeCallableWith({ name: 123 });
   });
 
   test('should not insert multiple rows with invalid colums', () => {
-    expect(
-      toSnap(db.insertInto(db.foo).values([{ name: `Test` }, { name: `Test 2`, asd: 123 }])),
-    ).type.toRaiseError();
+    expect(db.insertInto(db.foo).values).type.not.toBeCallableWith([
+      { name: `Test` },
+      { name: `Test 2`, asd: 123 },
+    ]);
   });
 
   test('should insert and await affect count', async () => {
-    expect(await db.insertInto(db.foo).values({ name: `Test` })).type.toBeNumber();
+    expect(await db.insertInto(db.foo).values({ name: `Test` })).type.toBe<number>();
   });
 
   test('should insert-returning and await rows', async () => {
@@ -136,9 +137,9 @@ describe('insert', () => {
   });
 
   test('should not insert with wrong type of expression', () => {
-    expect(
-      db.insertInto(db.serialTest).values({ value: raw<string>`get_value()` }),
-    ).type.toRaiseError();
+    expect(db.insertInto(db.serialTest).values).type.not.toBeCallableWith({
+      value: raw<string>`get_value()`,
+    });
   });
 
   test('should insert using subquery', () => {

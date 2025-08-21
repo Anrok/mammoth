@@ -34,11 +34,11 @@ describe('update', () => {
   });
 
   test('should update without returning and return number', () => {
-    expect(toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }))).type.toBeNumber();
+    expect(toSnap(db.update(db.foo).set({ name: `Test`, value: 123 }))).type.toBe<number>();
   });
 
   test('should update and await affected count', async () => {
-    expect(await db.update(db.foo).set({ name: `Test` })).type.toBeNumber();
+    expect(await db.update(db.foo).set({ name: `Test` })).type.toBe<number>();
   });
 
   test('should update-returning and await rows', async () => {
