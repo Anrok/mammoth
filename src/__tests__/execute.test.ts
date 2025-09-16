@@ -157,4 +157,9 @@ describe(`execute`, () => {
       ]
     `);
   });
+
+  it('with materialized test', async () => {
+    d
+  })
+
 });
