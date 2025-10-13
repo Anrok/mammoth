@@ -34,32 +34,40 @@ type FromItemQuery<Q, Result = Q extends Query<any> ? CapturingResultSet<Q> : ne
 
 type QueryFn<T> = Query<any> | ((args: T) => Query<any>);
 
+type NameAndMaterialization = string | [string, {materialized: boolean | null}];
+type GetNameFromNameAndMaterialization<NM> =
+  NM extends string ? NM :
+  NM extends [infer N, any] ? N :
+  never;
+
 export interface WithFn {
-  <N1 extends string, W1 extends QueryFn<never>, Q extends Query<any>>(
+  <N1 extends NameAndMaterialization, W1 extends QueryFn<never>, Q extends Query<any>>(
     name1: N1,
     with1: W1,
-    callback: (args: { [K in N1]: FromItem<W1> }) => Q,
+    callback: (args: { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }) => Q,
   ): Q;
   <
-    N1 extends string,
+    N1 extends NameAndMaterialization,
     W1 extends QueryFn<never>,
-    N2 extends string,
-    W2 extends QueryFn<{ [K in N1]: FromItem<W1> }>,
+    N2 extends NameAndMaterialization,
+    W2 extends QueryFn<{ [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }>,
     Q extends Query<any>,
   >(
     name1: N1,
     with1: W1,
     name2: N2,
     with2: W2,
-    callback: (args: { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> }) => Q,
+    callback: (args:
+      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } &
+      { [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2> }) => Q,
   ): Q;
   <
-    N1 extends string,
+    N1 extends NameAndMaterialization,
     W1 extends QueryFn<never>,
-    N2 extends string,
-    W2 extends QueryFn<{ [K in N1]: FromItem<W1> }>,
-    N3 extends string,
-    W3 extends QueryFn<{ [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> }>,
+    N2 extends NameAndMaterialization,
+    W2 extends QueryFn<{ [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }>,
+    N3 extends NameAndMaterialization,
+    W3 extends QueryFn<{ [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & { [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2> }>,
     Q extends Query<any>,
   >(
     name1: N1,
@@ -69,7 +77,10 @@ export interface WithFn {
     name3: N3,
     with3: W3,
     callback: (
-      args: { [K in N1]: FromItem<W1> } & { [K in N2]: FromItem<W2> } & { [K in N3]: FromItem<W3> },
+      args:
+        { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } &
+        { [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2> } &
+        { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> },
     ) => Q,
   ): Q;
   <
