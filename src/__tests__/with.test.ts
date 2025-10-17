@@ -116,13 +116,13 @@ describe(`with`, () => {
 
   it(`should work with materialized settings`, () => {
     const query = db.with(
-      [`regionalSales`, MaterializedCTE.materialized],
+      [`regionalSales`, {materialized: true}],
       () =>
         db
           .select(db.orderLog.region, sum(db.orderLog.amount).as(`totalSales`))
           .from(db.orderLog)
           .groupBy(db.orderLog.region),
-      [`topRegions`, MaterializedCTE.notMaterialized],
+      [`topRegions`, {materialized: false}],
       ({ regionalSales }) =>
         db
           .select(regionalSales.region)

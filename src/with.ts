@@ -551,12 +551,6 @@ export const makeFromItem = <Q extends Query<any>>(name: string, query: Q): From
   return fromItem;
 };
 
-export enum MaterializedCTE {
-  materialized = 'materialized',
-  notMaterialized = 'notMaterialized',
-  none = 'none'
-}
-
 export const makeWith =
   (): WithFn =>
   (...args: any[]) => {
@@ -571,27 +565,27 @@ export const makeWith =
     };
 
     const tokens: Token[] = [];
-    
+
     for (let i = 0; i < args.length - 1; i += 2) {
-      const arg = args[i];
+      const arg: NameAndMaterialization = args[i];
       let name = '';
-      let materialized = MaterializedCTE.none; 
+      let materialized: boolean | null = null;
       if (typeof arg === 'string') {
         name = arg;
       } else {
         name = arg[0]
-        materialized = arg[1];
+        materialized = arg[1].materialized ?? null
       }
 
       const withQuery = createWith(args[i + 1]);
 
       const asKeyword = (() => {
         switch (materialized) {
-          case MaterializedCTE.materialized:
+          case true:
             return 'AS MATERIALIZED';
-          case MaterializedCTE.notMaterialized:
+          case false:
             return 'AS NOT MATERIALIZED';
-          case MaterializedCTE.none:
+          case null:
             return 'AS';
         }
       })();
