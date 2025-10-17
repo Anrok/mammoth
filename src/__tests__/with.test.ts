@@ -115,13 +115,13 @@ describe(`with`, () => {
 
   it(`should work with materialized settings`, () => {
     const query = db.with(
-      [`regionalSales`, {materialized: true}],
+      [`regionalSales`, { materialized: true }],
       () =>
         db
           .select(db.orderLog.region, sum(db.orderLog.amount).as(`totalSales`))
           .from(db.orderLog)
           .groupBy(db.orderLog.region),
-      [`topRegions`, {materialized: false}],
+      [`topRegions`, { materialized: false }],
       ({ regionalSales }) =>
         db
           .select(regionalSales.region)
@@ -152,5 +152,5 @@ describe(`with`, () => {
         "text": "WITH "regionalSales" AS MATERIALIZED (SELECT order_log.region, SUM (order_log.amount) "totalSales" FROM order_log GROUP BY order_log.region), "topRegions" AS NOT MATERIALIZED (SELECT "regionalSales".region FROM "regionalSales" WHERE "regionalSales"."totalSales" > (SELECT SUM ("regionalSales"."totalSales") / $1 FROM "regionalSales")) SELECT order_log.region, order_log.product, SUM (order_log.quantity) "productUnits", SUM (order_log.amount) "productSales" FROM order_log WHERE order_log.region IN (SELECT "topRegions".region FROM "topRegions") GROUP BY order_log.region, order_log.product",
       }
     `);
-  })
+  });
 });
