@@ -15,6 +15,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Check Mammoth version in "package.json" vs "package-lock.json"
+        run: |
+          version_in_package_json=$(jq -r .version package.json)
+          version_in_lockfile=$(jq -r .version package-lock.json)
+          if [[ "$version_in_lockfile" != "$version_in_package_json" ]]; then
+            echo "Mammoth version mismatch:" > /dev/stderr
+            echo "    package.json: $version_in_package_json" > /dev/stderr
+            echo "    package-lock.json: $version_in_lockfile" > /dev/stderr
+            exit 1
+          fi
       - run: npm ci
       - run: npm run build
       - run: npm test -- --coverage
