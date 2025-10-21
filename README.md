@@ -12,7 +12,7 @@ This fork is based on the 1.x version rather than newer 2.x version.  We made th
 - Adds support for `SELECT DISTINCT`.
 - Adds support for adding comments to the front of queries.
 - Make .in(...) and .notIn(...) accept read-only arrays as well.
-- Add support for materialized and not materialized CTE statements.
+- Add support for `MATERIALIZED` and `NOT MATERIALIZED` modifier on CTEs.
 
 ---
 
