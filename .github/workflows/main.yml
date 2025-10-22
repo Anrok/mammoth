@@ -20,7 +20,7 @@ jobs:
           version_in_package_lock_json=$(jq -r .version package-lock.json)
           version_in_package_json=$(jq -r .version package.json)
           if [[ "$version_in_package_lock_json" != "$version_in_package_json" ]]; then
-            echo "Mammoth version mismatch:" > /dev/stderr
+            echo "ERROR: Mammoth version mismatch:" > /dev/stderr
             echo "    package.json: $version_in_package_json" > /dev/stderr
             echo "    package-lock.json: $version_in_package_lock_json" > /dev/stderr
             exit 1
