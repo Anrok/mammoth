@@ -1,5 +1,6 @@
 import { Table } from './TableType';
 import { Column, ColumnDefinition } from './column';
+import { validateInt8Parameter } from './int8-validation';
 import { toSnakeCase } from './naming';
 import { TableDefinition, TableRow } from './table';
 import {
@@ -89,9 +90,13 @@ export function makeValues<
                   new SeparatorToken(
                     ',',
                     columnEntries.map(([columnName, columnDefinition]) => {
-                      const columnValueToken = new ParameterToken(
-                        (value as any)[columnName] as any,
+                      const columnValue = (value as any)[columnName] as any;
+                      validateInt8Parameter(
+                        columnDefinition.getDefinition().dataType,
+                        columnName as string,
+                        columnValue,
                       );
+                      const columnValueToken = new ParameterToken(columnValue);
 
                       if (index === 0) {
                         // Cast on the first row only to ensure correct types in the list.

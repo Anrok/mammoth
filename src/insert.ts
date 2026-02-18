@@ -13,6 +13,7 @@ import { SelectFn, makeSelect } from './select';
 
 import { Column } from './column';
 import { DeleteQuery } from './delete';
+import { validateInt8Parameter } from './int8-validation';
 import { Expression } from './expression';
 import { Query } from './query';
 import { ResultSet } from './result-set';
@@ -748,6 +749,19 @@ export const makeInsertInto =
                     if (isTokenable(value)) {
                       return new GroupToken([new CollectionToken(value.toTokens())]);
                     } else {
+                      const column = (table as any)[columnName] as Column<
+                        any,
+                        any,
+                        any,
+                        any,
+                        any,
+                        any
+                      >;
+                      validateInt8Parameter(
+                        column.getDefinition().getDefinition().dataType,
+                        columnName,
+                        value,
+                      );
                       return new ParameterToken(value);
                     }
                   }),
