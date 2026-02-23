@@ -42,15 +42,17 @@ export class TruncateQuery<
     super(queryExecutor, commentTokens);
   }
 
+  execute(): Promise<number> {
+    const queryState = createQueryState(this.toTokens());
+    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
+      .then((result) => result.affectedCount);
+  }
+
   then<Result1, Result2 = never>(
     onFulfilled?: ((value: number) => Result1 | PromiseLike<Result1>) | undefined | null,
     onRejected?: ((reason: any) => Result2 | PromiseLike<Result2>) | undefined | null,
   ): Promise<Result1 | Result2> {
-    const queryState = createQueryState(this.toTokens());
-
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
-      .then((result) => onFulfilled?.(result.affectedCount))
-      .catch(onRejected) as any;
+    return this.execute().then(onFulfilled, onRejected);
   }
 
   restartIdentity<T extends Table<any, any>>() {

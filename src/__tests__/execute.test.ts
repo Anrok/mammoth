@@ -12,6 +12,48 @@ describe(`execute`, () => {
     Promise.resolve({ rows: [{ a: `1` }, { b: `2` }], affectedCount: 123 }),
   );
 
+  const failingDb = defineDb({ foo }, () =>
+    Promise.reject(new Error(`connection refused`)),
+  );
+
+  describe(`async stack traces`, () => {
+    // V8's async stack trace support only works with native Promises, not custom
+    // thenables. Since query objects implement .then() directly, awaiting them
+    // loses the caller's stack frame. The .execute() method returns a native
+    // Promise, preserving the full async call chain in stack traces.
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async function selectViaThenable() {
+      return await failingDb.select(failingDb.foo.id).from(failingDb.foo);
+    }
+
+    async function selectViaNativePromise() {
+      return await failingDb.select(failingDb.foo.id).from(failingDb.foo).execute();
+    }
+
+    it(`execute() should preserve caller in async stack trace`, async () => {
+      try {
+        await selectViaNativePromise();
+        fail(`should have thrown`);
+      } catch (e: any) {
+        expect(e.message).toBe(`connection refused`);
+        expect(e.stack).toContain(`selectViaNativePromise`);
+      }
+    });
+
+    it(`thenable await loses caller in async stack trace`, async () => {
+      try {
+        await selectViaThenable();
+        fail(`should have thrown`);
+      } catch (e: any) {
+        expect(e.message).toBe(`connection refused`);
+        // The caller's name is NOT in the stack trace because V8 can't track
+        // async context through custom thenables — this is the problem ENG-3594 fixes.
+        expect(e.stack).not.toContain(`selectViaThenable`);
+      }
+    });
+  });
+
   it(`select should return rows`, async () => {
     const rows = await db.select(db.foo.id).from(db.foo);
 

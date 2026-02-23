@@ -58,6 +58,14 @@ export class InsertQuery<
     super(queryExecutor, commentTokens);
   }
 
+  execute(): Promise<Returning extends number ? Returning : ResultSet<InsertQuery<T, Returning>>[]> {
+    const queryState = createQueryState(this.toTokens());
+    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
+      .then((result) =>
+        this.resultType === `AFFECTED_COUNT` ? result.affectedCount : (result.rows as any),
+      );
+  }
+
   then<Result1, Result2 = never>(
     onFulfilled?:
       | ((
@@ -67,17 +75,7 @@ export class InsertQuery<
       | null,
     onRejected?: ((reason: any) => Result2 | PromiseLike<Result2>) | undefined | null,
   ): Promise<Result1 | Result2> {
-    const queryState = createQueryState(this.toTokens());
-
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
-      .then((result) =>
-        onFulfilled
-          ? onFulfilled(
-              this.resultType === `AFFECTED_COUNT` ? result.affectedCount : (result.rows as any),
-            )
-          : result,
-      )
-      .catch(onRejected) as any;
+    return this.execute().then(onFulfilled, onRejected);
   }
 
   returning<C1 extends keyof TableColumns>(
