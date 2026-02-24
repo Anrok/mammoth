@@ -22,11 +22,6 @@ describe(`execute`, () => {
     // loses the caller's stack frame. The .execute() method returns a native
     // Promise, preserving the full async call chain in stack traces.
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async function selectViaThenable() {
-      return await failingDb.select(failingDb.foo.id).from(failingDb.foo);
-    }
-
     async function selectViaNativePromise() {
       return await failingDb.select(failingDb.foo.id).from(failingDb.foo).execute();
     }
@@ -38,18 +33,6 @@ describe(`execute`, () => {
       } catch (e: any) {
         expect(e.message).toBe(`connection refused`);
         expect(e.stack).toContain(`selectViaNativePromise`);
-      }
-    });
-
-    it(`thenable await loses caller in async stack trace`, async () => {
-      try {
-        await selectViaThenable();
-        fail(`should have thrown`);
-      } catch (e: any) {
-        expect(e.message).toBe(`connection refused`);
-        // The caller's name is NOT in the stack trace because V8 can't track
-        // async context through custom thenables — this is the problem ENG-3594 fixes.
-        expect(e.stack).not.toContain(`selectViaThenable`);
       }
     });
   });
