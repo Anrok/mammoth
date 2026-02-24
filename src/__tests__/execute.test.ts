@@ -12,9 +12,7 @@ describe(`execute`, () => {
     Promise.resolve({ rows: [{ a: `1` }, { b: `2` }], affectedCount: 123 }),
   );
 
-  const failingDb = defineDb({ foo }, () =>
-    Promise.reject(new Error(`connection refused`)),
-  );
+  const failingDb = defineDb({ foo }, () => Promise.reject(new Error(`connection refused`)));
 
   describe(`async stack traces`, () => {
     // V8's async stack trace support only works with native Promises, not custom

@@ -66,10 +66,9 @@ export class DeleteQuery<
 
   execute(): Promise<Returning extends number ? number : ResultSet<DeleteQuery<T, Returning>>[]> {
     const queryState = createQueryState(this.toTokens());
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
-      .then((result) =>
-        this.resultType === `AFFECTED_COUNT` ? result.affectedCount : (result.rows as any),
-      );
+    return this.queryExecutor(queryState.text.join(` `), queryState.parameters).then((result) =>
+      this.resultType === `AFFECTED_COUNT` ? result.affectedCount : (result.rows as any),
+    );
   }
 
   then<Result1, Result2 = never>(

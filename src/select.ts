@@ -148,8 +148,9 @@ export class SelectQuery<
 
   execute(): Promise<ResultSet<SelectQuery<Columns>>[]> {
     const queryState = createQueryState(this.toTokens());
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
-      .then((result) => result.rows as any);
+    return this.queryExecutor(queryState.text.join(` `), queryState.parameters).then(
+      (result) => result.rows as any,
+    );
   }
 
   then<Result1, Result2 = never>(

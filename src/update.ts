@@ -54,12 +54,13 @@ export class UpdateQuery<
     super(queryExecutor, commentTokens);
   }
 
-  execute(): Promise<Returning extends number ? Returning : ResultSet<UpdateQuery<T, Returning>>[]> {
+  execute(): Promise<
+    Returning extends number ? Returning : ResultSet<UpdateQuery<T, Returning>>[]
+  > {
     const queryState = createQueryState(this.toTokens());
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
-      .then((result) =>
-        this.resultType === `AFFECTED_COUNT` ? result.affectedCount : (result.rows as any),
-      );
+    return this.queryExecutor(queryState.text.join(` `), queryState.parameters).then((result) =>
+      this.resultType === `AFFECTED_COUNT` ? result.affectedCount : (result.rows as any),
+    );
   }
 
   then<Result1, Result2 = never>(

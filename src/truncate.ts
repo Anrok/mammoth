@@ -44,8 +44,9 @@ export class TruncateQuery<
 
   execute(): Promise<number> {
     const queryState = createQueryState(this.toTokens());
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
-      .then((result) => result.affectedCount);
+    return this.queryExecutor(queryState.text.join(` `), queryState.parameters).then(
+      (result) => result.affectedCount,
+    );
   }
 
   then<Result1, Result2 = never>(
