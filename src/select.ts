@@ -146,6 +146,13 @@ export class SelectQuery<
     super(queryExecutor, commentTokens);
   }
 
+  execute(): Promise<ResultSet<SelectQuery<Columns>>[]> {
+    const queryState = createQueryState(this.toTokens());
+    return this.queryExecutor(queryState.text.join(` `), queryState.parameters).then(
+      (result) => result.rows as any,
+    );
+  }
+
   then<Result1, Result2 = never>(
     onFulfilled?:
       | ((value: ResultSet<SelectQuery<Columns>>[]) => Result1 | PromiseLike<Result1>)
@@ -153,11 +160,7 @@ export class SelectQuery<
       | null,
     onRejected?: ((reason: any) => Result2 | PromiseLike<Result2>) | undefined | null,
   ): Promise<Result1 | Result2> {
-    const queryState = createQueryState(this.toTokens());
-
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
-      .then((result) => (onFulfilled ? onFulfilled(result.rows as any) : result))
-      .catch(onRejected) as any;
+    return this.execute().then(onFulfilled, onRejected);
   }
 
   private newSelectQuery(tokens: Token[], table?: Table<any, any>): SelectQuery<Columns> {

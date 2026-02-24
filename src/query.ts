@@ -28,4 +28,6 @@ export abstract class Query<Returning> {
   abstract getReturningKeys(): string[];
 
   abstract newQueryWithTokens(tokens: Token[]): Query<Returning>;
+
+  abstract execute(): Promise<any>;
 }

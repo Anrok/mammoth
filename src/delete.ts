@@ -64,6 +64,13 @@ export class DeleteQuery<
     super(queryExecutor, commentTokens);
   }
 
+  execute(): Promise<Returning extends number ? number : ResultSet<DeleteQuery<T, Returning>>[]> {
+    const queryState = createQueryState(this.toTokens());
+    return this.queryExecutor(queryState.text.join(` `), queryState.parameters).then((result) =>
+      this.resultType === `AFFECTED_COUNT` ? result.affectedCount : (result.rows as any),
+    );
+  }
+
   then<Result1, Result2 = never>(
     onFulfilled?:
       | ((
@@ -73,17 +80,7 @@ export class DeleteQuery<
       | null,
     onRejected?: ((reason: any) => Result2 | PromiseLike<Result2>) | undefined | null,
   ): Promise<Result1 | Result2> {
-    const queryState = createQueryState(this.toTokens());
-
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters)
-      .then((result) =>
-        onFulfilled
-          ? onFulfilled(
-              this.resultType === `AFFECTED_COUNT` ? result.affectedCount : (result.rows as any),
-            )
-          : (result as any),
-      )
-      .catch(onRejected);
+    return this.execute().then(onFulfilled, onRejected);
   }
 
   using(...fromItems: Array<FromItem<any> | Table<string, unknown>>): DeleteQuery<T, Returning> {
