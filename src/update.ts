@@ -10,6 +10,7 @@ import { DbNull, GetReturning, QueryExecutorFn, ResultType } from './types';
 
 import { Column } from './column';
 import { Expression } from './expression';
+import { validateInt8Parameter } from './int8-validation';
 import { Query } from './query';
 import { ResultSet } from './result-set';
 import { Table } from './TableType';
@@ -363,6 +364,10 @@ export const makeUpdate =
           if (value === undefined) continue;
 
           const column = (table as any)[key] as Column<any, any, any, any, any, any>;
+
+          if (!isTokenable(value)) {
+            validateInt8Parameter(column.getDefinition().getDefinition().dataType, key, value);
+          }
 
           valuesToken.push(
             new CollectionToken([
