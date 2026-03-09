@@ -64,11 +64,10 @@ export class DeleteQuery<
     super(queryExecutor, commentTokens);
   }
 
-  execute(): Promise<Returning extends number ? number : ResultSet<DeleteQuery<T, Returning>>[]> {
+  async execute(): Promise<Returning extends number ? number : ResultSet<DeleteQuery<T, Returning>>[]> {
     const queryState = createQueryState(this.toTokens());
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters).then((result) =>
-      this.resultType === `AFFECTED_COUNT` ? result.affectedCount : (result.rows as any),
-    );
+    const result = await this.queryExecutor(queryState.text.join(` `), queryState.parameters);
+    return (this.resultType === `AFFECTED_COUNT` ? result.affectedCount : result.rows) as any;
   }
 
   then<Result1, Result2 = never>(

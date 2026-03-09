@@ -42,11 +42,10 @@ export class TruncateQuery<
     super(queryExecutor, commentTokens);
   }
 
-  execute(): Promise<number> {
+  async execute(): Promise<number> {
     const queryState = createQueryState(this.toTokens());
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters).then(
-      (result) => result.affectedCount,
-    );
+    const result = await this.queryExecutor(queryState.text.join(` `), queryState.parameters);
+    return result.affectedCount;
   }
 
   then<Result1, Result2 = never>(

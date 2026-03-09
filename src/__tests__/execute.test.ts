@@ -33,6 +33,36 @@ describe(`execute`, () => {
         expect(e.stack).toContain(`selectViaNativePromise`);
       }
     });
+
+    async function selectViaThenable() {
+      return await failingDb.select(failingDb.foo.id).from(failingDb.foo);
+    }
+
+    // Node 25+ preserves async stack traces for thenables, so this test only
+    // applies to older versions where the thenable path loses the caller frame.
+    const nodeMajor = parseInt(process.versions.node.split('.')[0], 10);
+
+    if (nodeMajor < 25) {
+      it(`thenable should lose caller in async stack trace (pre-Node 25)`, async () => {
+        try {
+          await selectViaThenable();
+          fail(`should have thrown`);
+        } catch (e: any) {
+          expect(e.message).toBe(`connection refused`);
+          expect(e.stack).not.toContain(`selectViaThenable`);
+        }
+      });
+    } else {
+      it(`thenable should also preserve caller in async stack trace (Node 25+)`, async () => {
+        try {
+          await selectViaThenable();
+          fail(`should have thrown`);
+        } catch (e: any) {
+          expect(e.message).toBe(`connection refused`);
+          expect(e.stack).toContain(`selectViaThenable`);
+        }
+      });
+    }
   });
 
   it(`select should return rows`, async () => {

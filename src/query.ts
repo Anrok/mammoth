@@ -29,5 +29,7 @@ export abstract class Query<Returning> {
 
   abstract newQueryWithTokens(tokens: Token[]): Query<Returning>;
 
-  abstract execute(): Promise<any>;
+  // Each subclass has a different return type (e.g. ResultSet[], number, conditional types),
+  // so we can't use Returning here — it represents the row shape, not the resolved promise type.
+  abstract execute(): Promise<unknown>;
 }

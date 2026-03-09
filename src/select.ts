@@ -146,11 +146,10 @@ export class SelectQuery<
     super(queryExecutor, commentTokens);
   }
 
-  execute(): Promise<ResultSet<SelectQuery<Columns>>[]> {
+  async execute(): Promise<ResultSet<SelectQuery<Columns>>[]> {
     const queryState = createQueryState(this.toTokens());
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters).then(
-      (result) => result.rows as any,
-    );
+    const result = await this.queryExecutor(queryState.text.join(` `), queryState.parameters);
+    return result.rows as any;
   }
 
   then<Result1, Result2 = never>(

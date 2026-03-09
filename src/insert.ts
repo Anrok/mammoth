@@ -58,13 +58,12 @@ export class InsertQuery<
     super(queryExecutor, commentTokens);
   }
 
-  execute(): Promise<
+  async execute(): Promise<
     Returning extends number ? Returning : ResultSet<InsertQuery<T, Returning>>[]
   > {
     const queryState = createQueryState(this.toTokens());
-    return this.queryExecutor(queryState.text.join(` `), queryState.parameters).then((result) =>
-      this.resultType === `AFFECTED_COUNT` ? result.affectedCount : (result.rows as any),
-    );
+    const result = await this.queryExecutor(queryState.text.join(` `), queryState.parameters);
+    return (this.resultType === `AFFECTED_COUNT` ? result.affectedCount : result.rows) as any;
   }
 
   then<Result1, Result2 = never>(
