@@ -20,49 +20,39 @@ describe(`execute`, () => {
     // loses the caller's stack frame. The .execute() method returns a native
     // Promise, preserving the full async call chain in stack traces.
 
-    async function selectViaNativePromise() {
-      return await failingDb.select(failingDb.foo.id).from(failingDb.foo).execute();
-    }
+    it(`With .execute(), we get good async stack trace`, async () => {
+      async function wrapperFunction() {
+        return await failingDb.select(failingDb.foo.id).from(failingDb.foo).execute();
+      }
 
-    it(`execute() should preserve caller in async stack trace`, async () => {
       try {
-        await selectViaNativePromise();
+        await wrapperFunction();
         fail(`should have thrown`);
       } catch (e: any) {
         expect(e.message).toBe(`connection refused`);
-        expect(e.stack).toContain(`selectViaNativePromise`);
+        expect(e.stack).toContain(wrapperFunction.name);
       }
     });
 
-    async function selectViaThenable() {
-      return await failingDb.select(failingDb.foo.id).from(failingDb.foo);
-    }
+    it(`Without .execute(), we get a good async stack trace iff we're on Node 25+`, async () => {
+      const nodeMajorVersion = parseInt(process.versions.node.split('.')[0], 10);
 
-    // Node 25+ preserves async stack traces for thenables, so this test only
-    // applies to older versions where the thenable path loses the caller frame.
-    const nodeMajor = parseInt(process.versions.node.split('.')[0], 10);
+      async function wrapperFunction() {
+        return await failingDb.select(failingDb.foo.id).from(failingDb.foo);
+      }
 
-    if (nodeMajor < 25) {
-      it(`thenable should lose caller in async stack trace (pre-Node 25)`, async () => {
-        try {
-          await selectViaThenable();
-          fail(`should have thrown`);
-        } catch (e: any) {
-          expect(e.message).toBe(`connection refused`);
-          expect(e.stack).not.toContain(`selectViaThenable`);
+      try {
+        await wrapperFunction();
+        fail(`should have thrown`);
+      } catch (e: any) {
+        expect(e.message).toBe(`connection refused`);
+        if (nodeMajorVersion >= 25) {
+          expect(e.stack).toContain(wrapperFunction.name);
+        } else {
+          expect(e.stack).not.toContain(wrapperFunction.name);
         }
-      });
-    } else {
-      it(`thenable should also preserve caller in async stack trace (Node 25+)`, async () => {
-        try {
-          await selectViaThenable();
-          fail(`should have thrown`);
-        } catch (e: any) {
-          expect(e.message).toBe(`connection refused`);
-          expect(e.stack).toContain(`selectViaThenable`);
-        }
-      });
-    }
+      }
+    });
   });
 
   it(`select should return rows`, async () => {
