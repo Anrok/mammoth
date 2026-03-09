@@ -12,6 +12,49 @@ describe(`execute`, () => {
     Promise.resolve({ rows: [{ a: `1` }, { b: `2` }], affectedCount: 123 }),
   );
 
+  const failingDb = defineDb({ foo }, () => Promise.reject(new Error(`connection refused`)));
+
+  describe(`async stack traces`, () => {
+    // V8's async stack trace support only works with native Promises, not custom
+    // thenables. Since query objects implement .then() directly, awaiting them
+    // loses the caller's stack frame. The .execute() method returns a native
+    // Promise, preserving the full async call chain in stack traces.
+
+    it(`With .execute(), we get good async stack trace`, async () => {
+      async function wrapperFunction() {
+        return await failingDb.select(failingDb.foo.id).from(failingDb.foo).execute();
+      }
+
+      try {
+        await wrapperFunction();
+        fail(`should have thrown`);
+      } catch (e: any) {
+        expect(e.message).toBe(`connection refused`);
+        expect(e.stack).toContain(wrapperFunction.name);
+      }
+    });
+
+    it(`Without .execute(), we get a good async stack trace iff we're on Node 25+`, async () => {
+      const nodeMajorVersion = parseInt(process.versions.node.split('.')[0], 10);
+
+      async function wrapperFunction() {
+        return await failingDb.select(failingDb.foo.id).from(failingDb.foo);
+      }
+
+      try {
+        await wrapperFunction();
+        fail(`should have thrown`);
+      } catch (e: any) {
+        expect(e.message).toBe(`connection refused`);
+        if (nodeMajorVersion >= 25) {
+          expect(e.stack).toContain(wrapperFunction.name);
+        } else {
+          expect(e.stack).not.toContain(wrapperFunction.name);
+        }
+      }
+    });
+  });
+
   it(`select should return rows`, async () => {
     const rows = await db.select(db.foo.id).from(db.foo);
 
