@@ -12,7 +12,7 @@ import { SelectFn, Selectable } from './SelectFn';
 
 import { Column } from './column';
 import { Expression } from './expression';
-import { FromItem, makeFromItem } from './from-item';
+import { FromItem, SubqueryColumn, makeFromItem } from './from-item';
 import { Query } from './query';
 import { QueryExecutorFn } from './types';
 import { ResultSet } from './result-set';
@@ -28,16 +28,31 @@ type ToJoinType<OldType, NewType extends JoinType> =
 
 // It's important to note that to make sure we infer the table name, we should pass object instead
 // of any as the second argument to the table.
-type GetTableName<T extends Table<any, any>> = T extends Table<infer A, object> ? A : never;
+// For FromItem, return the literal alias when available; never otherwise.
+type GetTableName<T> =
+  T extends Table<infer A, object>
+    ? A
+    : T extends FromItem<any, infer Name>
+      ? string extends Name
+        ? never
+        : Name
+      : never;
 
 type FromItemOrTable = FromItem<any> | Table<string, unknown>;
 
-// Extracts the source name (table name) from a Column. Used alongside GetTableName to check
+// Extracts the source name from a column: the table name for a Column, or the
+// subquery alias for a SubqueryColumn. Used alongside GetTableName to check
 // whether a column belongs to a particular join target.
-type SourceOf<T> = T extends Column<any, infer TableName, any, any, any, any> ? TableName : never;
+type SourceOf<T> =
+  T extends Column<any, infer TableName, any, any, any, any>
+    ? TableName
+    : T extends SubqueryColumn<any, infer RelationName, any, any>
+      ? RelationName
+      : never;
 
-// Applies a join-type transformation to a Column by setting its JoinType parameter,
-// which result-set.ts resolves to nullable.
+// Applies a join-type transformation to a single column. For Column, this sets
+// the JoinType parameter (resolved to nullable in result-set.ts). For
+// SubqueryColumn, nullability is tracked directly via IsNotNull.
 type ApplyJoinType<T, J extends JoinType> =
   T extends Column<
     infer Name,
@@ -48,7 +63,9 @@ type ApplyJoinType<T, J extends JoinType> =
     infer OldJoinType
   >
     ? Column<Name, TableName, DataType, IsNotNull, HasDefault, ToJoinType<OldJoinType, J>>
-    : never;
+    : T extends SubqueryColumn<infer ColumnName, infer RelationName, infer DataType, any>
+      ? SubqueryColumn<ColumnName, RelationName, DataType, false>
+      : never;
 
 type AddLeftJoin<Columns, JoinTable> = {
   [K in keyof Columns]: Extract<GetTableName<JoinTable>, SourceOf<Columns[K]>> extends never
@@ -434,7 +451,7 @@ export class SelectQuery<
     return this.newSelectQuery([...this.tokens, new StringToken(`SKIP LOCKED`)]);
   }
 
-  as(name: string): FromItem<SelectQuery<Columns>> {
+  as<Name extends string>(name: Name): FromItem<SelectQuery<Columns>, Name> {
     const selectTokens = this.tokens;
     return {
       ...makeFromItem(name, this),

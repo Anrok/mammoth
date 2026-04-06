@@ -305,4 +305,71 @@ describe('select', () => {
       test: number | null;
     }>();
   });
+
+  test('should not make CTE columns nullable when left joining another table', async () => {
+    // CTE columns are on the outer (left) side — they must stay non-nullable
+    expect(
+      await db.with(
+        `cte`,
+        () => db.select(db.foo.id, db.foo.name).from(db.foo),
+        ({ cte }) =>
+          db.select(cte.id, cte.name, db.bar.endDate).from(cte).leftJoin(db.bar).on(true),
+      ),
+    ).type.toBe<
+      {
+        id: string;
+        name: string; // NOT NULL — CTE column on outer side must stay non-nullable
+        endDate: Date | null; // bar.endDate is nullable after left join
+      }[]
+    >();
+  });
+
+  test('should return nullable columns from CTE when left joining', async () => {
+    expect(
+      await db.with(
+        'cte',
+        () => db.select(db.foo.name).from(db.foo),
+        ({ cte }) => db.select(db.bar.startDate, cte.name).from(db.bar).leftJoin(cte).on(true),
+      ),
+    ).type.toBe<
+      {
+        startDate: Date;
+        name: string | null;
+      }[]
+    >();
+  });
+
+  test('should return nullable columns from subquery when left joining', () => {
+    // NOT NULL column in subquery (name) should become nullable after left join
+    // Already nullable column in subquery (value) should remain nullable
+    const sub = db.select(db.foo.name, db.foo.value).from(db.foo).limit(1).as('sub');
+    expect(
+      toSnap(db.select(db.bar.startDate, sub.name, sub.value).from(db.bar).leftJoin(sub).on(true)),
+    ).type.toBe<{
+      startDate: Date;
+      name: string | null;
+      value: number | null;
+    }>();
+  });
+
+  test('should not make outer columns nullable when left joining a subquery', () => {
+    // db.bar.startDate is from the left (outer) table — should stay non-nullable
+    const sub = db.select(db.foo.name).from(db.foo).limit(1).as('sub');
+    expect(
+      toSnap(db.select(db.bar.startDate, sub.name).from(db.bar).leftJoin(sub).on(true)),
+    ).type.toBe<{
+      startDate: Date;
+      name: string | null;
+    }>();
+  });
+
+  test('should make aliased subquery column nullable when left joining', () => {
+    const sub = db.select(db.foo.name).from(db.foo).limit(1).as('sub');
+    expect(
+      toSnap(db.select(db.bar.startDate, sub.name.as('n')).from(db.bar).leftJoin(sub).on(true)),
+    ).type.toBe<{
+      startDate: Date;
+      n: string | null;
+    }>();
+  });
 });
