@@ -32,45 +32,14 @@ type GetTableName<T extends Table<any, any>> = T extends Table<infer A, object> 
 
 type FromItemOrTable = FromItem<any> | Table<string, unknown>;
 
-type AddLeftJoin<Columns, JoinTable> = {
-  [K in keyof Columns]: Columns[K] extends Column<
-    infer Name,
-    infer TableName,
-    infer DataType,
-    infer IsNotNull,
-    infer HasDefault,
-    infer JoinType
-  >
-    ? Extract<GetTableName<JoinTable>, TableName> extends never
-      ? Column<Name, TableName, DataType, IsNotNull, HasDefault, JoinType>
-      : Column<Name, TableName, DataType, IsNotNull, HasDefault, ToJoinType<JoinType, 'left-join'>>
-    : never;
-};
+// Extracts the source name (table name) from a Column. Used alongside GetTableName to check
+// whether a column belongs to a particular join target.
+type SourceOf<T> = T extends Column<any, infer TableName, any, any, any, any> ? TableName : never;
 
-type AddRightJoin<Columns, JoinTable> = {
-  [K in keyof Columns]: Columns[K] extends Column<
-    infer Name,
-    infer TableName,
-    infer DataType,
-    infer IsNotNull,
-    infer HasDefault,
-    infer JoinType
-  >
-    ? Extract<GetTableName<JoinTable>, TableName> extends never
-      ? Column<
-          Name,
-          TableName,
-          DataType,
-          IsNotNull,
-          HasDefault,
-          ToJoinType<JoinType, 'left-side-of-right-join'>
-        >
-      : Columns[K]
-    : never;
-};
-
-type AddJoinType<Columns, NewJoinType extends JoinType> = {
-  [K in keyof Columns]: Columns[K] extends Column<
+// Applies a join-type transformation to a Column by setting its JoinType parameter,
+// which result-set.ts resolves to nullable.
+type ApplyJoinType<T, J extends JoinType> =
+  T extends Column<
     infer Name,
     infer TableName,
     infer DataType,
@@ -78,8 +47,23 @@ type AddJoinType<Columns, NewJoinType extends JoinType> = {
     infer HasDefault,
     infer OldJoinType
   >
-    ? Column<Name, TableName, DataType, IsNotNull, HasDefault, ToJoinType<OldJoinType, NewJoinType>>
+    ? Column<Name, TableName, DataType, IsNotNull, HasDefault, ToJoinType<OldJoinType, J>>
     : never;
+
+type AddLeftJoin<Columns, JoinTable> = {
+  [K in keyof Columns]: Extract<GetTableName<JoinTable>, SourceOf<Columns[K]>> extends never
+    ? Columns[K]
+    : ApplyJoinType<Columns[K], 'left-join'>;
+};
+
+type AddRightJoin<Columns, JoinTable> = {
+  [K in keyof Columns]: Extract<GetTableName<JoinTable>, SourceOf<Columns[K]>> extends never
+    ? ApplyJoinType<Columns[K], 'left-side-of-right-join'>
+    : Columns[K];
+};
+
+type AddJoinType<Columns, NewJoinType extends JoinType> = {
+  [K in keyof Columns]: ApplyJoinType<Columns[K], NewJoinType>;
 };
 
 type Join<Query extends SelectQuery<any, boolean>, JoinTable extends FromItemOrTable> =
