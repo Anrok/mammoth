@@ -12,7 +12,7 @@ import { SelectFn, Selectable } from './SelectFn';
 
 import { Column } from './column';
 import { Expression } from './expression';
-import { FromItem, makeFromItem } from './with';
+import { FromItem, makeFromItem } from './from-item';
 import { Query } from './query';
 import { QueryExecutorFn } from './types';
 import { ResultSet } from './result-set';

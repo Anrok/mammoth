@@ -15,7 +15,7 @@ import type { ResultSet } from './result-set';
 import type { Table } from './TableType';
 import type { TableDefinition } from './table';
 import { wrapQuotes } from './naming';
-import { FromItem } from './with';
+import { FromItem } from './from-item';
 
 export const makeDeleteFrom =
   (queryExecutor: QueryExecutorFn, commentTokens: Token[]) =>
