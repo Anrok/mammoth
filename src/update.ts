@@ -14,7 +14,7 @@ import { Query } from './query';
 import { ResultSet } from './result-set';
 import { Table } from './TableType';
 import { wrapQuotes } from './naming';
-import { FromItem } from './with';
+import { FromItem } from './from-item';
 import { isTokenable } from './sql-functions';
 import assert from 'assert';
 
