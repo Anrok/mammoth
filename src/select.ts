@@ -10,7 +10,7 @@ import {
 } from './tokens';
 import { SelectFn, Selectable } from './SelectFn';
 
-import { Column } from './column';
+import { Column, ColumnExpression } from './column';
 import { Expression } from './expression';
 import { FromItem, makeFromItem } from './from-item';
 import { Query } from './query';
@@ -28,26 +28,33 @@ type ToJoinType<OldType, NewType extends JoinType> =
 
 // It's important to note that to make sure we infer the table name, we should pass object instead
 // of any as the second argument to the table.
-type GetTableName<T extends Table<any, any>> = T extends Table<infer A, object> ? A : never;
+// For FromItem, return the literal alias when available; never otherwise.
+type GetTableName<T> =
+  T extends Table<infer A, object>
+    ? A
+    : T extends FromItem<any, infer Name>
+      ? string extends Name
+        ? never
+        : Name
+      : never;
 
 type FromItemOrTable = FromItem<any> | Table<string, unknown>;
 
-// Extracts the source name (table name) from a Column. Used alongside GetTableName to check
-// whether a column belongs to a particular join target.
-type SourceOf<T> = T extends Column<any, infer TableName, any, any, any, any> ? TableName : never;
+// Extracts the relation name (table name or subquery alias) from any ColumnExpression.
+// Used alongside GetTableName to check whether a column belongs to a join target.
+type SourceOf<T> =
+  T extends ColumnExpression<any, infer TableName, any, any, any> ? TableName : never;
 
-// Applies a join-type transformation to a Column by setting its JoinType parameter,
-// which result-set.ts resolves to nullable.
+// Applies a join-type transformation to any ColumnExpression.
 type ApplyJoinType<T, J extends JoinType> =
-  T extends Column<
+  T extends ColumnExpression<
     infer Name,
     infer TableName,
     infer DataType,
     infer IsNotNull,
-    infer HasDefault,
     infer OldJoinType
   >
-    ? Column<Name, TableName, DataType, IsNotNull, HasDefault, ToJoinType<OldJoinType, J>>
+    ? ColumnExpression<Name, TableName, DataType, IsNotNull, ToJoinType<OldJoinType, J>>
     : never;
 
 type AddLeftJoin<Columns, JoinTable> = {
@@ -434,7 +441,7 @@ export class SelectQuery<
     return this.newSelectQuery([...this.tokens, new StringToken(`SKIP LOCKED`)]);
   }
 
-  as(name: string): FromItem<SelectQuery<Columns>> {
+  as<Name extends string>(name: Name): FromItem<SelectQuery<Columns>, Name> {
     const selectTokens = this.tokens;
     return {
       ...makeFromItem(name, this),

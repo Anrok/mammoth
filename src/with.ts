@@ -5,9 +5,7 @@ import { wrapQuotes } from './naming';
 import { FromItem, makeFromItem } from './from-item';
 
 /** @deprecated Import from `./from-item` instead. */
-export type { FromItem } from './from-item';
-/** @deprecated Import from `./from-item` instead. */
-export { makeFromItem } from './from-item';
+export { FromItem, makeFromItem } from './from-item';
 
 type QueryFn<T> = Query<any> | ((args: T) => Query<any>);
 
@@ -19,7 +17,7 @@ type GetNameFromNameAndMaterialization<NM> = NM extends string
     : never;
 
 type WithArg<N extends NameAndMaterialization, W> = {
-  [K in GetNameFromNameAndMaterialization<N>]: FromItem<W>;
+  [K in GetNameFromNameAndMaterialization<N>]: FromItem<W, GetNameFromNameAndMaterialization<N>>;
 };
 
 export interface WithFn {
