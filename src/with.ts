@@ -18,40 +18,36 @@ type GetNameFromNameAndMaterialization<NM> = NM extends string
     ? N
     : never;
 
+type WithArg<N extends NameAndMaterialization, W> = {
+  [K in GetNameFromNameAndMaterialization<N>]: FromItem<W>;
+};
+
 export interface WithFn {
   <N1 extends NameAndMaterialization, W1 extends QueryFn<never>, Q extends Query<any>>(
     name1: N1,
     with1: W1,
-    callback: (args: { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }) => Q,
+    callback: (args: WithArg<N1, W1>) => Q,
   ): Q;
   <
     N1 extends NameAndMaterialization,
     W1 extends QueryFn<never>,
     N2 extends NameAndMaterialization,
-    W2 extends QueryFn<{ [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }>,
+    W2 extends QueryFn<WithArg<N1, W1>>,
     Q extends Query<any>,
   >(
     name1: N1,
     with1: W1,
     name2: N2,
     with2: W2,
-    callback: (
-      args: { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      },
-    ) => Q,
+    callback: (args: WithArg<N1, W1> & WithArg<N2, W2>) => Q,
   ): Q;
   <
     N1 extends NameAndMaterialization,
     W1 extends QueryFn<never>,
     N2 extends NameAndMaterialization,
-    W2 extends QueryFn<{ [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }>,
+    W2 extends QueryFn<WithArg<N1, W1>>,
     N3 extends NameAndMaterialization,
-    W3 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      }
-    >,
+    W3 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2>>,
     Q extends Query<any>,
   >(
     name1: N1,
@@ -60,29 +56,17 @@ export interface WithFn {
     with2: W2,
     name3: N3,
     with3: W3,
-    callback: (
-      args: { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> },
-    ) => Q,
+    callback: (args: WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3>) => Q,
   ): Q;
   <
     N1 extends NameAndMaterialization,
     W1 extends QueryFn<never>,
     N2 extends NameAndMaterialization,
-    W2 extends QueryFn<{ [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }>,
+    W2 extends QueryFn<WithArg<N1, W1>>,
     N3 extends NameAndMaterialization,
-    W3 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      }
-    >,
+    W3 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2>>,
     N4 extends NameAndMaterialization,
-    W4 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> }
-    >,
+    W4 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3>>,
     Q extends Query<any>,
   >(
     name1: N1,
@@ -93,39 +77,19 @@ export interface WithFn {
     with3: W3,
     name4: N4,
     with4: W4,
-    callback: (
-      args: { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      },
-    ) => Q,
+    callback: (args: WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4>) => Q,
   ): Q;
   <
     N1 extends NameAndMaterialization,
     W1 extends QueryFn<never>,
     N2 extends NameAndMaterialization,
-    W2 extends QueryFn<{ [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }>,
+    W2 extends QueryFn<WithArg<N1, W1>>,
     N3 extends NameAndMaterialization,
-    W3 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      }
-    >,
+    W3 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2>>,
     N4 extends NameAndMaterialization,
-    W4 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> }
-    >,
+    W4 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3>>,
     N5 extends NameAndMaterialization,
-    W5 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      }
-    >,
+    W5 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4>>,
     Q extends Query<any>,
   >(
     name1: N1,
@@ -139,45 +103,23 @@ export interface WithFn {
     name5: N5,
     with5: W5,
     callback: (
-      args: { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> },
+      args: WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4> & WithArg<N5, W5>,
     ) => Q,
   ): Q;
   <
     N1 extends NameAndMaterialization,
     W1 extends QueryFn<never>,
     N2 extends NameAndMaterialization,
-    W2 extends QueryFn<{ [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }>,
+    W2 extends QueryFn<WithArg<N1, W1>>,
     N3 extends NameAndMaterialization,
-    W3 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      }
-    >,
+    W3 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2>>,
     N4 extends NameAndMaterialization,
-    W4 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> }
-    >,
+    W4 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3>>,
     N5 extends NameAndMaterialization,
-    W5 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      }
-    >,
+    W5 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4>>,
     N6 extends NameAndMaterialization,
     W6 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> }
+      WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4> & WithArg<N5, W5>
     >,
     Q extends Query<any>,
   >(
@@ -194,57 +136,37 @@ export interface WithFn {
     name6: N6,
     with6: W6,
     callback: (
-      args: { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      },
+      args: WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6>,
     ) => Q,
   ): Q;
   <
     N1 extends NameAndMaterialization,
     W1 extends QueryFn<never>,
     N2 extends NameAndMaterialization,
-    W2 extends QueryFn<{ [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }>,
+    W2 extends QueryFn<WithArg<N1, W1>>,
     N3 extends NameAndMaterialization,
-    W3 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      }
-    >,
+    W3 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2>>,
     N4 extends NameAndMaterialization,
-    W4 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> }
-    >,
+    W4 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3>>,
     N5 extends NameAndMaterialization,
-    W5 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      }
-    >,
+    W5 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4>>,
     N6 extends NameAndMaterialization,
     W6 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> }
+      WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4> & WithArg<N5, W5>
     >,
     N7 extends NameAndMaterialization,
     W7 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      }
+      WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6>
     >,
     Q extends Query<any>,
   >(
@@ -263,67 +185,48 @@ export interface WithFn {
     name7: N7,
     with7: W7,
     callback: (
-      args: { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      } & { [K in GetNameFromNameAndMaterialization<N7>]: FromItem<W7> },
+      args: WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6> &
+        WithArg<N7, W7>,
     ) => Q,
   ): Q;
   <
     N1 extends NameAndMaterialization,
     W1 extends QueryFn<never>,
     N2 extends NameAndMaterialization,
-    W2 extends QueryFn<{ [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }>,
+    W2 extends QueryFn<WithArg<N1, W1>>,
     N3 extends NameAndMaterialization,
-    W3 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      }
-    >,
+    W3 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2>>,
     N4 extends NameAndMaterialization,
-    W4 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> }
-    >,
+    W4 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3>>,
     N5 extends NameAndMaterialization,
-    W5 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      }
-    >,
+    W5 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4>>,
     N6 extends NameAndMaterialization,
     W6 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> }
+      WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4> & WithArg<N5, W5>
     >,
     N7 extends NameAndMaterialization,
     W7 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      }
+      WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6>
     >,
     N8 extends NameAndMaterialization,
     W8 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      } & { [K in GetNameFromNameAndMaterialization<N7>]: FromItem<W7> }
+      WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6> &
+        WithArg<N7, W7>
     >,
     Q extends Query<any>,
   >(
@@ -344,81 +247,60 @@ export interface WithFn {
     name8: N8,
     with8: W8,
     callback: (
-      args: { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      } & { [K in GetNameFromNameAndMaterialization<N7>]: FromItem<W7> } & {
-        [K in GetNameFromNameAndMaterialization<N8>]: FromItem<W8>;
-      },
+      args: WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6> &
+        WithArg<N7, W7> &
+        WithArg<N8, W8>,
     ) => Q,
   ): Q;
   <
     N1 extends NameAndMaterialization,
     W1 extends QueryFn<never>,
     N2 extends NameAndMaterialization,
-    W2 extends QueryFn<{ [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }>,
+    W2 extends QueryFn<WithArg<N1, W1>>,
     N3 extends NameAndMaterialization,
-    W3 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      }
-    >,
+    W3 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2>>,
     N4 extends NameAndMaterialization,
-    W4 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> }
-    >,
+    W4 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3>>,
     N5 extends NameAndMaterialization,
-    W5 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      }
-    >,
+    W5 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4>>,
     N6 extends NameAndMaterialization,
     W6 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> }
+      WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4> & WithArg<N5, W5>
     >,
     N7 extends NameAndMaterialization,
     W7 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      }
+      WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6>
     >,
     N8 extends NameAndMaterialization,
     W8 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      } & { [K in GetNameFromNameAndMaterialization<N7>]: FromItem<W7> }
+      WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6> &
+        WithArg<N7, W7>
     >,
     N9 extends NameAndMaterialization,
     W9 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      } & { [K in GetNameFromNameAndMaterialization<N7>]: FromItem<W7> } & {
-        [K in GetNameFromNameAndMaterialization<N8>]: FromItem<W8>;
-      }
+      WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6> &
+        WithArg<N7, W7> &
+        WithArg<N8, W8>
     >,
     Q extends Query<any>,
   >(
@@ -441,93 +323,73 @@ export interface WithFn {
     name9: N9,
     with9: W9,
     callback: (
-      args: { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      } & { [K in GetNameFromNameAndMaterialization<N7>]: FromItem<W7> } & {
-        [K in GetNameFromNameAndMaterialization<N8>]: FromItem<W8>;
-      } & { [K in GetNameFromNameAndMaterialization<N9>]: FromItem<W9> },
+      args: WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6> &
+        WithArg<N7, W7> &
+        WithArg<N8, W8> &
+        WithArg<N9, W9>,
     ) => Q,
   ): Q;
   <
     N1 extends NameAndMaterialization,
     W1 extends QueryFn<never>,
     N2 extends NameAndMaterialization,
-    W2 extends QueryFn<{ [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> }>,
+    W2 extends QueryFn<WithArg<N1, W1>>,
     N3 extends NameAndMaterialization,
-    W3 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      }
-    >,
+    W3 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2>>,
     N4 extends NameAndMaterialization,
-    W4 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> }
-    >,
+    W4 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3>>,
     N5 extends NameAndMaterialization,
-    W5 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      }
-    >,
+    W5 extends QueryFn<WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4>>,
     N6 extends NameAndMaterialization,
     W6 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> }
+      WithArg<N1, W1> & WithArg<N2, W2> & WithArg<N3, W3> & WithArg<N4, W4> & WithArg<N5, W5>
     >,
     N7 extends NameAndMaterialization,
     W7 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      }
+      WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6>
     >,
     N8 extends NameAndMaterialization,
     W8 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      } & { [K in GetNameFromNameAndMaterialization<N7>]: FromItem<W7> }
+      WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6> &
+        WithArg<N7, W7>
     >,
     N9 extends NameAndMaterialization,
     W9 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      } & { [K in GetNameFromNameAndMaterialization<N7>]: FromItem<W7> } & {
-        [K in GetNameFromNameAndMaterialization<N8>]: FromItem<W8>;
-      }
+      WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6> &
+        WithArg<N7, W7> &
+        WithArg<N8, W8>
     >,
     N10 extends NameAndMaterialization,
     W10 extends QueryFn<
-      { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      } & { [K in GetNameFromNameAndMaterialization<N7>]: FromItem<W7> } & {
-        [K in GetNameFromNameAndMaterialization<N8>]: FromItem<W8>;
-      } & { [K in GetNameFromNameAndMaterialization<N9>]: FromItem<W9> }
+      WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6> &
+        WithArg<N7, W7> &
+        WithArg<N8, W8> &
+        WithArg<N9, W9>
     >,
     Q extends Query<any>,
   >(
@@ -552,17 +414,16 @@ export interface WithFn {
     name10: N10,
     with10: W10,
     callback: (
-      args: { [K in GetNameFromNameAndMaterialization<N1>]: FromItem<W1> } & {
-        [K in GetNameFromNameAndMaterialization<N2>]: FromItem<W2>;
-      } & { [K in GetNameFromNameAndMaterialization<N3>]: FromItem<W3> } & {
-        [K in GetNameFromNameAndMaterialization<N4>]: FromItem<W4>;
-      } & { [K in GetNameFromNameAndMaterialization<N5>]: FromItem<W5> } & {
-        [K in GetNameFromNameAndMaterialization<N6>]: FromItem<W6>;
-      } & { [K in GetNameFromNameAndMaterialization<N7>]: FromItem<W7> } & {
-        [K in GetNameFromNameAndMaterialization<N8>]: FromItem<W8>;
-      } & { [K in GetNameFromNameAndMaterialization<N9>]: FromItem<W9> } & {
-        [K in GetNameFromNameAndMaterialization<N10>]: FromItem<W10>;
-      },
+      args: WithArg<N1, W1> &
+        WithArg<N2, W2> &
+        WithArg<N3, W3> &
+        WithArg<N4, W4> &
+        WithArg<N5, W5> &
+        WithArg<N6, W6> &
+        WithArg<N7, W7> &
+        WithArg<N8, W8> &
+        WithArg<N9, W9> &
+        WithArg<N10, W10>,
     ) => Q,
   ): Q;
 }
