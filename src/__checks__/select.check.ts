@@ -14,9 +14,20 @@ import {
   uuid,
 } from '../';
 
+import { Column } from '../column';
+import { FromItem } from '../from-item';
 import { Query } from '../query';
 import { ResultSet } from '../result-set';
+import { SelectQuery } from '../select';
 import { expect, describe, test } from 'tstyche';
+
+// Extracts the Columns record type from a SelectQuery.
+// Used to inspect column types (e.g. Column vs ColumnExpression) after joins.
+function getColumnsType<Cols extends { [column: string]: any }, Inc extends boolean>(
+  _: SelectQuery<Cols, Inc>,
+): Cols {
+  return undefined as any;
+}
 
 const toSnap = <T extends Query<any>>(query: T): ResultSet<T> => {
   return undefined as any;
@@ -371,5 +382,32 @@ describe('select', () => {
       startDate: Date;
       n: string | null;
     }>();
+  });
+
+  test('named subquery should be assignable to FromItem without a name parameter', () => {
+    // A function accepting a generic (unnamed) FromItem — typical in helper functions
+    // that receive a subquery but don't care about its alias.
+    const q = db.select(db.foo.name, db.foo.value).from(db.foo).limit(1);
+    const sub = q.as('sub');
+    const acceptsUnnamed = (fromItem: FromItem<typeof q>) => fromItem;
+    expect(acceptsUnnamed(sub)).type.not.toRaiseError();
+  });
+
+  test('Column TableName is a structural member — columns from different tables are not interchangeable', () => {
+    // ColumnExpression carries TableName as `protected readonly tableName`, so
+    // Column<N, T1, ...> and Column<N, T2, ...> are structurally distinct when T1 ≠ T2.
+    // Before ColumnExpression was introduced, TableName was phantom-only and any two
+    // Column instances with the same Name/DataType/IsNotNull were interchangeable.
+    //
+    // Code that passed a column aliased from one table where a column from a different
+    // table was expected now gets a type error. This test guards against regressions
+    // that would silently restore the old phantom behaviour.
+    const acceptsFooId = (_: Column<'id', 'foo', string, true, boolean, undefined>) => {};
+
+    // foo.id is Column<'id', 'foo', ...> — accepted.
+    expect(acceptsFooId(db.foo.id)).type.not.toRaiseError();
+
+    // bar.fooId aliased to 'id' is Column<'id', 'bar', ...> — rejected: wrong TableName.
+    expect(acceptsFooId(db.bar.fooId.as('id'))).type.toRaiseError();
   });
 });

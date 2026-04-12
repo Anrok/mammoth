@@ -6,9 +6,9 @@ import { Query } from './query';
 import { CapturingResultSet } from './result-set';
 import { wrapQuotes } from './naming';
 
-// Use the literal name when captured; never otherwise (prevents false matches
-// when the name isn't known at compile time).
-type CapturedName<Name extends string> = string extends Name ? never : Name;
+// Use the literal name when captured; string otherwise (allows named subqueries
+// to be assigned to FromItem without a name parameter).
+type CapturedName<Name extends string> = string extends Name ? string : Name;
 
 export type FromItem<Q, Name extends string = string> =
   Q extends Query<any>

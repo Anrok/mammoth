@@ -38,14 +38,13 @@ type GetTableName<T> =
         : Name
       : never;
 
-type FromItemOrTable = FromItem<any> | Table<string, unknown>;
+type FromItemOrTable = FromItem<any> | Table<unknown, unknown>;
 
 // Extracts the relation name (table name or subquery alias) from any ColumnExpression.
 // Used alongside GetTableName to check whether a column belongs to a join target.
 type SourceOf<T> =
   T extends ColumnExpression<any, infer TableName, any, any, any> ? TableName : never;
 
-// Applies a join-type transformation to any ColumnExpression.
 type ApplyJoinType<T, J extends JoinType> =
   T extends ColumnExpression<
     infer Name,
