@@ -955,10 +955,7 @@ describe(`select`, () => {
   });
 
   it(`should auto-inline a true boolean value in a where clause`, () => {
-    const query = db
-      .select(db.listItem.id)
-      .from(db.listItem)
-      .where(db.listItem.isGreat.eq(true));
+    const query = db.select(db.listItem.id).from(db.listItem).where(db.listItem.isGreat.eq(true));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       {
@@ -969,10 +966,7 @@ describe(`select`, () => {
   });
 
   it(`should auto-inline a false boolean value in a where clause`, () => {
-    const query = db
-      .select(db.listItem.id)
-      .from(db.listItem)
-      .where(db.listItem.isGreat.eq(false));
+    const query = db.select(db.listItem.id).from(db.listItem).where(db.listItem.isGreat.eq(false));
 
     expect(toSql(query)).toMatchInlineSnapshot(`
       {
@@ -1010,7 +1004,10 @@ describe(`select`, () => {
       }
     `);
 
-    const inlined = db.select(db.foo.id).from(db.foo).where(db.foo.value.gt(literal(0)));
+    const inlined = db
+      .select(db.foo.id)
+      .from(db.foo)
+      .where(db.foo.value.gt(literal(0)));
 
     expect(toSql(inlined)).toMatchInlineSnapshot(`
       {
