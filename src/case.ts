@@ -1,5 +1,5 @@
 import { BooleanQuery, Query } from './query';
-import { ParameterToken, StringToken, Token } from './tokens';
+import { expressionValueToken, StringToken, Token } from './tokens';
 
 import { Expression } from './expression';
 
@@ -15,7 +15,7 @@ export class CaseStatement<DataType> {
           new StringToken(`WHEN`),
           ...expression.toTokens(),
           new StringToken(`THEN`),
-          new ParameterToken(result),
+          expressionValueToken(result),
         ]);
       },
     };
@@ -25,7 +25,7 @@ export class CaseStatement<DataType> {
     return new CaseStatement<DataType | T>([
       ...this.tokens,
       new StringToken(`ELSE`),
-      new ParameterToken(result),
+      expressionValueToken(result),
     ]);
   }
 

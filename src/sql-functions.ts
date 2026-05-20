@@ -2,6 +2,7 @@ import {
   AllStarToken,
   CollectionToken,
   EmptyToken,
+  expressionValueToken,
   GroupToken,
   ParameterToken,
   SeparatorToken,
@@ -56,6 +57,38 @@ export function raw<DataType, IsNotNull extends boolean = false, Name extends st
   });
 
   return new Expression<DataType, IsNotNull, Name>(tokens, '' as any);
+}
+
+// Inlines a value directly into the SQL text instead of sending it as a bound parameter.
+//
+// Useful when you want the Postgres planner to see the actual constant — e.g. comparing a
+// boolean column to `TRUE`/`FALSE` so the planner can use a partial index or fold the
+// predicate, which it cannot do for `column = $1` because it does not know what $1 will be.
+//
+// Only types that are unambiguously safe to render as SQL text are accepted (boolean, finite
+// number, bigint). String values are intentionally not supported here to avoid SQL injection
+// risk — use `raw` if you really need to inline a string literal yourself.
+export function literal(value: boolean): Expression<boolean, true, '?column?'>;
+export function literal(value: number): Expression<number, true, '?column?'>;
+export function literal(value: bigint): Expression<bigint, true, '?column?'>;
+export function literal(value: boolean | number | bigint): Expression<any, true, '?column?'> {
+  let sql: string;
+  if (typeof value === 'boolean') {
+    sql = value ? 'TRUE' : 'FALSE';
+  } else if (typeof value === 'number') {
+    if (!Number.isFinite(value)) {
+      throw new Error(`literal() does not support non-finite numbers, got ${value}`);
+    }
+    sql = String(value);
+  } else if (typeof value === 'bigint') {
+    sql = value.toString();
+  } else {
+    throw new Error(
+      `literal() only supports boolean, number, or bigint values; got ${typeof value}`,
+    );
+  }
+
+  return new Expression([new StringToken(sql)], '?column?');
 }
 
 export function star(): Star;
@@ -235,7 +268,7 @@ export const coalesce = <DataType>(
           expressions.map((expression) =>
             expression instanceof Expression
               ? new CollectionToken(expression.toTokens())
-              : new ParameterToken(expression),
+              : expressionValueToken(expression),
           ),
         ),
       ]),

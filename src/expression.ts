@@ -1,8 +1,8 @@
 import { BooleanQuery, Query, SpecificQuery } from './query';
 import {
   CollectionToken,
+  expressionValueToken,
   GroupToken,
-  ParameterToken,
   SeparatorToken,
   StringToken,
   Token,
@@ -42,7 +42,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
       return value.toTokens();
     }
 
-    return [new ParameterToken(value)];
+    return [expressionValueToken(value)];
   }
 
   private toGroup(expression: Expression<any, any, any> | Query<any>) {
@@ -148,7 +148,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
         new GroupToken([
           new SeparatorToken(
             ',',
-            array.map((item) => new ParameterToken(item)),
+            array.map((item) => expressionValueToken(item)),
           ),
         ]),
       ]);
@@ -172,7 +172,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
         new GroupToken([
           new SeparatorToken(
             ',',
-            array.map((item) => new ParameterToken(item)),
+            array.map((item) => expressionValueToken(item)),
           ),
         ]),
       ]);
@@ -243,9 +243,9 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`BETWEEN`),
-      new ParameterToken(a),
+      expressionValueToken(a),
       new StringToken(`AND`),
-      new ParameterToken(b),
+      expressionValueToken(b),
     ]);
   }
 
@@ -253,9 +253,9 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`BETWEEN SYMMETRIC`),
-      new ParameterToken(a),
+      expressionValueToken(a),
       new StringToken(`AND`),
-      new ParameterToken(b),
+      expressionValueToken(b),
     ]);
   }
 
@@ -263,7 +263,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`IS DISTINCT FROM`),
-      new ParameterToken(a),
+      expressionValueToken(a),
     ]);
   }
 
@@ -271,7 +271,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`IS NOT DISTINCT FROM`),
-      new ParameterToken(a),
+      expressionValueToken(a),
     ]);
   }
 
@@ -279,7 +279,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`LIKE`),
-      new ParameterToken(value),
+      expressionValueToken(value),
     ]);
   }
 
@@ -287,7 +287,7 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
     return new DefaultExpression([
       ...this.tokens,
       new StringToken(`ILIKE`),
-      new ParameterToken(value),
+      expressionValueToken(value),
     ]);
   }
 

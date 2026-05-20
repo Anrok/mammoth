@@ -1,4 +1,4 @@
-import { raw, star, toSql } from '../sql-functions';
+import { literal, raw, star, toSql } from '../sql-functions';
 import {
   any,
   arrayAgg,
@@ -72,12 +72,10 @@ describe(`select`, () => {
     const query = db.select(star()).from(db.foo).joinLateral(barSub).on(true);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      {
-        "parameters": [
-          true,
-        ],
-        "text": "SELECT foo.id, foo.create_date "createDate", foo.name, foo.value, foo.enum_test "enumTest", "barSub"."barId" "barId" FROM foo JOIN LATERAL (SELECT bar.id "barId" FROM bar) AS "barSub" ON $1",
-      }
+     {
+       "parameters": [],
+       "text": "SELECT foo.id, foo.create_date "createDate", foo.name, foo.value, foo.enum_test "enumTest", "barSub"."barId" "barId" FROM foo JOIN LATERAL (SELECT bar.id "barId" FROM bar) AS "barSub" ON TRUE",
+     }
     `);
   });
 
@@ -209,12 +207,10 @@ describe(`select`, () => {
     const query = db.select(barSub.barId).from(db.foo).joinLateral(barSub).on(true);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      {
-        "parameters": [
-          true,
-        ],
-        "text": "SELECT "barSub"."barId" "barId" FROM foo JOIN LATERAL (SELECT bar.id "barId" FROM bar) AS "barSub" ON $1",
-      }
+     {
+       "parameters": [],
+       "text": "SELECT "barSub"."barId" "barId" FROM foo JOIN LATERAL (SELECT bar.id "barId" FROM bar) AS "barSub" ON TRUE",
+     }
     `);
   });
 
@@ -620,12 +616,10 @@ describe(`select`, () => {
     const query = db.select(db.foo.id).from(db.foo).joinLateral(db.bar).on(true);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      {
-        "parameters": [
-          true,
-        ],
-        "text": "SELECT foo.id FROM foo JOIN LATERAL bar ON $1",
-      }
+     {
+       "parameters": [],
+       "text": "SELECT foo.id FROM foo JOIN LATERAL bar ON TRUE",
+     }
     `);
   });
 
@@ -638,12 +632,10 @@ describe(`select`, () => {
       .on(true);
 
     expect(toSql(query)).toMatchInlineSnapshot(`
-      {
-        "parameters": [
-          true,
-        ],
-        "text": "SELECT foo.id, "barSub".id "barId" FROM foo JOIN LATERAL (SELECT bar.id FROM bar) AS "barSub" ON $1",
-      }
+     {
+       "parameters": [],
+       "text": "SELECT foo.id, "barSub".id "barId" FROM foo JOIN LATERAL (SELECT bar.id FROM bar) AS "barSub" ON TRUE",
+     }
     `);
   });
 
@@ -960,6 +952,82 @@ describe(`select`, () => {
         "text": "SELECT list_item.id FROM list_item WHERE list_item.is_great",
       }
     `);
+  });
+
+  it(`should auto-inline a true boolean value in a where clause`, () => {
+    const query = db
+      .select(db.listItem.id)
+      .from(db.listItem)
+      .where(db.listItem.isGreat.eq(true));
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [],
+        "text": "SELECT list_item.id FROM list_item WHERE list_item.is_great = TRUE",
+      }
+    `);
+  });
+
+  it(`should auto-inline a false boolean value in a where clause`, () => {
+    const query = db
+      .select(db.listItem.id)
+      .from(db.listItem)
+      .where(db.listItem.isGreat.eq(false));
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [],
+        "text": "SELECT list_item.id FROM list_item WHERE list_item.is_great = FALSE",
+      }
+    `);
+  });
+
+  it(`should auto-inline booleans in IN clauses while still parameterizing strings`, () => {
+    const query = db
+      .select(db.listItem.id)
+      .from(db.listItem)
+      .where(db.listItem.isGreat.in([true, false]).and(db.listItem.name.eq(`example`)));
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          "example",
+        ],
+        "text": "SELECT list_item.id FROM list_item WHERE list_item.is_great IN (TRUE, FALSE) AND list_item.name = $1",
+      }
+    `);
+  });
+
+  it(`should still parameterize numbers by default (use literal() to opt in)`, () => {
+    const parametrized = db.select(db.foo.id).from(db.foo).where(db.foo.value.gt(0));
+
+    expect(toSql(parametrized)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          0,
+        ],
+        "text": "SELECT foo.id FROM foo WHERE foo.value > $1",
+      }
+    `);
+
+    const inlined = db.select(db.foo.id).from(db.foo).where(db.foo.value.gt(literal(0)));
+
+    expect(toSql(inlined)).toMatchInlineSnapshot(`
+      {
+        "parameters": [],
+        "text": "SELECT foo.id FROM foo WHERE foo.value > 0",
+      }
+    `);
+  });
+
+  it(`should reject non-finite numeric literals`, () => {
+    expect(() => literal(Number.NaN)).toThrow(/non-finite/);
+    expect(() => literal(Number.POSITIVE_INFINITY)).toThrow(/non-finite/);
+  });
+
+  it(`should reject unsupported literal types at runtime`, () => {
+    expect(() => (literal as any)(`hello`)).toThrow(/only supports/);
+    expect(() => (literal as any)(null)).toThrow(/only supports/);
   });
 
   it(`should select with case and else`, () => {

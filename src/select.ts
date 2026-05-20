@@ -1,5 +1,6 @@
 import {
   CollectionToken,
+  expressionValueToken,
   GroupToken,
   ParameterToken,
   SeparatorToken,
@@ -316,7 +317,7 @@ export class SelectQuery<
   ): SelectQuery<Columns, IncludesStar> {
     const joinConditionToken = isTokenable(joinCondition)
       ? new GroupToken(joinCondition.toTokens())
-      : new ParameterToken(joinCondition);
+      : expressionValueToken(joinCondition);
 
     return this.newSelectQuery([...this.tokens, new StringToken(`ON`), joinConditionToken]) as any;
   }

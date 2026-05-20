@@ -14,6 +14,8 @@ This fork is based on the 1.x version rather than newer 2.x version.  We made th
 - Make .in(...) and .notIn(...) accept read-only arrays as well.
 - Add support for `MATERIALIZED` and `NOT MATERIALIZED` modifier on CTEs.
 - Add an explicit `.execute()` method. It's not necessary, but using it results in better stack traces.
+- Boolean values passed into expression-building APIs (e.g. `column.eq(true)`, `column.in([true, false])`, `joinLateral(...).on(true)`, `case().when(...).then(true)`, `coalesce(col, false)`) are now rendered as the SQL literals `TRUE` / `FALSE` instead of being bound as parameters. This lets the Postgres planner fold the predicate / pick a partial index, which it cannot do for a bind parameter. Booleans in `INSERT VALUES` and `UPDATE SET` are still parameterized so prepared statements can be reused across rows.
+- Add a `literal()` helper for inlining `number` and `bigint` values into SQL instead of binding them as parameters. Same use case as the boolean change above, but opt-in for numeric types because inlining them pollutes the plan cache.
 
 ---
 
