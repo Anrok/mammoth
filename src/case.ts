@@ -4,7 +4,11 @@ import { ParameterToken, StringToken, Token } from './tokens';
 import { Expression } from './expression';
 
 export class CaseStatement<DataType> {
-  constructor(private readonly tokens: Token[]) {}
+  static make(): CaseStatement<never> {
+    return new CaseStatement<never>([]);
+  }
+
+  private constructor(private readonly tokens: Token[]) {}
 
   when<Q extends Query<any>>(expression: Expression<boolean, boolean, string> | BooleanQuery<Q>) {
     const self = this;
@@ -30,6 +34,9 @@ export class CaseStatement<DataType> {
   }
 
   end(): Expression<DataType, true, 'case'> {
-    return new Expression(this.tokens, `case`);
+    return new Expression(
+      [new StringToken(`CASE`), ...this.tokens, new StringToken(`END`)],
+      `case`,
+    );
   }
 }
