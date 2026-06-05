@@ -2,16 +2,17 @@ import { BooleanQuery, Query } from './query';
 import { ParameterToken, StringToken, Token } from './tokens';
 
 import { Expression } from './expression';
+import { isTokenable } from './sql-functions';
 
 type ResultDataType<T> = T extends Expression<infer D, any, any> ? D : T;
 type ResultIsNotNull<T> = T extends Expression<any, infer N extends boolean, any> ? N : true;
 type And<A extends boolean, B extends boolean> = A extends true ? B : false;
 
-function valueToTokens(result: unknown): Token[] {
-  if (result instanceof Expression) {
-    return result.toTokens();
+function valueToTokens(value: unknown): Token[] {
+  if (isTokenable(value)) {
+    return value.toTokens();
   }
-  return [new ParameterToken(result)];
+  return [new ParameterToken(value)];
 }
 
 export class CaseStatement<DataType, IsNotNull extends boolean = true> {
