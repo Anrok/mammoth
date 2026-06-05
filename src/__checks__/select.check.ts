@@ -290,6 +290,74 @@ describe('select', () => {
     }>();
   });
 
+  test('should select case with not-null expression in then and literal in else', () => {
+    expect(
+      toSnap(
+        db
+          .select(
+            db.case().when(db.foo.value.gt(0)).then(db.foo.name).else('default').end().as(`bar`),
+          )
+          .from(db.foo),
+      ),
+    ).type.toBe<{
+      bar: string;
+    }>();
+  });
+
+  test('should select case with nullable expression in then and literal in else', () => {
+    expect(
+      toSnap(
+        db
+          .select(
+            db.case().when(db.foo.value.gt(0)).then(db.foo.value).else('default').end().as(`bar`),
+          )
+          .from(db.foo),
+      ),
+    ).type.toBe<{
+      bar: number | string | null;
+    }>();
+  });
+
+  test('should select case with literal in then and nullable expression in else', () => {
+    expect(
+      toSnap(
+        db
+          .select(
+            db.case().when(db.foo.value.gt(0)).then('great').else(db.foo.value).end().as(`bar`),
+          )
+          .from(db.foo),
+      ),
+    ).type.toBe<{
+      bar: string | number | null;
+    }>();
+  });
+
+  test('should select case with not-null expressions in both then and else', () => {
+    expect(
+      toSnap(
+        db
+          .select(
+            db.case().when(db.foo.value.gt(0)).then(db.foo.name).else(db.foo.name).end().as(`bar`),
+          )
+          .from(db.foo),
+      ),
+    ).type.toBe<{
+      bar: string;
+    }>();
+  });
+
+  test('should select case with not-null expression in then and null in else', () => {
+    expect(
+      toSnap(
+        db
+          .select(db.case().when(db.foo.value.gt(0)).then(db.foo.name).else(null).end().as(`bar`))
+          .from(db.foo),
+      ),
+    ).type.toBe<{
+      bar: string | null;
+    }>();
+  });
+
   test('should select and await result set', async () => {
     expect(await db.select(db.foo.id, db.foo.value).from(db.foo)).type.toBe<
       {
