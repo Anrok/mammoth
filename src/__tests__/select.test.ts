@@ -977,7 +977,7 @@ describe(`select`, () => {
           "great",
           "not great",
         ],
-        "text": "SELECT foo.id, (WHEN foo.value > $1 THEN $2 ELSE $3) greatness FROM foo",
+        "text": "SELECT foo.id, (CASE WHEN foo.value > $1 THEN $2 ELSE $3 END) greatness FROM foo",
       }
     `);
   });

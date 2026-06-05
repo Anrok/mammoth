@@ -30,6 +30,6 @@ export class CaseStatement<DataType> {
   }
 
   end(): Expression<DataType, true, 'case'> {
-    return new Expression(this.tokens, `case`);
+    return new Expression([...this.tokens, new StringToken(`END`)], `case`);
   }
 }
