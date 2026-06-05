@@ -4,7 +4,7 @@ import { ParameterToken, StringToken, Token } from './tokens';
 import { Expression } from './expression';
 
 export class CaseStatement<DataType> {
-  static create(): CaseStatement<never> {
+  static make(): CaseStatement<never> {
     return new CaseStatement<never>([new StringToken(`CASE`)]);
   }
 

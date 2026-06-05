@@ -88,7 +88,7 @@ export const defineDb = <TableDefinitions extends { [key: string]: TableDefiniti
     ...makeQueryStartFunctions(queryExecutor, []),
     with: makeWith(),
     values: makeValues,
-    case: () => CaseStatement.create(),
+    case: () => CaseStatement.make(),
     ...sqlFunctions,
 
     ...createTables(tableDefinitions),
