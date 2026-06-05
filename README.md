@@ -15,6 +15,7 @@ This fork is based on the 1.x version rather than newer 2.x version.  We made th
 - Add support for `MATERIALIZED` and `NOT MATERIALIZED` modifier on CTEs.
 - Add an explicit `.execute()` method. It's not necessary, but using it results in better stack traces.
 - Add `CASE` and `END` to case statements.
+- Add support for expressions in case statements.
 
 ---
 

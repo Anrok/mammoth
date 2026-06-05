@@ -982,6 +982,31 @@ describe(`select`, () => {
     `);
   });
 
+  it(`should select with case and expression and else`, () => {
+    const query = db
+      .select(
+        db.foo.id,
+        db
+          .case()
+          .when(db.foo.value.gt(0))
+          .then(db.foo.value)
+          .else('not great')
+          .end()
+          .as('greatness'),
+      )
+      .from(db.foo);
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          0,
+          "not great",
+        ],
+        "text": "SELECT foo.id, (CASE WHEN foo.value > $1 THEN foo.value ELSE $2 END) greatness FROM foo",
+      }
+    `);
+  });
+
   it(`should select enum column`, () => {
     const query = db.select(db.foo.enumTest).from(db.foo);
 
