@@ -5,7 +5,7 @@ import { Expression } from './expression';
 
 export class CaseStatement<DataType> {
   static make(): CaseStatement<never> {
-    return new CaseStatement<never>([new StringToken(`CASE`)]);
+    return new CaseStatement<never>([]);
   }
 
   private constructor(private readonly tokens: Token[]) {}
@@ -34,6 +34,9 @@ export class CaseStatement<DataType> {
   }
 
   end(): Expression<DataType, true, 'case'> {
-    return new Expression([...this.tokens, new StringToken(`END`)], `case`);
+    return new Expression(
+      [new StringToken(`CASE`), ...this.tokens, new StringToken(`END`)],
+      `case`,
+    );
   }
 }
