@@ -14,9 +14,20 @@ import {
   uuid,
 } from '../';
 
+import { Column } from '../column';
+import { FromItem } from '../from-item';
 import { Query } from '../query';
 import { ResultSet } from '../result-set';
+import { SelectQuery } from '../select';
 import { expect, describe, test } from 'tstyche';
+
+// Extracts the Columns record type from a SelectQuery.
+// Used to inspect column types (e.g. Column vs ColumnExpression) after joins.
+function getColumnsType<Cols extends { [column: string]: any }, Inc extends boolean>(
+  _: SelectQuery<Cols, Inc>,
+): Cols {
+  return undefined as any;
+}
 
 const toSnap = <T extends Query<any>>(query: T): ResultSet<T> => {
   return undefined as any;
@@ -304,5 +315,99 @@ describe('select', () => {
       id: string;
       test: number | null;
     }>();
+  });
+
+  test('should not make CTE columns nullable when left joining another table', async () => {
+    // CTE columns are on the outer (left) side — they must stay non-nullable
+    expect(
+      await db.with(
+        `cte`,
+        () => db.select(db.foo.id, db.foo.name).from(db.foo),
+        ({ cte }) =>
+          db.select(cte.id, cte.name, db.bar.endDate).from(cte).leftJoin(db.bar).on(true),
+      ),
+    ).type.toBe<
+      {
+        id: string;
+        name: string; // NOT NULL — CTE column on outer side must stay non-nullable
+        endDate: Date | null; // bar.endDate is nullable after left join
+      }[]
+    >();
+  });
+
+  test('should return nullable columns from CTE when left joining', async () => {
+    expect(
+      await db.with(
+        'cte',
+        () => db.select(db.foo.name).from(db.foo),
+        ({ cte }) => db.select(db.bar.startDate, cte.name).from(db.bar).leftJoin(cte).on(true),
+      ),
+    ).type.toBe<
+      {
+        startDate: Date;
+        name: string | null;
+      }[]
+    >();
+  });
+
+  test('should return nullable columns from subquery when left joining', () => {
+    // NOT NULL column in subquery (name) should become nullable after left join
+    // Already nullable column in subquery (value) should remain nullable
+    const sub = db.select(db.foo.name, db.foo.value).from(db.foo).limit(1).as('sub');
+    expect(
+      toSnap(db.select(db.bar.startDate, sub.name, sub.value).from(db.bar).leftJoin(sub).on(true)),
+    ).type.toBe<{
+      startDate: Date;
+      name: string | null;
+      value: number | null;
+    }>();
+  });
+
+  test('should not make outer columns nullable when left joining a subquery', () => {
+    // db.bar.startDate is from the left (outer) table — should stay non-nullable
+    const sub = db.select(db.foo.name).from(db.foo).limit(1).as('sub');
+    expect(
+      toSnap(db.select(db.bar.startDate, sub.name).from(db.bar).leftJoin(sub).on(true)),
+    ).type.toBe<{
+      startDate: Date;
+      name: string | null;
+    }>();
+  });
+
+  test('should make aliased subquery column nullable when left joining', () => {
+    const sub = db.select(db.foo.name).from(db.foo).limit(1).as('sub');
+    expect(
+      toSnap(db.select(db.bar.startDate, sub.name.as('n')).from(db.bar).leftJoin(sub).on(true)),
+    ).type.toBe<{
+      startDate: Date;
+      n: string | null;
+    }>();
+  });
+
+  test('named subquery should be assignable to FromItem without a name parameter', () => {
+    // A function accepting a generic (unnamed) FromItem — typical in helper functions
+    // that receive a subquery but don't care about its alias.
+    const q = db.select(db.foo.name, db.foo.value).from(db.foo).limit(1);
+    const sub = q.as('sub');
+    const acceptsUnnamed = (fromItem: FromItem<typeof q>) => fromItem;
+    expect(acceptsUnnamed(sub)).type.not.toRaiseError();
+  });
+
+  test('Column TableName is a structural member — columns from different tables are not interchangeable', () => {
+    // ColumnExpression carries TableName as `protected readonly tableName`, so
+    // Column<N, T1, ...> and Column<N, T2, ...> are structurally distinct when T1 ≠ T2.
+    // Before ColumnExpression was introduced, TableName was phantom-only and any two
+    // Column instances with the same Name/DataType/IsNotNull were interchangeable.
+    //
+    // Code that passed a column aliased from one table where a column from a different
+    // table was expected now gets a type error. This test guards against regressions
+    // that would silently restore the old phantom behaviour.
+    const acceptsFooId = (_: Column<'id', 'foo', string, true, boolean, undefined>) => {};
+
+    // foo.id is Column<'id', 'foo', ...> — accepted.
+    expect(acceptsFooId(db.foo.id)).type.not.toRaiseError();
+
+    // bar.fooId aliased to 'id' is Column<'id', 'bar', ...> — rejected: wrong TableName.
+    expect(acceptsFooId(db.bar.fooId.as('id'))).type.toRaiseError();
   });
 });

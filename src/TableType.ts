@@ -7,8 +7,7 @@ export interface InternalTable<TableName, Columns> {
   /** @internal */
   _tableBrand: any;
 
-  /** @internal */
-  getName(): string;
+  getName(): TableName;
 
   /** @internal */
   getOriginalName(): string | undefined;

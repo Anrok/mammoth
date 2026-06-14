@@ -733,6 +733,25 @@ describe(`select`, () => {
     `);
   });
 
+  it(`should select left join with subquery alias and explicit columns`, () => {
+    const fooSub = db.select(db.foo.name, db.foo.value).from(db.foo).limit(1).as('fooSub');
+    const query = db
+      .select(db.bar.id, fooSub.name, fooSub.value)
+      .from(db.bar)
+      .leftJoin(fooSub)
+      .on(true);
+
+    expect(toSql(query)).toMatchInlineSnapshot(`
+      {
+        "parameters": [
+          1,
+          true,
+        ],
+        "text": "SELECT bar.id, "fooSub".name, "fooSub".value FROM bar LEFT JOIN (SELECT foo.name, foo.value FROM foo LIMIT $1) AS "fooSub" ON $2",
+      }
+    `);
+  });
+
   it(`should select right outer join`, () => {
     const query = db.select(db.foo.id).from(db.foo).rightOuterJoin(db.bar).using(db.foo.id);
 

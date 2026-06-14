@@ -130,6 +130,38 @@ export const makeColumnDefinition = <
   };
 };
 
+// Base class for any typed column reference — either a table column (Column) or a
+// subquery/CTE column reference. Carries TableName and JoinType as type parameters
+// so join logic in select.ts and result-set.ts can treat both uniformly.
+export class ColumnExpression<
+  Name extends string,
+  TableName,
+  DataType,
+  IsNotNull extends boolean,
+  JoinType = never,
+> extends Expression<DataType, IsNotNull, Name> {
+  constructor(
+    tokens: Token[],
+    protected readonly columnName: Name,
+    protected readonly tableName: TableName,
+    protected readonly originalColumnName: string | undefined,
+  ) {
+    super(tokens, columnName, originalColumnName !== undefined);
+  }
+
+  as<NewName extends string>(
+    name: NewName,
+  ): ColumnExpression<NewName, TableName, DataType, IsNotNull, JoinType> {
+    const sqlName = this.originalColumnName ?? this.columnName;
+    return new ColumnExpression<NewName, TableName, DataType, IsNotNull, JoinType>(
+      [new StringToken(`${wrapQuotes(this.tableName as string)}.${wrapQuotes(sqlName)}`)],
+      name,
+      this.tableName,
+      sqlName,
+    );
+  }
+}
+
 // This is only used as a nominal type, not actually as an instance.
 export class ColumnSet<Columns> {
   private _columnSetBrand: any;
@@ -146,10 +178,8 @@ export class Column<
   DataType,
   IsNotNull extends boolean,
   HasDefault extends boolean,
-  JoinType,
-> extends Expression<DataType, IsNotNull, Name> {
-  private _columnBrand: any;
-
+  JoinType = never,
+> extends ColumnExpression<Name, TableName, DataType, IsNotNull, JoinType> {
   /** @internal */
   getSnakeCaseName() {
     return wrapQuotes(toSnakeCase(this.columnName));
@@ -167,31 +197,25 @@ export class Column<
 
   constructor(
     private readonly definition: ColumnDefinition<DataType, IsNotNull, HasDefault>,
-    private readonly columnName: Name,
-    private readonly tableName: TableName,
-    private readonly originalColumnName: string | undefined,
+    columnName: Name,
+    tableName: TableName,
+    originalColumnName: string | undefined,
   ) {
     super(
-      originalColumnName
-        ? [
-            new StringToken(
-              `${wrapQuotes(tableName as unknown as string)}.${wrapQuotes(
-                toSnakeCase(originalColumnName),
-              )}`,
-            ),
-          ]
-        : [
-            new StringToken(
-              `${wrapQuotes(tableName as unknown as string)}.${wrapQuotes(
-                toSnakeCase(columnName),
-              )}`,
-            ),
-          ],
-      columnName as any,
+      [
+        new StringToken(
+          `${wrapQuotes(tableName as unknown as string)}.${wrapQuotes(
+            toSnakeCase(originalColumnName ?? columnName),
+          )}`,
+        ),
+      ],
+      columnName,
+      tableName,
+      originalColumnName,
     );
   }
 
-  as<AliasName extends string>(
+  override as<AliasName extends string>(
     alias: AliasName,
   ): Column<AliasName, TableName, DataType, IsNotNull, HasDefault, JoinType> {
     return new Column(this.definition, alias, this.tableName, this.columnName as unknown as string);

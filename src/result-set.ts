@@ -1,4 +1,4 @@
-import type { Column } from './column';
+import type { ColumnExpression } from './column';
 import { DeleteQuery } from './delete';
 import type { Expression } from './expression';
 import { DbNull, Expand, GetDataType } from './types';
@@ -21,12 +21,11 @@ type MaybeCapturingResultSetDataType<
 > = ShouldCapture extends true ? GetDataType<Type, IsNotNull> : ResultSetDataType<Type, IsNotNull>;
 
 type MaybeCapturingReturningResultSet<Returning, ShouldCapture extends boolean> = {
-  [K in keyof Returning]: Returning[K] extends Column<
+  [K in keyof Returning]: Returning[K] extends ColumnExpression<
     any,
     any,
     infer D,
     infer N,
-    any,
     infer JoinType
   >
     ? Extract<JoinType, 'left-join'> extends never
