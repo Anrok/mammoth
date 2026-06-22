@@ -8,7 +8,7 @@ import {
 } from './tokens';
 import { DbNull, GetReturning, QueryExecutorFn, ResultType } from './types';
 
-import { Column } from './column';
+import { Column, IsRequiredOnWrite } from './column';
 import { Expression } from './expression';
 import { Query } from './query';
 import { ResultSet } from './result-set';
@@ -346,9 +346,10 @@ export const makeUpdate =
                 infer DataType,
                 infer IsNotNull,
                 any,
-                any
+                any,
+                infer RequiredOnWrite
               >
-                ? IsNotNull extends true
+                ? IsRequiredOnWrite<IsNotNull, RequiredOnWrite> extends true
                   ? DataType | Expression<DataType, boolean, any>
                   : DataType | DbNull | Expression<DataType | DbNull, boolean, any>
                 : never;

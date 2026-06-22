@@ -54,9 +54,10 @@ export const makeTable = <
           ? TableDefinition[K] extends ColumnDefinition<
               infer DataType,
               infer IsNotNull,
-              infer HasDefault
+              infer HasDefault,
+              infer RequiredOnWrite
             >
-            ? Column<K, TableName, DataType, IsNotNull, HasDefault, undefined>
+            ? Column<K, TableName, DataType, IsNotNull, HasDefault, undefined, RequiredOnWrite>
             : never
           : never;
       }

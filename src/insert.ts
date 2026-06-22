@@ -11,7 +11,7 @@ import {
 import { DbNull, GetReturning, PickByValue, QueryExecutorFn, ResultType } from './types';
 import { SelectFn, makeSelect } from './select';
 
-import { Column } from './column';
+import { Column, IsRequiredOnWrite } from './column';
 import { DeleteQuery } from './delete';
 import { Expression } from './expression';
 import { Query } from './query';
@@ -341,9 +341,10 @@ export class InsertQuery<
                 infer DataType,
                 infer IsNotNull,
                 any,
-                any
+                any,
+                infer RequiredOnWrite
               >
-                ? IsNotNull extends true
+                ? IsRequiredOnWrite<IsNotNull, RequiredOnWrite> extends true
                   ? DataType | Expression<DataType, IsNotNull, any> | Query<any>
                   : DataType | DbNull | Expression<DataType, IsNotNull, any> | Query<any>
                 : never;
@@ -441,9 +442,10 @@ export class InsertQuery<
                 infer DataType,
                 infer IsNotNull,
                 any,
-                any
+                any,
+                infer RequiredOnWrite
               >
-                ? IsNotNull extends true
+                ? IsRequiredOnWrite<IsNotNull, RequiredOnWrite> extends true
                   ? DataType | Expression<DataType, IsNotNull, any> | Query<any>
                   : DataType | DbNull | Expression<DataType, IsNotNull, any> | Query<any>
                 : never;
@@ -514,11 +516,12 @@ export interface InsertIntoResult<
               any,
               infer IsNotNull,
               infer HasDefault,
-              any
+              any,
+              infer RequiredOnWrite
             >
               ? HasDefault extends true
                 ? false
-                : IsNotNull
+                : IsRequiredOnWrite<IsNotNull, RequiredOnWrite>
               : never;
           },
           true
@@ -542,11 +545,12 @@ export interface InsertIntoResult<
               any,
               infer IsNotNull,
               infer HasDefault,
-              any
+              any,
+              infer RequiredOnWrite
             >
               ? HasDefault extends true
                 ? false
-                : IsNotNull
+                : IsRequiredOnWrite<IsNotNull, RequiredOnWrite>
               : never;
           },
           false
@@ -578,9 +582,10 @@ export interface InsertIntoResult<
               infer DataType,
               infer IsNotNull,
               any,
-              any
+              any,
+              infer RequiredOnWrite
             >
-              ? IsNotNull extends true
+              ? IsRequiredOnWrite<IsNotNull, RequiredOnWrite> extends true
                 ? DataType | Expression<DataType, boolean, any>
                 : DataType | DbNull | Expression<DataType | DbNull, boolean, any>
               : never;
@@ -652,9 +657,10 @@ export const makeInsertInto =
                     infer DataType,
                     infer IsNotNull,
                     any,
-                    any
+                    any,
+                    infer RequiredOnWrite
                   >
-                    ? IsNotNull extends true
+                    ? IsRequiredOnWrite<IsNotNull, RequiredOnWrite> extends true
                       ? DataType | Expression<DataType, boolean, any>
                       : DataType | DbNull | Expression<DataType | DbNull, boolean, any>
                     : never;
