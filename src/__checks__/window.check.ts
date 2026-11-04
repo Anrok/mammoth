@@ -116,6 +116,18 @@ describe('window functions', () => {
     expect(lag).type.not.toBeCallableWith(db.transaction.amount, 1, `zero`);
   });
 
+  test('frame bounds only accept valid start and end positions', () => {
+    expect(rowNumber().over).type.not.toBeCallableWith({
+      frame: { mode: 'ROWS', start: 'UNBOUNDED FOLLOWING' },
+    });
+    expect(rowNumber().over).type.not.toBeCallableWith({
+      frame: { mode: 'ROWS', start: 'CURRENT ROW', end: 'UNBOUNDED PRECEDING' },
+    });
+    expect(rowNumber().over).type.toBeCallableWith({
+      frame: { mode: 'GROUPS', start: 'UNBOUNDED PRECEDING', end: 'UNBOUNDED FOLLOWING' },
+    });
+  });
+
   test('over() only accepts a window name or definition', () => {
     expect(rowNumber().over).type.not.toBeCallableWith(42);
     expect(rowNumber().over).type.toBeCallableWith({

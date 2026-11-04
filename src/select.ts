@@ -377,6 +377,17 @@ export class SelectQuery<
       throw new Error(`window() needs at least one window definition.`);
     }
 
+    // Postgres only lets a window refine one defined earlier in the same WINDOW clause.
+    const defined = new Set<string>();
+    for (const [name, definition] of entries) {
+      if (definition.existingWindow !== undefined && !defined.has(definition.existingWindow)) {
+        throw new Error(
+          `Window ${JSON.stringify(name)} refers to ${JSON.stringify(definition.existingWindow)}, which must be defined earlier in the same window() call.`,
+        );
+      }
+      defined.add(name);
+    }
+
     return this.newSelectQuery([
       ...this.tokens,
       new StringToken(`WINDOW`),

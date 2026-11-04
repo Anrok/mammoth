@@ -177,7 +177,7 @@ FROM foo
 WINDOW recent AS (ORDER BY foo.create_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)
 ```
 
-Call `.over()` before `.as()`. `lag`/`lead` results are nullable unless you pass a non-null default, and `firstValue`/`lastValue`/`nthValue` are nullable because the frame can be empty.
+Call `.over()` before `.as()`. `lag`/`lead` results are nullable unless the value is not null and you pass a default, and `firstValue`/`lastValue`/`nthValue` are nullable because the frame can be empty.
 
 </details>
 
@@ -271,7 +271,7 @@ Below is a list of clauses per query and a short description on what we Mammoth 
 - [ WHERE condition ] — mostly supported. The condition concept is pretty broad but it should contain a lot of cases.
 - [ GROUP BY grouping_element [, ...] ] — supported.
 - [ HAVING condition [, ...] ] — supported.
-- [ WINDOW window_name AS ( window_definition ) [, ...] ] — not supported.
+- [ WINDOW window_name AS ( window_definition ) [, ...] ] — supported via `.window({ name: definition })`.
 - [ { UNION | INTERSECT | EXCEPT } [ ALL | DISTINCT ] select ] — not supported yet
 - [ ORDER BY expression [ ASC | DESC | USING operator ] [ NULLS { FIRST | LAST } ] [, ...] ] — supported, but expressions are pretty broad and there might be cases not covered yet.
 - [ LIMIT { count | ALL } ] — supported.

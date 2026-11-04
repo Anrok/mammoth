@@ -5,18 +5,17 @@ import { wrapQuotes } from './naming';
 
 // frame_start / frame_end:
 //   UNBOUNDED PRECEDING | offset PRECEDING | CURRENT ROW | offset FOLLOWING | UNBOUNDED FOLLOWING
-export type WindowFrameBound =
-  | 'UNBOUNDED PRECEDING'
-  | 'CURRENT ROW'
-  | 'UNBOUNDED FOLLOWING'
-  | { preceding: number }
-  | { following: number };
+// Postgres rejects UNBOUNDED FOLLOWING as a start and UNBOUNDED PRECEDING as an end.
+type OffsetBound = { preceding: number } | { following: number };
+export type WindowFrameStart = 'UNBOUNDED PRECEDING' | 'CURRENT ROW' | OffsetBound;
+export type WindowFrameEnd = 'CURRENT ROW' | 'UNBOUNDED FOLLOWING' | OffsetBound;
+export type WindowFrameBound = WindowFrameStart | WindowFrameEnd;
 
 export interface WindowFrame {
   mode: 'ROWS' | 'RANGE' | 'GROUPS';
-  start: WindowFrameBound;
+  start: WindowFrameStart;
   // When omitted, Postgres uses CURRENT ROW as the end of the frame.
-  end?: WindowFrameBound;
+  end?: WindowFrameEnd;
   exclude?: 'CURRENT ROW' | 'GROUP' | 'TIES' | 'NO OTHERS';
 }
 
@@ -61,6 +60,13 @@ const frameBoundToTokens = (bound: WindowFrameBound): Token[] => {
 };
 
 const frameToTokens = (frame: WindowFrame): Token[] => {
+  if ((frame.start as WindowFrameBound) === `UNBOUNDED FOLLOWING`) {
+    throw new Error(`A window frame cannot start at UNBOUNDED FOLLOWING.`);
+  }
+  if ((frame.end as WindowFrameBound | undefined) === `UNBOUNDED PRECEDING`) {
+    throw new Error(`A window frame cannot end at UNBOUNDED PRECEDING.`);
+  }
+
   const bounds = frame.end
     ? [
         new StringToken(`BETWEEN`),
@@ -87,7 +93,11 @@ const expressionList = (expressions: Expression<any, any, any>[]) =>
 export const windowDefinitionToTokens = (definition: WindowDefinition): Token[] => {
   const tokens: Token[] = [];
 
-  if (definition.existingWindow) {
+  if (definition.existingWindow !== undefined) {
+    if (definition.partitionBy && definition.partitionBy.length > 0) {
+      // Postgres: "cannot override PARTITION BY clause of window".
+      throw new Error(`A window that refines existingWindow cannot set partitionBy.`);
+    }
     tokens.push(windowNameToken(definition.existingWindow));
   }
 

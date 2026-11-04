@@ -264,6 +264,42 @@ describe(`window functions`, () => {
     ).toThrow(/non-negative integer/);
   });
 
+  it(`should reject a window that refines one defined later or not at all`, () => {
+    const query = db.select(db.transaction.id).from(db.transaction);
+    expect(() =>
+      query.window({
+        refined: { existingWindow: `base`, orderBy: [db.transaction.createdAt] },
+        base: { partitionBy: [db.transaction.customerId] },
+      }),
+    ).toThrow(/must be defined earlier/);
+    expect(() =>
+      query.window({
+        base: { partitionBy: [db.transaction.customerId] },
+        refined: { existingWindow: `base`, orderBy: [db.transaction.createdAt] },
+      }),
+    ).not.toThrow();
+  });
+
+  it(`should reject an empty existingWindow and overriding its PARTITION BY`, () => {
+    expect(() => rowNumber().over({ existingWindow: `` })).toThrow(/Invalid window name/);
+    expect(() =>
+      rowNumber().over({ existingWindow: `base`, partitionBy: [db.transaction.customerId] }),
+    ).toThrow(/cannot set partitionBy/);
+  });
+
+  it(`should reject frames that start at UNBOUNDED FOLLOWING or end at UNBOUNDED PRECEDING`, () => {
+    expect(() =>
+      sum(db.transaction.amount).over({
+        frame: { mode: `ROWS`, start: `UNBOUNDED FOLLOWING` as any },
+      }),
+    ).toThrow(/cannot start at UNBOUNDED FOLLOWING/);
+    expect(() =>
+      sum(db.transaction.amount).over({
+        frame: { mode: `ROWS`, start: `CURRENT ROW`, end: `UNBOUNDED PRECEDING` as any },
+      }),
+    ).toThrow(/cannot end at UNBOUNDED PRECEDING/);
+  });
+
   it(`should reject an empty WINDOW clause`, () => {
     expect(() => db.select(db.transaction.id).from(db.transaction).window({})).toThrow(
       /at least one window definition/,
