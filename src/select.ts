@@ -19,6 +19,7 @@ import { ResultSet } from './result-set';
 import { isTokenable, Star } from './sql-functions';
 import { Table } from './TableType';
 import { TableDefinition } from './table';
+import { WindowDefinition, windowDefinitionToTokens, windowNameToken } from './window';
 
 export { SelectFn };
 
@@ -370,8 +371,27 @@ export class SelectQuery<
   }
 
   // [ WINDOW window_name AS ( window_definition ) [, ...] ]
-  window(): SelectQuery<Columns> {
-    return undefined as any;
+  window(definitions: Record<string, WindowDefinition>): SelectQuery<Columns> {
+    const entries = Object.entries(definitions);
+    if (entries.length === 0) {
+      throw new Error(`window() needs at least one window definition.`);
+    }
+
+    return this.newSelectQuery([
+      ...this.tokens,
+      new StringToken(`WINDOW`),
+      new SeparatorToken(
+        `,`,
+        entries.map(([name, definition]) => {
+          const definitionTokens = windowDefinitionToTokens(definition);
+          return new CollectionToken([
+            windowNameToken(name),
+            new StringToken(`AS`),
+            definitionTokens.length > 0 ? new GroupToken(definitionTokens) : new StringToken(`()`),
+          ]);
+        }),
+      ),
+    ]);
   }
 
   // [ { UNION | INTERSECT | EXCEPT } [ ALL | DISTINCT ] select ]

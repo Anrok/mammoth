@@ -15,6 +15,7 @@ This fork is based on the 1.x version rather than newer 2.x version.  We made th
 - Add support for `MATERIALIZED` and `NOT MATERIALIZED` modifier on CTEs.
 - Add an explicit `.execute()` method. It's not necessary, but using it results in better stack traces.
 - Add `CASE` and `END` to case statements.
+- Add window functions (`rowNumber`, `rank`, `denseRank`, `percentRank`, `cumeDist`, `ntile`, `lag`, `lead`, `firstValue`, `lastValue`, `nthValue`), `.over(...)` on any aggregate or window function (with `PARTITION BY`, `ORDER BY` and frame clauses), and named windows via `.window({...})`.
 
 ---
 
@@ -147,6 +148,36 @@ db.select(arrayAgg(db.foo.name.orderBy(db.foo.name.desc()))).from(db.foo);
 ```sql
 SELECT array_agg(foo.name ORDER BY foo.name DESC) "arrayAgg" FROM foo
 ```
+
+</details>
+
+<details>
+  <summary>Window functions</summary>
+
+```ts
+const byCustomer = { partitionBy: [db.foo.customerId], orderBy: [db.foo.createDate.desc()] };
+
+db.select(
+  db.foo.id,
+  rowNumber().over(byCustomer),
+  lag(db.foo.value).over(byCustomer).as(`previousValue`),
+  sum(db.foo.value).over(`recent`).as(`runningTotal`),
+)
+  .from(db.foo)
+  .window({ recent: { orderBy: [db.foo.createDate], frame: { mode: `ROWS`, start: { preceding: 6 }, end: `CURRENT ROW` } } });
+```
+
+```sql
+SELECT
+  foo.id,
+  row_number () OVER (PARTITION BY foo.customer_id ORDER BY foo.create_date DESC) "rowNumber",
+  (lag (foo.value) OVER (PARTITION BY foo.customer_id ORDER BY foo.create_date DESC)) "previousValue",
+  (SUM (foo.value) OVER recent) "runningTotal"
+FROM foo
+WINDOW recent AS (ORDER BY foo.create_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)
+```
+
+Call `.over()` before `.as()`. `lag`/`lead` results are nullable unless you pass a non-null default, and `firstValue`/`lastValue`/`nthValue` are nullable because the frame can be empty.
 
 </details>
 

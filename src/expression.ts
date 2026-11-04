@@ -10,6 +10,7 @@ import {
 
 import { wrapQuotes } from './naming';
 import { isTokenable } from './sql-functions';
+import { WindowDefinition, windowDefinitionToTokens, windowNameToken } from './window';
 import assert from 'assert';
 
 export class Expression<DataType, IsNotNull extends boolean, Name extends string> {
@@ -102,6 +103,29 @@ export class Expression<DataType, IsNotNull extends boolean, Name extends string
     }
 
     return new Expression([...this.tokens], name, true);
+  }
+
+  // function_call OVER window_name
+  // function_call OVER ( window_definition )
+  //
+  // Turns an aggregate (sum, count, ...) or a window function (rowNumber, rank, lag, ...) into a
+  // window function call. Call `over()` before `as()`, because Postgres requires OVER to follow the
+  // function call directly.
+  over(window?: string | WindowDefinition): Expression<DataType, IsNotNull, Name> {
+    let windowTokens: Token[];
+    if (typeof window === `string`) {
+      windowTokens = [windowNameToken(window)];
+    } else {
+      const definitionTokens = window ? windowDefinitionToTokens(window) : [];
+      windowTokens =
+        definitionTokens.length > 0 ? [new GroupToken(definitionTokens)] : [new StringToken(`()`)];
+    }
+
+    return new Expression(
+      [...this.tokens, new StringToken(`OVER`), ...windowTokens],
+      this.name,
+      this.nameIsAlias,
+    );
   }
 
   isNull(): DefaultExpression<boolean> {
